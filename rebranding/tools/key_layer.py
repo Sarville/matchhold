@@ -1,16 +1,17 @@
 """Ключ #FF00FF -> RGBA с мягким краем, без розовой каймы (для слоёв фона, переднего плана, лунок).
-Использование: key_layer.py in.png out.png
+Использование: key_layer.py in.png out.png [ключ-hex, по умолчанию FF00FF]
 Край: цвет берётся у ближайшего чистого пикселя, альфа = проекция пикселя на отрезок [цвет, #FF00FF]."""
 import sys
 import numpy as np
 from PIL import Image
 from scipy import ndimage as ndi
 
-M = np.array([255.0, 0.0, 255.0])
+M = np.array([int(c, 16) for c in map(("".join), zip(*[iter((sys.argv[3] if len(sys.argv) > 3 else "FF00FF").lstrip("#"))] * 2))], float)
 BAND = 10  # ширина каймы (px), ponytail: под боке шире 10 px поднять
 a = np.array(Image.open(sys.argv[1]).convert("RGB")).astype(float)
 d = np.linalg.norm(a - M, axis=2)
-pink = np.minimum(a[..., 0], a[..., 2]) - a[..., 1]   # «розовость»: R и B выше G
+hi, lo = M > 127, M <= 127
+pink = a[..., hi].min(2) - (a[..., lo].max(2) if lo.any() else 0)   # «ключевость»: каналы ключа выше остальных
 clean = pink < 25                                 # цвет без примеси ключа
 core = ndi.binary_erosion(clean, iterations=BAND)  # ядро: далеко от края, цвет без примеси
 _, (iy, ix) = ndi.distance_transform_edt(~core, return_indices=True)

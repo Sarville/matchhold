@@ -1,0 +1,527 @@
+{
+ "cell": 52,
+ "cols": 6,
+ "rows": 19,
+ "tiles": [
+  {
+   "file": "day_grain_1.png",
+   "block": "day",
+   "cls": "grain",
+   "level": 1,
+   "col": 0,
+   "row": 0
+  },
+  {
+   "file": "night_grain_1.png",
+   "block": "night",
+   "cls": "grain",
+   "level": 1,
+   "col": 0,
+   "row": 9
+  },
+  {
+   "file": "day_grain_2.png",
+   "block": "day",
+   "cls": "grain",
+   "level": 2,
+   "col": 0,
+   "row": 1
+  },
+  {
+   "file": "night_grain_2.png",
+   "block": "night",
+   "cls": "grain",
+   "level": 2,
+   "col": 0,
+   "row": 10
+  },
+  {
+   "file": "day_grain_3.png",
+   "block": "day",
+   "cls": "grain",
+   "level": 3,
+   "col": 0,
+   "row": 2
+  },
+  {
+   "file": "night_grain_3.png",
+   "block": "night",
+   "cls": "grain",
+   "level": 3,
+   "col": 0,
+   "row": 11
+  },
+  {
+   "file": "day_grain_4.png",
+   "block": "day",
+   "cls": "grain",
+   "level": 4,
+   "col": 0,
+   "row": 3
+  },
+  {
+   "file": "night_grain_4.png",
+   "block": "night",
+   "cls": "grain",
+   "level": 4,
+   "col": 0,
+   "row": 12
+  },
+  {
+   "file": "day_stone_1.png",
+   "block": "day",
+   "cls": "stone",
+   "level": 1,
+   "col": 1,
+   "row": 0
+  },
+  {
+   "file": "night_stone_1.png",
+   "block": "night",
+   "cls": "stone",
+   "level": 1,
+   "col": 1,
+   "row": 9
+  },
+  {
+   "file": "day_stone_2.png",
+   "block": "day",
+   "cls": "stone",
+   "level": 2,
+   "col": 1,
+   "row": 1
+  },
+  {
+   "file": "night_stone_2.png",
+   "block": "night",
+   "cls": "stone",
+   "level": 2,
+   "col": 1,
+   "row": 10
+  },
+  {
+   "file": "day_stone_3.png",
+   "block": "day",
+   "cls": "stone",
+   "level": 3,
+   "col": 1,
+   "row": 2
+  },
+  {
+   "file": "night_stone_3.png",
+   "block": "night",
+   "cls": "stone",
+   "level": 3,
+   "col": 1,
+   "row": 11
+  },
+  {
+   "file": "day_stone_4.png",
+   "block": "day",
+   "cls": "stone",
+   "level": 4,
+   "col": 1,
+   "row": 3
+  },
+  {
+   "file": "night_stone_4.png",
+   "block": "night",
+   "cls": "stone",
+   "level": 4,
+   "col": 1,
+   "row": 12
+  },
+  {
+   "file": "day_stone_5.png",
+   "block": "day",
+   "cls": "stone",
+   "level": 5,
+   "col": 1,
+   "row": 4
+  },
+  {
+   "file": "night_stone_5.png",
+   "block": "night",
+   "cls": "stone",
+   "level": 5,
+   "col": 1,
+   "row": 13
+  },
+  {
+   "file": "day_stone_6.png",
+   "block": "day",
+   "cls": "stone",
+   "level": 6,
+   "col": 1,
+   "row": 5
+  },
+  {
+   "file": "night_stone_6.png",
+   "block": "night",
+   "cls": "stone",
+   "level": 6,
+   "col": 1,
+   "row": 14
+  },
+  {
+   "file": "day_stone_7.png",
+   "block": "day",
+   "cls": "stone",
+   "level": 7,
+   "col": 1,
+   "row": 6
+  },
+  {
+   "file": "night_stone_7.png",
+   "block": "night",
+   "cls": "stone",
+   "level": 7,
+   "col": 1,
+   "row": 15
+  },
+  {
+   "file": "day_stone_8.png",
+   "block": "day",
+   "cls": "stone",
+   "level": 8,
+   "col": 1,
+   "row": 7
+  },
+  {
+   "file": "night_stone_8.png",
+   "block": "night",
+   "cls": "stone",
+   "level": 8,
+   "col": 1,
+   "row": 16
+  },
+  {
+   "file": "day_stone_9.png",
+   "block": "day",
+   "cls": "stone",
+   "level": 9,
+   "col": 1,
+   "row": 8
+  },
+  {
+   "file": "night_stone_9.png",
+   "block": "night",
+   "cls": "stone",
+   "level": 9,
+   "col": 1,
+   "row": 17
+  },
+  {
+   "file": "day_wood_1.png",
+   "block": "day",
+   "cls": "wood",
+   "level": 1,
+   "col": 2,
+   "row": 0
+  },
+  {
+   "file": "night_wood_1.png",
+   "block": "night",
+   "cls": "wood",
+   "level": 1,
+   "col": 2,
+   "row": 9
+  },
+  {
+   "file": "day_wood_2.png",
+   "block": "day",
+   "cls": "wood",
+   "level": 2,
+   "col": 2,
+   "row": 1
+  },
+  {
+   "file": "night_wood_2.png",
+   "block": "night",
+   "cls": "wood",
+   "level": 2,
+   "col": 2,
+   "row": 10
+  },
+  {
+   "file": "day_wood_3.png",
+   "block": "day",
+   "cls": "wood",
+   "level": 3,
+   "col": 2,
+   "row": 2
+  },
+  {
+   "file": "night_wood_3.png",
+   "block": "night",
+   "cls": "wood",
+   "level": 3,
+   "col": 2,
+   "row": 11
+  },
+  {
+   "file": "day_wood_4.png",
+   "block": "day",
+   "cls": "wood",
+   "level": 4,
+   "col": 2,
+   "row": 3
+  },
+  {
+   "file": "night_wood_4.png",
+   "block": "night",
+   "cls": "wood",
+   "level": 4,
+   "col": 2,
+   "row": 12
+  },
+  {
+   "file": "day_wood_5.png",
+   "block": "day",
+   "cls": "wood",
+   "level": 5,
+   "col": 2,
+   "row": 4
+  },
+  {
+   "file": "night_wood_5.png",
+   "block": "night",
+   "cls": "wood",
+   "level": 5,
+   "col": 2,
+   "row": 13
+  },
+  {
+   "file": "day_wood_6.png",
+   "block": "day",
+   "cls": "wood",
+   "level": 6,
+   "col": 2,
+   "row": 5
+  },
+  {
+   "file": "night_wood_6.png",
+   "block": "night",
+   "cls": "wood",
+   "level": 6,
+   "col": 2,
+   "row": 14
+  },
+  {
+   "file": "day_wood_7.png",
+   "block": "day",
+   "cls": "wood",
+   "level": 7,
+   "col": 2,
+   "row": 6
+  },
+  {
+   "file": "night_wood_7.png",
+   "block": "night",
+   "cls": "wood",
+   "level": 7,
+   "col": 2,
+   "row": 15
+  },
+  {
+   "file": "day_wood_8.png",
+   "block": "day",
+   "cls": "wood",
+   "level": 8,
+   "col": 2,
+   "row": 7
+  },
+  {
+   "file": "night_wood_8.png",
+   "block": "night",
+   "cls": "wood",
+   "level": 8,
+   "col": 2,
+   "row": 16
+  },
+  {
+   "file": "day_wood_9.png",
+   "block": "day",
+   "cls": "wood",
+   "level": 9,
+   "col": 2,
+   "row": 8
+  },
+  {
+   "file": "night_wood_9.png",
+   "block": "night",
+   "cls": "wood",
+   "level": 9,
+   "col": 2,
+   "row": 17
+  },
+  {
+   "file": "day_clay_1.png",
+   "block": "day",
+   "cls": "clay",
+   "level": 1,
+   "col": 3,
+   "row": 0
+  },
+  {
+   "file": "night_clay_1.png",
+   "block": "night",
+   "cls": "clay",
+   "level": 1,
+   "col": 3,
+   "row": 9
+  },
+  {
+   "file": "day_clay_2.png",
+   "block": "day",
+   "cls": "clay",
+   "level": 2,
+   "col": 3,
+   "row": 1
+  },
+  {
+   "file": "night_clay_2.png",
+   "block": "night",
+   "cls": "clay",
+   "level": 2,
+   "col": 3,
+   "row": 10
+  },
+  {
+   "file": "day_clay_3.png",
+   "block": "day",
+   "cls": "clay",
+   "level": 3,
+   "col": 3,
+   "row": 2
+  },
+  {
+   "file": "night_clay_3.png",
+   "block": "night",
+   "cls": "clay",
+   "level": 3,
+   "col": 3,
+   "row": 11
+  },
+  {
+   "file": "day_clay_4.png",
+   "block": "day",
+   "cls": "clay",
+   "level": 4,
+   "col": 3,
+   "row": 3
+  },
+  {
+   "file": "night_clay_4.png",
+   "block": "night",
+   "cls": "clay",
+   "level": 4,
+   "col": 3,
+   "row": 12
+  },
+  {
+   "file": "day_cloth_1.png",
+   "block": "day",
+   "cls": "cloth",
+   "level": 1,
+   "col": 4,
+   "row": 0
+  },
+  {
+   "file": "night_cloth_1.png",
+   "block": "night",
+   "cls": "cloth",
+   "level": 1,
+   "col": 4,
+   "row": 9
+  },
+  {
+   "file": "day_cloth_2.png",
+   "block": "day",
+   "cls": "cloth",
+   "level": 2,
+   "col": 4,
+   "row": 1
+  },
+  {
+   "file": "night_cloth_2.png",
+   "block": "night",
+   "cls": "cloth",
+   "level": 2,
+   "col": 4,
+   "row": 10
+  },
+  {
+   "file": "day_cloth_3.png",
+   "block": "day",
+   "cls": "cloth",
+   "level": 3,
+   "col": 4,
+   "row": 2
+  },
+  {
+   "file": "night_cloth_3.png",
+   "block": "night",
+   "cls": "cloth",
+   "level": 3,
+   "col": 4,
+   "row": 11
+  },
+  {
+   "file": "day_cloth_4.png",
+   "block": "day",
+   "cls": "cloth",
+   "level": 4,
+   "col": 4,
+   "row": 3
+  },
+  {
+   "file": "night_cloth_4.png",
+   "block": "night",
+   "cls": "cloth",
+   "level": 4,
+   "col": 4,
+   "row": 12
+  },
+  {
+   "file": "day_mana_1.png",
+   "block": "day",
+   "cls": "mana",
+   "level": 1,
+   "col": 5,
+   "row": 0
+  },
+  {
+   "file": "night_mana_1.png",
+   "block": "night",
+   "cls": "mana",
+   "level": 1,
+   "col": 5,
+   "row": 9
+  },
+  {
+   "file": "dragon_grain_1.png",
+   "block": "dragon",
+   "cls": "grain",
+   "level": 1,
+   "col": 0,
+   "row": 18
+  },
+  {
+   "file": "dragon_clay_1.png",
+   "block": "dragon",
+   "cls": "clay",
+   "level": 1,
+   "col": 3,
+   "row": 18
+  },
+  {
+   "file": "dragon_cloth_1.png",
+   "block": "dragon",
+   "cls": "cloth",
+   "level": 1,
+   "col": 4,
+   "row": 18
+  }
+ ]
+}

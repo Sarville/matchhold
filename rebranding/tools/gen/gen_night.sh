@@ -4,7 +4,7 @@ S=/tmp/claude-1000/-home-user-projects-matchhold/7b41e65d-5e68-4a3d-92c6-7055445
 NIGHT='Cozy fantasy match-3 game art at night. Same warm, soft, matte hand-painted 3D look as the day art (chunky rounded forms, soft ambient occlusion, NO glossy plastic highlights). Deep indigo and navy shadows, cool moonlight from the top-left, warm torch-orange accents, soft rim light and a gentle glow on key details. Thin outline slightly darker than the object own hue, never black. Clean, readable silhouette against dark backgrounds.'
 NEG='Avoid: text, letters, numbers, logos, watermark, signature, UI overlay, photorealism, harsh gloss, lens flare, pixel art, thick black outlines, extra objects, cropped edges, blurry subject, multiple views, collage.'
 gen() { # out refs size prompt
-  codex exec -m gpt-5.6-terra -c model_reasoning_effort=medium --sandbox workspace-write \
+  codex exec -m gpt-5.6-terra -c model_reasoning_effort=low --sandbox workspace-write \
   "Use the built-in image_gen tool (imagegen skill) to generate ONE image. The attached images are references: follow them exactly where the prompt says so, otherwise use them for palette, material and light only. Target size $3 (resize/cover-crop with ImageMagick if the native size differs, no stretching). PNG. $4 $NEG Save the final PNG to exactly: /home/user/projects/matchhold/rebranding/$1 . Do not overwrite existing files. Print the saved path and dimensions." -i $2 \
   > "$S/$(basename $1).log" 2>&1
 }

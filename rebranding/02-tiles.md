@@ -204,14 +204,16 @@ Make it clearly an upgrade: {WHAT TO ADD}. Transparent background, no plate.
 | `clay_3` | a neat stack of three bricks with visible mortar edges |
 | `clay_4` | a piece of brick wall topped with a small tower crenellation |
 
-### cloth (4): фиолетовый
+### cloth (4): фиолетовый, от полотен к рулонам
+
+Решение пользователя (сессия 3): клубок нити не читался как ткань. Начинаем со сложенных полотен, богаче уровни идут рулонами.
 
 | ID | SUBJECT |
 |---|---|
-| `cloth_1` | violet thread bundle (якорь) |
-| `cloth_2` | a folded plain cream-and-lavender piece of cloth |
-| `cloth_3` | a folded violet cloth with a light stripe |
-| `cloth_4` | a royal violet cloth with a pattern and a gold trim |
+| `cloth_1` | a neatly folded violet piece of cloth with a light lavender stripe (якорь) |
+| `cloth_2` | a stack of two or three folded violet cloths |
+| `cloth_3` | a neat violet cloth roll (bolt) tied with a cream ribbon |
+| `cloth_4` | two royal violet cloth rolls with a pattern and gold trim |
 
 ### mana (1)
 

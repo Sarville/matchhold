@@ -5,7 +5,7 @@ DAY='Cozy fantasy village match-3 game art. Warm, soft, matte hand-painted 3D lo
 NEG='Avoid: text, letters, numbers, logos, watermark, signature, UI overlay, photorealism, harsh gloss, lens flare, pixel art, thick black outlines, extra objects, cropped edges, blurry subject, multiple views, collage.'
 
 gen() { # id out ref size prompt
-  codex exec -m gpt-5.6-terra -c model_reasoning_effort=medium --sandbox workspace-write \
+  codex exec -m gpt-5.6-terra -c model_reasoning_effort=low --sandbox workspace-write \
   "Use the built-in image_gen tool (imagegen skill) to generate ONE image. The attached image is a style/mood reference only (palette, material, light); do not copy its composition. Target size $4 (resize/cover-crop with ImageMagick if the native size differs, no stretching). PNG. $5 $NEG Save the final PNG to exactly: /home/user/projects/matchhold/rebranding/$2 . Do not overwrite existing files. Print the saved path and dimensions." -i "$3" \
   > "/tmp/claude-1000/-home-user-projects-matchhold/7b41e65d-5e68-4a3d-92c6-7055445f73e0/scratchpad/$(basename $2).log" 2>&1
 }
