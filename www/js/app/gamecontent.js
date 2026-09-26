@@ -17,7 +17,7 @@ define({
 				castle: 4
 			},
 			effectDest: {
-				day: [-20, 10],
+				day: [-79, 40],
 				night: 'side'
 			}
 		},
@@ -38,8 +38,8 @@ define({
 				sawmill8: 3
 			},
 			effectDest: {
-				day: [32, -20],
-				night: [-20, -15]
+				day: [53, -85],
+				night: [-79, -20]
 			}
 		},
 		Stone: {
@@ -59,7 +59,7 @@ define({
 				blacksmith8: 3
 			},
 			effectDest: {
-				day: [32, -20],
+				day: [53, -85],
 				night: 'sword'
 			}
 		},
@@ -80,7 +80,7 @@ define({
 				bricklayer4: 4
 			},
 			effectDest: {
-				day: [32, -20],
+				day: [53, -85],
 				night: 'side'
 			}
 		},
@@ -101,7 +101,7 @@ define({
 				weaver4: 4
 			},
 			effectDest: {
-				day: [32, -20],
+				day: [53, -85],
 				night: 'side'
 			}
 		},
@@ -113,7 +113,7 @@ define({
 			},
 			multipliers: {},
 			effectDest: {
-				day: [30, 505],
+				day: [-20, 554],
 				night: 'side'
 			}
 		}
@@ -150,7 +150,7 @@ define({
 		Shack: {
 			className: 'shack',
 			spriteName: 'shack',
-			position: 30,
+			position: 60,
 			cost: {},
 			requiredLevel: 1,
 			animationFrames: 1,
@@ -161,7 +161,7 @@ define({
 		House: {
 			className: 'house',
 			spriteName: 'shack',
-			position: 30,
+			position: 60,
 			cost: {},
 			requiredLevel: 4,
 			prestigeDependency: 'blacksmith',
@@ -177,7 +177,7 @@ define({
 		Fort: {
 			className: 'fort',
 			spriteName: 'shack',
-			position: 30,
+			position: 60,
 			cost: {},
 			requiredLevel: 7,
 			prestigeDependency: 'blacksmith3',
@@ -193,7 +193,7 @@ define({
 		Castle: {
 			className: 'castle',
 			spriteName: 'shack',
-			position: 30,
+			position: 60,
 			cost: {},
 			requiredLevel: 10,
 			prestigeDependency: 'blacksmith6',
@@ -209,7 +209,7 @@ define({
 		BrickLayer: {
 			className: 'bricklayer',
 			spriteName: 'bricklayer',
-			position: 90,
+			position: 158,
 			cost: {
 				stone: 5,
 				wood: 5
@@ -221,7 +221,7 @@ define({
 		Bricklayer2: {
 			className: 'bricklayer2',
 			spriteName: 'bricklayer',
-			position: 90,
+			position: 158,
 			cost: {
 				stone: 3,
 				wood: 3,
@@ -238,7 +238,7 @@ define({
 		Bricklayer3: {
 			className: 'bricklayer3',
 			spriteName: 'bricklayer',
-			position: 90,
+			position: 158,
 			cost: {
 				stone: 5,
 				wood: 5,
@@ -255,7 +255,7 @@ define({
 		Bricklayer4: {
 			className: 'bricklayer4',
 			spriteName: 'bricklayer',
-			position: 90,
+			position: 158,
 			cost: {
 				stone: 8,
 				wood: 8,
@@ -272,7 +272,7 @@ define({
 		Weaver: {
 			className: 'weaver',
 			spriteName: 'weaver',
-			position: 150,
+			position: 234,
 			cost: { 
 				stone: 5,
 				wood: 5
@@ -284,7 +284,7 @@ define({
 		Weaver2: {
 			className: 'weaver2',
 			spriteName: 'weaver',
-			position: 150,
+			position: 234,
 			cost: {
 				wood: 3,
 				stone: 3,
@@ -301,7 +301,7 @@ define({
 		Weaver3: {
 			className: 'weaver3',
 			spriteName: 'weaver',
-			position: 150,
+			position: 234,
 			cost: {
 				wood: 5,
 				stone: 5,
@@ -318,7 +318,7 @@ define({
 		Weaver4: {
 			className: 'weaver4',
 			spriteName: 'weaver',
-			position: 150,
+			position: 234,
 			cost: {
 				wood: 8,
 				stone: 8,
@@ -335,7 +335,7 @@ define({
 		Blacksmith: {
 			className: 'blacksmith',
 			spriteName: 'blacksmith',
-			position: 210,
+			position: 310,
 			cost: {
 				wood: 2,
 				clay: 2
@@ -349,7 +349,7 @@ define({
 		Blacksmith2: {
 			className: 'blacksmith2',
 			spriteName: 'blacksmith',
-			position: 210,
+			position: 310,
 			cost: {
 				wood: 2,
 				clay: 5,
@@ -366,7 +366,7 @@ define({
 		Blacksmith3: {
 			className: 'blacksmith3',
 			spriteName: 'blacksmith',
-			position: 210,
+			position: 310,
 			cost: {
 				wood: 2,
 				clay: 8,
@@ -383,7 +383,7 @@ define({
 		Blacksmith4: {
 			className: 'blacksmith4',
 			spriteName: 'blacksmith',
-			position: 210,
+			position: 310,
 			cost: {
 				wood: 4,
 				clay: 8,
@@ -400,7 +400,7 @@ define({
 		Blacksmith5: {
 			className: 'blacksmith5',
 			spriteName: 'blacksmith',
-			position: 210,
+			position: 310,
 			cost: {
 				wood: 6,
 				clay: 8,
@@ -417,7 +417,7 @@ define({
 		Blacksmith6: {
 			className: 'blacksmith6',
 			spriteName: 'blacksmith',
-			position: 210,
+			position: 310,
 			cost: {
 				wood: 6,
 				clay: 10,
@@ -434,7 +434,7 @@ define({
 		Blacksmith7: {
 			className: 'blacksmith7',
 			spriteName: 'blacksmith',
-			position: 210,
+			position: 310,
 			cost: {
 				wood: 8,
 				clay: 10,
@@ -451,7 +451,7 @@ define({
 		Blacksmith8: {
 			className: 'blacksmith8',
 			spriteName: 'blacksmith',
-			position: 210,
+			position: 310,
 			cost: {
 				wood: 10,
 				clay: 10,
@@ -468,7 +468,7 @@ define({
 		Sawmill: {
 			className: 'sawmill',
 			spriteName: 'sawmill',
-			position: 270,
+			position: 386,
 			cost: {
 				stone: 2,
 				cloth: 2
@@ -482,7 +482,7 @@ define({
 		Sawmill2: {
 			className: 'sawmill2',
 			spriteName: 'sawmill',
-			position: 270,
+			position: 386,
 			cost: {
 				stone: 2,
 				clay: 5,
@@ -499,7 +499,7 @@ define({
 		Sawmill3: {
 			className: 'sawmill3',
 			spriteName: 'sawmill',
-			position: 270,
+			position: 386,
 			cost: {
 				stone: 2,
 				clay: 8,
@@ -516,7 +516,7 @@ define({
 		Sawmill4: {
 			className: 'sawmill4',
 			spriteName: 'sawmill',
-			position: 270,
+			position: 386,
 			cost: {
 				stone: 4,
 				clay: 8,
@@ -533,7 +533,7 @@ define({
 		Sawmill5: {
 			className: 'sawmill5',
 			spriteName: 'sawmill',
-			position: 270,
+			position: 386,
 			cost: {
 				stone: 6,
 				clay: 8,
@@ -550,7 +550,7 @@ define({
 		Sawmill6: {
 			className: 'sawmill6',
 			spriteName: 'sawmill',
-			position: 270,
+			position: 386,
 			cost: {
 				stone: 6,
 				clay: 10,
@@ -567,7 +567,7 @@ define({
 		Sawmill7: {
 			className: 'sawmill7',
 			spriteName: 'sawmill',
-			position: 270,
+			position: 386,
 			cost: {
 				stone: 8,
 				clay: 10,
@@ -584,7 +584,7 @@ define({
 		Sawmill8: {
 			className: 'sawmill8',
 			spriteName: 'sawmill',
-			position: 270,
+			position: 386,
 			cost: {
 				stone: 10,
 				clay: 10,
@@ -601,7 +601,8 @@ define({
 		Tower: {
 			className: 'tower',
 			spriteName: 'tower',
-			position: 330,
+			position: 452,
+			defaultAnimation: 4,
 			cost: {},
 			requiredLevel: 1,
 			priority: 1,

@@ -24,7 +24,13 @@ def compose(plate, icon, fill=0.66, shadow=0.28, glow=None):
     if glow:  # (rgb, сила 0..1): размытая альфа иконки цветом класса под иконкой (ночью)
         g = Image.new("RGBA", plate.size, (0, 0, 0, 0))
         g.paste(glow[0] + (255,), (x, y), icon.getchannel("A").point(lambda v: int(v * glow[1])))
-        g = g.filter(ImageFilter.GaussianBlur(W * 0.035))
+        # широкое мягкое гало (читаемость иконки на тёмной плашке) + узкое свечение у контура
+        h = Image.new("RGBA", plate.size, (0, 0, 0, 0))
+        lit = tuple(int(c + (255 - c) * 0.55) for c in glow[0])   # чуть светлее цвета класса: гало светится, а не темнит
+        h.paste(lit + (255,), (x, y), icon.getchannel("A").point(lambda v: min(255, int(v * glow[1] * 2.6))))
+        h = h.filter(ImageFilter.GaussianBlur(W * 0.1))
+        for _ in range(3): out = Image.alpha_composite(out, h)
+        g = g.filter(ImageFilter.GaussianBlur(W * 0.03))
         out = Image.alpha_composite(out, g)
     out.alpha_composite(icon, (x, y))
     return out

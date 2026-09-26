@@ -6,7 +6,7 @@ define(['app/eventmanager', 'app/gameboard', 'app/entity/tile', 'app/gamecontent
 	var tileContainer = null;
 	var tiles = [];
 	var TILE_WIDTH = 0, TILE_HEIGHT = 0;
-	var BOARD_PAD = 2;
+	var BOARD_PAD = 0; // рамка и отступы рисуются в CSS (art.css)
 	var FILL_DELAY = 100;
 	
 	function el() {
@@ -39,6 +39,7 @@ define(['app/eventmanager', 'app/gameboard', 'app/entity/tile', 'app/gamecontent
 			$('body').addClass('portrait');
 		}
 		tileContainer = G.make('tileContainer').attr('id', 'tileContainer').appendTo(el);
+		addChrome(el);
 		// Determine the board dimensions based on the size of the tiles
 		var testTile = G.make('tile').hide().appendTo('body');
 		TILE_WIDTH = testTile.width();
@@ -49,6 +50,27 @@ define(['app/eventmanager', 'app/gameboard', 'app/entity/tile', 'app/gamecontent
 		return el;
 	}
 	
+	// Рамка поля, мини-фон вдоль рельса и столбики с табличками (день/ночь кроссфейдом)
+	function addChrome(board) {
+		var m = function(cls, tag) { return G.make(cls, tag); };
+		var ground = function(cls) {
+			return m('set ' + cls).append(m('cap l'), m('mid'), m('cap r'));
+		};
+		var sign = function(side) {
+			var s = m('sign ' + side).append(m('board day'), m('board night'));
+			if(side == 'left') {
+				s.append(m('phase').append(m('sun'), m('moon')));
+			}
+			return s.append(m('num').append(m('val')));
+		};
+		board.append(
+			m('frame').append(m('day'), m('night')),
+			m('ground').append(ground('day'), ground('night')),
+			sign('left'), sign('right'),
+			m('gear').append(m('slot shield'), m('slot sword'))
+		);
+	}
+
 	function drawSwapTiles(opts) {
 		var t1 = tiles[opts.pos1.row][opts.pos1.col];
 		var t2 = tiles[opts.pos2.row][opts.pos2.col];
@@ -133,10 +155,17 @@ define(['app/eventmanager', 'app/gameboard', 'app/entity/tile', 'app/gamecontent
 			// Move it to the destination
 			e.css('left');
 			var dest = type.effectDest[isNight ? 'night' : 'day'];
+			if(GameBoard.options.mobile) {
+				// телефон: сердца на левом рельсе, щит и меч на нижнем бортике, магия под полем
+				if(dest == 'sword') { dest = [274, -21]; }
+				else if(isNight && type.className == 'wood') { dest = [220, -21]; }
+				else if(!isNight && type.className == 'grain') { dest = [-20, 40]; }
+				else if(!isNight && type.className == 'mana') { dest = [-14, 645]; }
+			}
 			if(dest == 'side') {
-				dest = [ side == 'left' ? 0 : G.worldWidth(), -20];
+				dest = [ side == 'left' ? 0 : G.worldWidth(), -70];
 			} else if(dest == 'sword') {
-				dest = [-20, 28 * G.numHearts() + 14];
+				dest = [-79, 30 + 39 * G.numHearts() + 20];
 			}
 			e.css({
 				'transform': 'translate3d(' + dest[0] + 'px, ' + dest[1] + 'px, 0px) scale(0.2)', 
@@ -327,4 +356,4 @@ define(['app/eventmanager', 'app/gameboard', 'app/entity/tile', 'app/gamecontent
 			return tilePool.length;
 		}
 	};
-});
+});

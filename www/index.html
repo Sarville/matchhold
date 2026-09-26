@@ -2,26 +2,29 @@
 <html>
 	<head>
 		<!-- 
-			Gridland (v1.1)
+			Matchhold (v1.1)
 			====================
 			
-			A weird little time-waster from doublespeak games.
-			https://www.doublespeakgames.com
+			Based on Gridland by doublespeak games (MPL 2.0).
 
 			Code, game design and graphics by Michael Townsend
 			Music by Vince Nitro (http://rule2.the-back-row.com)
 		 -->
 		<meta name="viewport" content="width=device-width">
-		<title>Gridland</title>
+		<script>if(location.search.indexOf('debug')>=0){document.documentElement.className+=' debug';}</script>
+		<title>Matchhold</title>
 		<meta itemprop="description" name="description" property="og:description" content="Match. Build. Survive.">
-		<meta itemprop="image" property="og:image" content="https://glmedia.doublespeakgames.com/img/badge.png" />
-		<meta itemprop="name" property="og:title" content="Gridland" />
+		<meta itemprop="image" property="og:image" content="img/badge.png" />
+		<meta itemprop="name" property="og:title" content="Matchhold" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="mobile-web-app-capable" content="yes" />
 		<link rel="shortcut icon" href="favicon.ico">
-		<link rel="image_src" href="https://glmedia.doublespeakgames.com/img/badge.png" />
-		<link rel="apple-touch-icon" href="https://glmedia.doublespeakgames.com/img/badge.png" />
+		<link rel="image_src" href="img/badge.png" />
+		<link rel="apple-touch-icon" href="img/badge.png" />
 		<link rel="stylesheet" type="text/css" href="css/main.css" />
+		<link rel="stylesheet" type="text/css" href="css/art.css" />
+		<link rel="stylesheet" type="text/css" href="css/bg.css" />
+		<link rel="stylesheet" type="text/css" href="css/store.css" />
 		<script type="text/javascript" data-main="js/app" src="js/lib/require.js"></script>
 		<style>
 			@viewport {
@@ -44,7 +47,12 @@
 			}
 		</style>
 	</head>
-	<body class="titleScreen">
+	<body class="titleScreen stage1">
+		<div id="bg">
+			<div class="far day"></div><div class="far night"></div>
+			<div class="mid day"></div><div class="mid night"></div>
+		</div>
+		<div id="fg"><div class="day"></div><div class="night"></div></div>
 		<div id="test" nodeploy></div>
 		<div id="pauseIcon"></div>
 		<div id="loadingScreen">
@@ -60,6 +68,7 @@
 			</div>
 		</div>
 		<div id="gameContainer"></div>
+		<div class="menuBtn"><span></span></div>
 		<div class="menuBar litBorder">
 			<div id="debug" style="position:absolute;top:5px;left:100px;" nodeploy></div>
 			<div class="saveSpinner">
@@ -72,13 +81,8 @@
 				<div></div>
 				<div></div>
 			</div>
-			<a class="logo" onclick="require('app/eventmanager').trigger('click', ['logo']);" target="_blank" href="https://www.doublespeakgames.com">
-				<span class="nightSprite" data-clickable='true'></span>
-			</a>
 			<span class="menuHeading"></span>
-			<div class="menuBtn litBorder">
-				<div class="nightSprite"></div>
-			</div>
+			<div class="menuContinue litBorder"></div>
 		</div>
 	</body>
 </html>

@@ -1,10 +1,10 @@
 define(['jquery', 'app/eventmanager', 'app/analytics', 'app/graphics/graphics', 
         'app/gamecontent', 'app/gameboard', 'app/gamestate', 'app/world', 'app/loot', 
-        'app/magic', 'app/gameoptions', 'app/audio/audio', 'app/graphics/share',
-        'app/graphics/donate', 'app/visibility', 'app/keysequencer', 'app/graphics/difficulty'], 
+        'app/magic', 'app/gameoptions', 'app/audio/audio',
+        'app/visibility', 'app/keysequencer', 'app/graphics/difficulty'], 
 		function($, EventManager, Analytics, Graphics, Content, GameBoard, 
-				 GameState, World, Loot, Magic, GameOptions, GameAudio, Share,
-				 Donate, Visibility, KeySequencer, Difficulty) {
+				 GameState, World, Loot, Magic, GameOptions, GameAudio,
+				 Visibility, KeySequencer, Difficulty) {
 
 	var DRAG_THRESHOLD = 30; // in pixels
 	var MOBILE_RATIO = 16/10; // height/width
@@ -155,14 +155,30 @@ define(['jquery', 'app/eventmanager', 'app/analytics', 'app/graphics/graphics',
 				EventManager.trigger('phaseChange', [!Engine.isNight()]);
 			});
 			
-			$('.menuBtn').off().on("click touchstart", function() {
+			// Меню открывается сверху кнопкой-бургером; пока оно открыто, игра стоит на паузе; «Continue» и бургер закрывают
+			var lastMenuToggle = 0;
+			function toggleMenuBar(open) {
+				if(Date.now() - lastMenuToggle < 350) return; // touchstart и следом синтетический click
+				lastMenuToggle = Date.now();
 				var menuBar = $('.menuBar');
-				menuBar.toggleClass('open').addClass('closing');
+				open = open == null ? !menuBar.hasClass('open') : open;
+				if(open == menuBar.hasClass('open')) return;
+				menuBar.toggleClass('open', open).addClass('closing');
+				$('body').toggleClass('menuOpen', open);
 				setTimeout(function() {
 					menuBar.removeClass('closing');
 				}, 200);
+				if(started) {
+					// пауза без события 'pause': звук не глушим (громкость настраивают в этом же меню), затемнения нет
+					Engine.paused = open;
+					if(!open) {
+						EventManager.trigger('afterUnpaused');
+					}
+				}
 				EventManager.trigger('click', ['menubutton']);
-			});
+			}
+			$('.menuBtn').off().on("click touchstart", function() { toggleMenuBar(); return false; });
+			$('.menuContinue').off().on("click touchstart", function() { toggleMenuBar(false); return false; });
 
 			$('#pauseIcon').off().on('click touchstart', function() {
 				if(!Engine.paused) {
@@ -199,8 +215,6 @@ define(['jquery', 'app/eventmanager', 'app/analytics', 'app/graphics/graphics',
 			}
 			
 			modules.push(Difficulty);
-			modules.push(Share);
-			modules.push(Donate);
 			
 			// Start the game
 			GameOptions.load();

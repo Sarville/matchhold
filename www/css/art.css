@@ -1,0 +1,780 @@
+/* Новый арт (ребрендинг): поверх main.css. Ассеты: img/v2 (rebranding/tools/export_www.py), x2 от логических px.
+   Геометрия (десктоп): клетка 60, зазор лунок 3, проём 483; рамка 43 (рельс) + 3 внутрь; полоса мира 150 над рельсом;
+   портрет (7x8, клетка 70): проём 493,5 x 563,5. Числа: rebranding/01-environment.md, «Геометрия полосы мира». */
+
+/* ---------- фон: 4 слоя (дальний, средний, ..., передний) ---------- */
+#bg, #fg {
+	position: fixed;
+	left: 0; top: 0; right: 0; bottom: 0;
+	pointer-events: none;
+	transition: opacity 1s linear;
+}
+#bg { z-index: -1; overflow: hidden; }
+#fg { z-index: 2; overflow: hidden; }
+.titleScreen #bg, .titleScreen #fg { opacity: 0; }
+#bg > div, #fg > div {
+	position: absolute;
+	left: 0; top: 0; right: 0; bottom: 0;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	transition: opacity 1400ms linear;
+}
+#bg .night, #fg .night { opacity: 0; }
+.night #bg .night, .night #fg .night { opacity: 1; }
+
+/* ---------- сцена ---------- */
+#gameContainer { margin-left: -241.5px; }
+.portrait #gameContainer { margin-left: -246.75px; }
+
+/* ---------- доска: пол с лунками (день + ночь поверх), рамка 9-slice, плитки ---------- */
+.gameBoard {
+	margin: 221px auto 0;
+	border: 0;
+	padding: 1.5px;
+	background:
+		url(../img/v2/socket_day.webp) 1.5px 1.5px / 60px 60px repeat,
+		url(../img/v2/floor_day.webp) 0 0 / 100% 100% no-repeat;
+}
+.gameBoard::before {
+	content: '';
+	position: absolute;
+	left: 0; top: 0; right: 0; bottom: 0;
+	background:
+		url(../img/v2/socket_night.webp) 1.5px 1.5px / 60px 60px repeat,
+		url(../img/v2/floor_night.webp) 0 0 / 100% 100% no-repeat;
+	opacity: 0;
+	transition: opacity 1400ms linear;
+}
+.night .gameBoard::before { opacity: 1; }
+.portrait .gameBoard {
+	padding: 1.75px;
+	background-position: 1.75px 1.75px, 0 0;
+	background-size: 70px 70px, 100% 100%;
+}
+.portrait .gameBoard::before {
+	background-position: 1.75px 1.75px, 0 0;
+	background-size: 70px 70px, 100% 100%;
+}
+
+.tileContainer, .night .tileContainer {
+	left: 1.5px; top: 1.5px; right: 1.5px; bottom: 1.5px;
+	width: auto; height: auto;
+	background-color: transparent;
+}
+.portrait .tileContainer { left: 1.75px; top: 1.75px; right: 1.75px; bottom: 1.75px; }
+
+.frame {
+	position: absolute;
+	left: -43px; top: -43px; right: -43px; bottom: -43px;
+	z-index: 4;
+	pointer-events: none;
+}
+.frame > div {
+	position: absolute;
+	left: 0; top: 0; right: 0; bottom: 0;
+	border: 46px solid transparent;
+	border-image-slice: 92;
+	border-image-repeat: stretch;
+	transition: opacity 1400ms linear;
+}
+.frame > .day { border-image-source: url(../img/v2/frame_day.webp); }
+.frame > .night { border-image-source: url(../img/v2/frame_night.webp); opacity: 0; }
+.night .frame > .night { opacity: 1; }
+
+/* плитки: лист 6 x 19 по 52 (x2), день/ночь; плашка и иконка уже в арте */
+.tile > div {
+	border: 0;
+	border-radius: 0;
+	width: 52px;
+	height: 52px;
+	margin: -26px 0 0 -26px;
+}
+.tile .daySide, .tile .nightSide {
+	background-image: url(../img/v2/tiles.webp);
+	background-size: 312px 988px;
+}
+.selected:after {
+	background: none;
+	border: 3px solid #e2701a;
+	border-radius: 14px;
+	box-shadow: 0 0 0 1.5px #fff1c2, 0 0 12px 3px rgba(255, 128, 20, 0.85), inset 0 0 10px 2px rgba(255, 150, 40, 0.55);
+	top: 2px; bottom: 2px; left: 2px; right: 2px;
+	animation: selpulse 700ms ease-in-out infinite alternate;
+}
+.night .selected:after {
+	border-color: #f4f8ff;
+	box-shadow: 0 0 0 1.5px #ffffff, 0 0 14px 4px rgba(235, 242, 255, 0.9), inset 0 0 10px 2px rgba(235, 242, 255, 0.5);
+}
+.portrait .selected:after { top: 3px; bottom: 3px; left: 3px; right: 3px; }
+@keyframes selpulse { from { opacity: 0.75; } to { opacity: 1; } }
+
+/* ---------- полоса мира: мини-фон, столбики с табличками ---------- */
+.world, .night .world {
+	top: -213px;
+	height: 164.4px;
+	background: none;
+}
+.ground {
+	position: absolute;
+	left: -43px; right: -43px; top: -57px;
+	height: 14px;
+	z-index: 1;
+	pointer-events: none;
+}
+.ground .set {
+	position: absolute;
+	left: 0; right: 0; top: 0; bottom: 0;
+	transition: opacity 1400ms linear;
+}
+.ground .cap { position: absolute; top: 0; width: 22px; height: 14px; background-size: 22px 14px; background-repeat: no-repeat; }
+.ground .cap.l { left: 0; }
+.ground .cap.r { right: 0; }
+.ground .mid { position: absolute; left: 22px; right: 22px; top: 0; height: 14px; background-repeat: repeat-x; background-size: auto 14px; }
+.ground .day .cap.l { background-image: url(../img/v2/ground_cap_l.webp); }
+.ground .day .cap.r { background-image: url(../img/v2/ground_cap_r.webp); }
+.ground .day .mid { background-image: url(../img/v2/ground_tile.webp); }
+.ground .night { opacity: 0; }
+.ground .night .cap.l { background-image: url(../img/v2/ground_cap_l_night.webp); }
+.ground .night .cap.r { background-image: url(../img/v2/ground_cap_r_night.webp); }
+.ground .night .mid { background-image: url(../img/v2/ground_tile_night.webp); }
+.night .ground .night { opacity: 1; }
+
+.sign {
+	position: absolute;
+	top: -127px;
+	width: 44px;
+	height: 84px;
+	z-index: 3;
+	pointer-events: none;
+}
+.sign.left { left: -43px; }
+.sign.right { right: -43px; }
+.sign .board {
+	position: absolute;
+	left: 0; top: 0;
+	width: 44px; height: 84px;
+	background-size: 44px 84px;
+	background-repeat: no-repeat;
+	transition: opacity 1400ms linear;
+}
+.sign .board.day { background-image: url(../img/v2/sign_day.webp); }
+.sign .board.night { background-image: url(../img/v2/sign_night.webp); opacity: 0; }
+.night .sign .board.night { opacity: 1; }
+.sign .num {
+	position: absolute;
+	left: 12px; top: 30.5px;
+	width: 22.9px; height: 19.2px;
+	display: flex; align-items: center; justify-content: center;
+	overflow: hidden;
+	font: bold 15px/1 Georgia, 'Times New Roman', serif;
+	color: #5c3a22;
+	transition: color 1400ms linear;
+}
+.night .sign .num { color: #ebc86e; }
+.sign.left .num { font-size: 11px; }
+.sign.left .val { position: relative; top: 2.6px; }
+.sign .num.roll .val { animation: numroll 400ms ease-out 1; }
+@keyframes numroll {
+	0% { transform: translateY(70%) scale(1.25); opacity: 0; }
+	60% { opacity: 1; }
+	100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+.sign.swing .num { animation: levelglint 900ms ease-out 1; }
+@keyframes levelglint {
+	0% { text-shadow: 0 0 0 rgba(255, 230, 140, 0); }
+	20% { text-shadow: 0 0 6px rgba(255, 220, 110, 1), 0 0 2px #fff3b0; }
+	100% { text-shadow: 0 0 0 rgba(255, 230, 140, 0); }
+}
+.sign .phase {
+	position: absolute;
+	left: 20px; top: 31.2px;
+	width: 7px; height: 7px;
+	z-index: 1;
+}
+.sign .phase .sun, .sign .phase .moon {
+	position: absolute; left: 0; top: 0;
+	width: 7px; height: 7px;
+	border-radius: 50%;
+	transition: opacity 1400ms linear;
+}
+.sign .phase .sun { background: radial-gradient(circle at 40% 35%, #fff2a8, #ffc93c 60%, #e59a1c); box-shadow: 0 0 2px 1px rgba(255, 200, 60, 0.55); }
+.sign .phase .moon { background: transparent; box-shadow: inset -2.4px -0.6px 0 0 #dfe7ff; opacity: 0; transform: rotate(-20deg); }
+.night .sign .phase .sun { opacity: 0; }
+.night .sign .phase .moon { opacity: 1; }
+.portrait .sign .phase { display: none; }
+.portrait .sign.left .num, .portrait .sign.right .num { font-size: 15px; }
+.portrait .sign.left .val { top: 0; }
+
+/* ---------- здания: лист 100x107 на строку, слот 80 (жилая линия 100), ноги на дорожке ---------- */
+.building {
+	background-image: url(../img/v2/buildings.webp);
+	background-size: 100px 3531px;
+	background-position: 0 0;
+	bottom: -107px;
+	width: 80px;
+	height: 107px;
+}
+.shack, .house, .fort, .castle {
+	background-image: url(../img/v2/home.webp);
+	background-size: 120px 512px;
+	width: 120px;
+	height: 128px;
+	bottom: -128px;
+}
+.building.upgrading, .building.upgrading.up1 { margin-bottom: 15.1px; }
+.building.upgrading.up2 { margin-bottom: 25.3px; }
+.building.upgrading.up3 { margin-bottom: 35.5px; }
+.building.sunk { margin-bottom: -107px; }
+.shack.sunk, .house.sunk, .fort.sunk, .castle.sunk { margin-bottom: -128px; }
+.tower, .gem {
+	background-image: url(../img/v2/tower.webp);
+	background-size: 120px 800px;
+	width: 120px; height: 160px;
+}
+.tower { bottom: -160px; }
+.tower.sunk { margin-bottom: -160px; }
+.gem {
+	background-repeat: no-repeat;
+	top: auto; bottom: 0;
+	transition: opacity 1400ms linear;
+}
+.night .gem { opacity: 0; }   /* ночью кристалл прячется вместе со зданиями */
+
+/* капсулы: каменная плита 76 x 19/29,2/39,4; в лунке иконка ресурса, в жёлобе заливка */
+.resourceBars {
+	width: 74px;
+	margin: 0 0 0 3px;
+	border: 0;
+	height: 19px;
+	background: url(../img/v2/capsule_1.webp) 0 0 / 74px 19px no-repeat;
+}
+.house .resourceBars, .fort .resourceBars, .castle .resourceBars { margin-left: 23px; }
+.resourceBars.bars-2 { height: 29.2px; background-image: url(../img/v2/capsule_2.webp); background-size: 74px 29.2px; }
+.resourceBars.bars-3 { height: 39.4px; background-image: url(../img/v2/capsule_3.webp); background-size: 74px 39.4px; }
+.resourceBars.bars-1.show { transform: translateY(-19px); }
+.resourceBars.bars-2.show { transform: translateY(-29.2px); }
+.resourceBars.bars-3.show { transform: translateY(-39.4px); }
+.resourceBars.sunk, .resourceBars.bars-1.sunk, .resourceBars.bars-2.sunk, .resourceBars.bars-3.sunk { transform: translateY(107px); }
+.resourceBar, .bars-2 .resourceBar, .bars-3 .resourceBar {
+	position: absolute;
+	left: 17.7px;
+	width: 50.8px;
+	height: 6px;
+	border-radius: 3px;
+	background: none;
+}
+.resourceBar:nth-child(1) { top: 7.9px; }
+.resourceBar:nth-child(2) { top: 18.15px; }
+.resourceBar:nth-child(3) { top: 28.3px; }
+.resourceBar-inner { border-radius: 3px; }
+.resourceBar:before {
+	content: '';
+	position: absolute;
+	left: -12.3px; top: -0.5px;
+	width: 6.7px; height: 6.7px;
+	background: url(../img/v2/capsule_icons.webp) 0 0 / 33.5px 6.7px no-repeat;
+}
+.resourceBar.grain:before { background-position: 0 0; }
+.resourceBar.stone:before { background-position: -6.7px 0; }
+.resourceBar.wood:before { background-position: -13.4px 0; }
+.resourceBar.clay:before { background-position: -20.1px 0; }
+.resourceBar.cloth:before { background-position: -26.8px 0; }
+.portrait .resourceBar:before { border-radius: 50%; background-image: none; left: -12.4px; top: -0.3px; width: 6.3px; height: 6.3px; }
+.portrait .resourceBar.grain:before { background-color: #f2c14e; }
+.portrait .resourceBar.stone:before { background-color: #9aa0a6; }
+.portrait .resourceBar.wood:before { background-color: #b07a4e; }
+.portrait .resourceBar.clay:before { background-color: #c65645; }
+.portrait .resourceBar.cloth:before { background-color: #7e57c2; }
+/* цвета заливки: палитра классов (README rebranding), без сдвигов по уровню плиток */
+.grain .resourceBar-inner, .block.grain div { background-color: #f2c14e !important; }
+.wood .resourceBar-inner, .block.wood div { background-color: #b07a4e !important; }
+.stone .resourceBar-inner, .block.stone div { background-color: #9aa0a6 !important; }
+.clay .resourceBar-inner, .block.clay div { background-color: #c65645 !important; }
+.cloth .resourceBar-inner, .block.cloth div { background-color: #7e57c2 !important; }
+.block.mana div { background-color: #d94fa8 !important; }
+
+/* запас: ячейки на полу павильона (позиции: store.css из store-layout.json) */
+.resources, .grain2 .resources, .grain3 .resources, .grain4 .resources {
+	left: 0; bottom: 0;
+	width: 120px; height: 128px;
+	border: 0;
+	transform: none;
+	pointer-events: none;
+}
+.resources .block {
+	position: absolute;
+	display: block;
+	box-sizing: border-box;
+	border: 1px solid #2a1a12;
+	border-radius: 1.5px;
+	background: #3a2418;
+	transform: none;
+	overflow: hidden;
+}
+
+/* ---------- сердца (левая панель) ---------- */
+.statusContainer {
+	left: -107px;
+	top: 0;
+	width: 56px;
+	height: auto;
+	padding: 30px 0;
+	box-sizing: border-box;
+}
+.statusContainer::before, .statusContainer::after {
+	content: '';
+	position: absolute;
+	left: 0; top: 0; right: 0; bottom: 0;
+	z-index: -1;
+	pointer-events: none;
+	border-style: solid;
+	border-color: transparent;
+	border-width: 20px 0;
+	transition: opacity 1400ms linear;
+}
+.statusContainer::before { border-image: url(../img/v2/plate_v_day.webp) 40 0 fill / 20px 0 stretch; }
+.statusContainer::after { border-image: url(../img/v2/plate_v_night.webp) 40 0 fill / 20px 0 stretch; opacity: 0; }
+.night .statusContainer::after { opacity: 1; }
+.statusContainer .vine {
+	position: absolute;
+	left: -29px; top: -12px; bottom: -12px;
+	width: 72px;
+	background-size: 72px 1000px;
+	background-repeat: repeat-y;
+	pointer-events: none;
+	transition: opacity 1400ms linear;
+}
+.statusContainer .vine.day { background-image: url(../img/v2/vine_day.webp); }
+.statusContainer .vine.night { background-image: url(../img/v2/vine_night.webp); opacity: 0; }
+.night .statusContainer .vine.night { opacity: 1; }
+.statusContainer .hearts { position: relative; }
+.statusContainer .heart, .statusContainer .bigheart {
+	position: relative;
+	width: 41px; height: 41px;
+	margin: 0 auto -2px;
+}
+.statusContainer .heart.empty, .statusContainer .bigheart.empty { opacity: 1; }
+.statusContainer .heart .mask, .statusContainer .bigheart .mask {
+	z-index: 0;
+	background: url(../img/v2/heart_socket_day.webp) 0 0 / 100% 100% no-repeat;
+}
+.statusContainer .heart .mask.nightSprite, .statusContainer .bigheart .mask.nightSprite {
+	background-image: url(../img/v2/heart_socket_night.webp);
+	background-position: 0 0;
+}
+.statusContainer .heart .bar, .statusContainer .bigheart .bar {
+	z-index: 1;
+	left: 0; top: 0;
+	background: url(../img/v2/heart_fill.webp) 0 0 / 41px 41px no-repeat;
+}
+.statusContainer .bigheart .bar { filter: hue-rotate(48deg) saturate(1.5) brightness(1.15); }
+.statusContainer .sword, .statusContainer .shield { margin: 0 auto; position: relative; z-index: 1; }
+.statusContainer .shield { position: absolute; top: -35px; left: 13px; }
+
+/* ---------- опыт (правая панель) ---------- */
+.xpBar, .night .xpBar {
+	z-index: 10;
+	left: 100%;
+	right: auto;
+	top: 0;
+	margin-left: 50.5px;
+	width: 56px;
+	height: 100%;
+	border: 0;
+	transform: none;
+}
+.xpBar::before, .xpBar::after {
+	content: '';
+	position: absolute;
+	left: 0; top: 0; right: 0; bottom: 0;
+	z-index: -1;
+	pointer-events: none;
+	border-style: solid;
+	border-color: transparent;
+	border-width: 20px 0;
+	transition: opacity 1400ms linear;
+}
+.xpBar::before { border-image: url(../img/v2/plate_v_day.webp) 40 0 fill / 20px 0 stretch; }
+.xpBar::after { border-image: url(../img/v2/plate_v_night.webp) 40 0 fill / 20px 0 stretch; opacity: 0; }
+.night .xpBar::after { opacity: 1; }
+.xpBar .mask {
+	position: absolute;
+	z-index: 1;
+	left: 50%; top: 26px; bottom: 26px;
+	width: 23.5px; height: auto;
+	margin-left: -11.75px;
+	border-radius: 12px;
+	background: #342014;
+	box-shadow: inset 0 0 0 1.5px #e2b65c, inset 1px 2px 4px 1px rgba(0, 0, 0, 0.55);
+	transition: background 1400ms linear, box-shadow 1400ms linear;
+}
+.night .xpBar .mask {
+	background: #0e1228;
+	box-shadow: inset 0 0 0 1.5px #a07850, inset 1px 2px 4px 1px rgba(0, 0, 0, 0.7);
+}
+.xpBar .nightSprite { display: none; }
+.xpBar .fill {
+	z-index: 0;
+	left: 3.5px; right: 3.5px; bottom: 3.5px;
+	width: auto;
+	max-height: calc(100% - 7px);
+	border-radius: 9px;
+	background: linear-gradient(90deg, #fad060, #dea654);
+	box-shadow: inset 2px 0 0 rgba(255, 245, 200, 0.45);
+}
+
+/* ---------- инвентарь: выезжает ночью из-под нижнего рельса ---------- */
+.inventory, .night .inventory {
+	background: none;
+	border: 0;
+	height: 56px;
+	right: -43px;
+	bottom: 0;
+	padding: 0 24.5px;
+	box-sizing: border-box;
+}
+.night .inventory { bottom: -107px; }
+.inventory.hidden { bottom: 0; }
+/* днём ящик спрятан за доской: рамка и плитки его больше не закрывают целиком */
+.inventory { visibility: hidden; transition: all 1400ms linear, visibility 0s linear 1400ms; }
+.night .inventory { visibility: visible; transition: all 1400ms linear, visibility 0s; }
+.inventory::before, .inventory::after {
+	content: '';
+	position: absolute;
+	left: 0; top: 0; right: 0; bottom: 0;
+	z-index: -1;
+	pointer-events: none;
+	border-style: solid;
+	border-color: transparent;
+	border-width: 0 20px;
+	transition: opacity 1400ms linear;
+}
+.inventory::before { border-image: url(../img/v2/plate_h_day.webp) 0 40 fill / 0 20px stretch; }
+.inventory::after { border-image: url(../img/v2/plate_h_night.webp) 0 40 fill / 0 20px stretch; opacity: 0; }
+.night .inventory::after { opacity: 1; }
+.inventory .button {
+	z-index: 1;
+	width: 39px; height: 39px;
+	margin: 5px 3.5px 0;
+	border: 0;
+	border-radius: 50%;
+	background: url(../img/v2/ring_day.webp) 0 0 / 100% 100% no-repeat;
+}
+.night .inventory .button { background-image: url(../img/v2/ring_night.webp); }
+.inventory .button::before {
+	content: '';
+	position: absolute;
+	left: 14%; top: 12%; right: 14%; bottom: 16%;
+	border-radius: 50%;
+	background: radial-gradient(circle closest-side, rgba(255, 240, 200, 0.75), rgba(255, 240, 200, 0) 100%);
+}
+.night .inventory .button::before { background: radial-gradient(circle closest-side, rgba(190, 215, 255, 0.6), rgba(190, 215, 255, 0) 100%); }
+.inventory .button > div:nth-child(1) {
+	left: 6.5px; top: 6px; bottom: auto;
+	width: 26px; height: 26px;
+	background-color: transparent;
+	filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 4px rgba(240, 246, 255, 0.8));
+	background-position: center; background-size: contain; background-repeat: no-repeat;
+}
+.button.healthPotion div:nth-child(1), .loot.healthPotion { background-image: url(../img/v2/loot_health_potion.webp); background-position: center; background-size: contain; }
+.button.manaPotion div:nth-child(1), .loot.manaPotion { background-image: url(../img/v2/loot_mana_potion.webp); background-position: center; background-size: contain; }
+.button.bomb div:nth-child(1), .loot.bomb { background-image: url(../img/v2/loot_bomb.webp); background-position: center; background-size: contain; }
+.button.equipment div:nth-child(1), .loot.equipment { background-image: url(../img/v2/loot_equipment.webp); background-position: center; background-size: contain; }
+.button.callDragon div:nth-child(1), .loot.callDragon { background-image: url(../img/v2/loot_dragon_scroll.webp); background-position: center; background-size: contain; }
+/* заряды: кружки по нижней дуге кольца */
+.inventory .button > div:nth-child(n+2) {
+	box-sizing: border-box;
+	width: 8px; height: 8px;
+	border: 1px solid #c4963a;
+	border-radius: 50%;
+	bottom: auto; right: auto;
+	background: radial-gradient(circle at 40% 35%, #46281a, #2e1c10);
+}
+.night .inventory .button > div:nth-child(n+2) { border-color: #78708c; background: radial-gradient(circle at 40% 35%, #242a52, #0c0e20); }
+.inventory .button > div:nth-child(2) { left: 3.4px; top: 31.1px; }
+.inventory .button > div:nth-child(3), .inventory .button.large > div:nth-child(2) { left: 15.5px; top: 36px; }
+.inventory .button > div:nth-child(4) { left: 27.6px; top: 31.1px; }
+.inventory .button.large > div:nth-child(2) { top: 35.4px; }
+.inventory .button.charge_1 > div:nth-child(2), .inventory .button.charge_2 > div:nth-child(2), .inventory .button.charge_3 > div:nth-child(2),
+.inventory .button.charge_2 > div:nth-child(3), .inventory .button.charge_3 > div:nth-child(3),
+.inventory .button.charge_3 > div:nth-child(4) {
+	background: radial-gradient(circle at 38% 32%, #fff4c8, #f5c750 55%, #c98d1e);
+	background-color: transparent;
+}
+
+/* ---------- магия: кольцо маны внизу слева, заклинания веером ---------- */
+/* отверстие кольца (по slot_*.webp): центр 49,2% x 46%, диаметр ~76%; заливка чуть больше отверстия, кольцо (::after) поверх скрывает край */
+.magic {
+	left: -43px;
+	top: calc(100% + 47px);
+	z-index: 6;
+}
+.magic .button, .night .magic .button {
+	width: 64px; height: 64px;
+	border: 0;
+	border-radius: 50%;
+	background: none;
+	transition: all 200ms linear;
+}
+.magic .button > .inner {
+	left: 10.8%; top: 9.45%; bottom: auto;
+	width: 76%; height: 73.5%;
+	border-radius: 50%;
+	z-index: 1;
+	background: radial-gradient(circle at 50% 50%, #241c3a, #0d0a1a);
+}
+.night .magic .button > .inner { background: radial-gradient(circle at 50% 50%, #131736, #05061a); }
+.magic .button > .inner > div { background: linear-gradient(#a99cff, #5a55d0 60%, #3f3ba8); }
+/* выпуклость: блик сверху-слева и тень снизу-справа поверх заливки (под кольцом) */
+.magic .button:before {
+	content: '';
+	position: absolute;
+	left: 10.8%; top: 9.45%;
+	width: 76%; height: 73.5%;
+	border-radius: 50%;
+	z-index: 2;
+	pointer-events: none;
+	background:
+		radial-gradient(ellipse 42% 30% at 36% 25%, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0) 100%),
+		radial-gradient(circle at 42% 38%, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 55%),
+		radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0) 55%, rgba(8, 4, 30, 0.6) 100%);
+}
+.magic .button:after {
+	display: block;
+	content: '';
+	position: absolute;
+	left: 0; top: 0; right: 0; bottom: 0;
+	z-index: 3;
+	pointer-events: none;
+	background: url(../img/v2/mana_ring_day.webp) 0 0 / 100% 100% no-repeat;
+	opacity: 1;
+}
+.night .magic .button:after { background-image: url(../img/v2/mana_ring_night.webp); }
+.magic .button.open:after { opacity: 1; }
+.magic .button.open { width: 172px; height: 172px; border-radius: 50%; }
+.magic .button.open > .inner { border-radius: 50%; }
+.spells > div {
+	border: 0;
+	border-radius: 50%;
+	width: 64px; height: 64px;
+	margin: -32px 0 0 -32px;
+	background-color: transparent;
+	background-repeat: no-repeat;
+	background-position: center, center;
+	background-size: 50px 50px, 100% 100%;
+}
+.night .spells > div { background-color: transparent; }
+.spells > .haste { background-image: url(../img/v2/spell_haste.webp), url(../img/v2/slot_day.webp);  background-position: center, center; }
+.spells > .freezeTime { background-image: url(../img/v2/spell_freeze_time.webp), url(../img/v2/slot_day.webp);  background-position: center, center; }
+.spells > .phaseChange { background-image: url(../img/v2/spell_phase_change.webp), url(../img/v2/slot_day.webp);  background-position: center, center; }
+.night .spells > .haste { background-image: url(../img/v2/spell_haste.webp), url(../img/v2/slot_night.webp);  background-position: center, center; }
+.night .spells > .freezeTime { background-image: url(../img/v2/spell_freeze_time.webp), url(../img/v2/slot_night.webp);  background-position: center, center; }
+.night .spells > .phaseChange { background-image: url(../img/v2/spell_phase_change.webp), url(../img/v2/slot_night.webp);  background-position: center, center; }
+/* иконки заклинаний: светлый контур и мягкое свечение, чтобы читались на тёмной полости */
+.spells > div { filter: drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.5)); }
+/* resetBoard: арта пока нет, остаётся старый значок в кольце */
+.spells > .resetBoard { background-image: url(../img/icons.png), url(../img/v2/slot_day.webp); background-position: 12px -782px, center; background-size: auto, 100% 100%; }
+.night .spells > .resetBoard { background-image: url(../img/icons.png), url(../img/v2/slot_night.webp); background-position: 12px -822px, center; }
+/* активные заклинания: кружочки по центру нижнего рельса рамки (несколько эффектов встают в ряд) */
+.states, .night .states {
+	position: absolute;
+	left: -43px; right: -43px; top: auto; bottom: -41px;
+	width: auto; height: 39px; overflow: visible;
+	display: flex; align-items: center; justify-content: center;
+	z-index: 5;
+	pointer-events: none;
+}
+.states > div, .night .states > div {
+	position: relative;
+	width: 39px; height: 39px;
+	margin: 0 3px;
+	background-repeat: no-repeat;
+	background-position: center, center;
+	background-size: 26px 26px, 100% 100%;
+	filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55));
+}
+.states > .haste { background-image: url(../img/v2/spell_haste.webp), url(../img/v2/slot_day.webp); }
+.states > .freezeTime, .states > .frozen { background-image: url(../img/v2/spell_freeze_time.webp), url(../img/v2/slot_day.webp); }
+.night .states > .haste { background-image: url(../img/v2/spell_haste.webp), url(../img/v2/slot_night.webp); }
+.night .states > .freezeTime, .night .states > .frozen { background-image: url(../img/v2/spell_freeze_time.webp), url(../img/v2/slot_night.webp); }
+
+/* ---------- мелочи поверх нового фона ---------- */
+.tile.effect_explosive > div { border-radius: 12px; }
+#test { display: none; top: auto; bottom: 60px; left: 10px; opacity: 0.5; z-index: 4; }
+.debug #test { display: block; }   /* переключатель дня и ночи: только с ?debug */
+/* меню: бургер вместо иконки паузы справа сверху, панель выезжает сверху, внизу экрана полосы больше нет */
+#pauseIcon { display: none; }
+.paused #pauseIcon { display: block; }
+.menuBtn, .night .menuBtn {
+	position: fixed; top: 10px; right: 10px; left: auto;
+	width: 41px; height: 41px;
+	z-index: 103;
+	border: 0; border-radius: 12px;
+	background: rgba(255, 250, 240, 0.6);
+	backdrop-filter: blur(6px);
+	box-shadow: 0 0 0 1.5px rgba(196, 150, 58, 0.9);
+	cursor: pointer;
+}
+.night .menuBtn { background: rgba(8, 12, 32, 0.62); box-shadow: 0 0 0 1.5px rgba(206, 212, 240, 0.85); }
+.menuBtn span {
+	position: absolute; left: 9.5px; top: 19px;
+	width: 22px; height: 3px; border-radius: 2px;
+	background: #5c3a22;
+	box-shadow: 0 -7px 0 #5c3a22, 0 7px 0 #5c3a22;
+	transition: background-color 1400ms linear, box-shadow 1400ms linear;
+}
+.night .menuBtn span { background: #ebc86e; box-shadow: 0 -7px 0 #ebc86e, 0 7px 0 #ebc86e; }
+.menuBar {
+	top: 0; bottom: auto;
+	z-index: 102;
+	height: 370px; max-height: 100%;
+	padding-top: 68px;
+	border-top: 0;
+	border-bottom: 2px solid;
+	background-color: #fff;
+	transform: translateY(-110%);
+}
+.night .menuBar { background-color: #000; }
+.menuBar.open, .night .menuBar.open { box-shadow: 0 4px 12px 2px rgba(0, 0, 0, 0.45); }
+.menuBar .menuContinue {
+	position: absolute; left: 12px; right: 64px; top: 8px;
+	height: 44px; line-height: 40px;
+	text-align: center; font-size: 1.35em;
+	border: 2px solid; border-radius: 10px;
+	cursor: pointer; user-select: none;
+}
+.menuBar .menuContinue:hover { box-shadow: inset 0 0 6px 2px rgba(128, 128, 128, 0.35); }
+.menuOpen.paused:before, .menuOpen #pauseIcon { display: none; }
+.dayNotifier { color: #fff; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7), 0 0 2px rgba(0, 0, 0, 0.8); }
+.celestial {
+	width: 46px; height: 46px;
+	transform: translate3d(0px, 180px, 0px);
+	background-size: 100% 100% !important;
+	background-repeat: no-repeat !important;
+	background-position: 0 0 !important;
+	background-image: radial-gradient(circle closest-side, #fffbe2 0, #fff0a0 34%, #ffd45a 52%, rgba(255, 204, 70, 0.45) 74%, rgba(255, 204, 70, 0) 100%);
+}
+.night .celestial {
+	background-image: radial-gradient(circle closest-side, #ffffff 0, #eef2ff 40%, #cfd9f5 58%, rgba(170, 195, 255, 0.4) 78%, rgba(170, 195, 255, 0) 100%);
+}
+.celestial.noTransition { transition: none; }
+.resourceEffect { border: 0; border-radius: 4px; box-shadow: 0 0 6px 1px rgba(255, 255, 255, 0.5); }
+.night .resourceEffect, .night .resourceEffect.stone, .night .resourceEffect.wood { border-color: transparent; }
+
+/* ---------- портрет (телефон): панели на рельсах рамки, крупнее ---------- */
+.portrait .statusContainer {
+	left: -43px; top: 3px;
+	width: 46px;
+	padding: 18px 0;
+}
+.portrait .statusContainer::before, .portrait .statusContainer::after { border-width: 16.5px 0; border-image-width: 16.5px 0; }
+.portrait .statusContainer .vine { display: none; }
+/* сердца без колец: голое сердце на всю ширину плашки, пустое тусклое, заливка красная слева направо */
+.portrait .statusContainer .heart, .portrait .statusContainer .bigheart { width: 44px; height: 38px; margin-bottom: 0; }
+.portrait .statusContainer .heart .mask, .portrait .statusContainer .bigheart .mask {
+	background: url(../img/v2/heart_plain.webp) 0 0 / 44px auto no-repeat;
+	filter: grayscale(1) brightness(0.8);
+	opacity: 0.5;
+}
+.portrait .statusContainer .heart .mask.nightSprite, .portrait .statusContainer .bigheart .mask.nightSprite { display: none; }
+.portrait .statusContainer .heart .bar, .portrait .statusContainer .bigheart .bar { background: url(../img/v2/heart_plain.webp) 0 0 / 44px auto no-repeat; }
+.portrait .xpBar, .portrait.night .xpBar { margin-left: 0; width: 40px; }
+.portrait .xpBar::before, .portrait .xpBar::after { display: none; }
+.portrait .xpBar .mask { top: 6px; bottom: 6px; width: 18px; margin-left: -9px; border-radius: 9px; }
+.portrait .xpBar .fill { left: 3px; right: 3px; bottom: 3px; border-radius: 6px; }
+/* щит и меч: постоянная тонкая панель на верхней планке поля; сами полоски заливаются поверх бледных слотов */
+.gear { display: none; }
+.portrait .gear {
+	display: block;
+	opacity: 0;   /* щит и меч есть только ночью */
+	position: absolute;
+	left: 182.75px; top: -39.5px;
+	width: 128px; height: 36px;
+	box-sizing: border-box;
+	z-index: 5;
+	pointer-events: none;
+	border: 1.5px solid rgba(190, 146, 60, 0.85);
+	border-radius: 11px;
+	background: rgba(58, 36, 20, 0.28);
+	transition: opacity 1400ms linear, border-color 1400ms linear, background-color 1400ms linear;
+}
+.portrait.night .gear { opacity: 1; border: 2px solid rgba(206, 212, 240, 0.95); background: rgba(5, 8, 24, 0.72); }
+.portrait .gear .slot {
+	position: absolute;
+	top: 3px;
+	width: 30px; height: 30px;
+	opacity: 0.5;
+	filter: grayscale(0.6) drop-shadow(0 0 2px rgba(255, 255, 255, 0.55));
+}
+.portrait .gear .slot.shield { left: 20.25px; background: url(../img/v2/gear_shield.webp) 0 0 / 30px 270px no-repeat; }
+.portrait .gear .slot.sword { left: 74.25px; background: url(../img/v2/gear_sword.webp) 0 0 / 30px 270px no-repeat; }
+.portrait .statusContainer .shield, .portrait .statusContainer .sword {
+	position: absolute;
+	top: -39.5px;
+	margin: 0;
+	width: 30px; height: 30px;
+	background: none;
+	transform: none;
+	border-radius: 0;
+	box-shadow: none;
+	z-index: 6;
+	opacity: 0;
+	transition: opacity 1400ms linear;
+}
+.portrait.night .statusContainer .shield, .portrait.night .statusContainer .sword { opacity: 1; }
+.portrait .statusContainer .shield > div, .portrait .statusContainer .sword > div { filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 5px rgba(235, 242, 255, 0.6)); }
+.portrait .statusContainer .shield { left: 247.75px; }
+.portrait .statusContainer .sword { left: 301.75px; }
+.portrait .statusContainer .shield > div { background: url(../img/v2/gear_shield.webp) 0 0 / 30px 270px no-repeat; }
+.portrait .statusContainer .sword > div { background: url(../img/v2/gear_sword.webp) 0 0 / 30px 270px no-repeat; }
+.wood2 .gear .slot.shield, .wood2 .statusContainer .shield > div { background-position: 0 -30px; }
+.stone2 .gear .slot.sword, .stone2 .statusContainer .sword > div { background-position: 0 -30px; }
+.wood3 .gear .slot.shield, .wood3 .statusContainer .shield > div { background-position: 0 -60px; }
+.stone3 .gear .slot.sword, .stone3 .statusContainer .sword > div { background-position: 0 -60px; }
+.wood4 .gear .slot.shield, .wood4 .statusContainer .shield > div { background-position: 0 -90px; }
+.stone4 .gear .slot.sword, .stone4 .statusContainer .sword > div { background-position: 0 -90px; }
+.wood5 .gear .slot.shield, .wood5 .statusContainer .shield > div { background-position: 0 -120px; }
+.stone5 .gear .slot.sword, .stone5 .statusContainer .sword > div { background-position: 0 -120px; }
+.wood6 .gear .slot.shield, .wood6 .statusContainer .shield > div { background-position: 0 -150px; }
+.stone6 .gear .slot.sword, .stone6 .statusContainer .sword > div { background-position: 0 -150px; }
+.wood7 .gear .slot.shield, .wood7 .statusContainer .shield > div { background-position: 0 -180px; }
+.stone7 .gear .slot.sword, .stone7 .statusContainer .sword > div { background-position: 0 -180px; }
+.wood8 .gear .slot.shield, .wood8 .statusContainer .shield > div { background-position: 0 -210px; }
+.stone8 .gear .slot.sword, .stone8 .statusContainer .sword > div { background-position: 0 -210px; }
+.wood9 .gear .slot.shield, .wood9 .statusContainer .shield > div { background-position: 0 -240px; }
+.stone9 .gear .slot.sword, .stone9 .statusContainer .sword > div { background-position: 0 -240px; }
+/* инвентарь и магия крупнее */
+.portrait .inventory { height: 94px; padding: 0 39px; }
+.portrait .night .inventory, .portrait.night .inventory { bottom: -145px; }
+.portrait .inventory::before, .portrait .inventory::after { border-width: 0 33.6px; }
+.portrait .inventory::before { border-image-width: 0 33.6px; }
+.portrait .inventory::after { border-image-width: 0 33.6px; }
+.portrait .inventory .button { width: 68px; height: 68px; margin: 9px 5.5px 0; }
+.portrait .inventory .button > div:nth-child(1) { left: 10px; top: 8px; width: 48px; height: 48px; }
+.portrait .inventory .button > div:nth-child(n+2) { width: 13.5px; height: 13.5px; }
+.portrait .inventory .button > div:nth-child(2) { left: 6.2px; top: 54.5px; }
+.portrait .inventory .button > div:nth-child(3), .portrait .inventory .button.large > div:nth-child(2) { left: 27.2px; top: 63px; }
+.portrait .inventory .button > div:nth-child(4) { left: 48.3px; top: 54.5px; }
+.portrait .inventory .button.large > div:nth-child(2) { top: 61.7px; }
+.portrait .magic { left: -43px; top: calc(100% + 48px); }
+.portrait .magic .button, .portrait.night .magic .button { width: 78px; height: 78px; }
+.portrait .magic .button.open { width: 200px; height: 200px; }
+.portrait .spells > div { width: 74px; height: 74px; margin: -37px 0 0 -37px; background-size: 60px 60px, 100% 100%; }
+.portrait .spells > .resetBoard { background-position: 17px -777px, center; }
+.portrait.night .spells > .resetBoard { background-position: 17px -817px, center; }
+/* портрет */
+.portrait .states > div, .portrait.night .states > div { width: 40px; height: 40px; background-size: 27px 27px, 100% 100%; }
+/* столбики с табличками крупнее */
+.portrait .sign { transform: scale(1.5); transform-origin: 50% 100%; }
+.portrait .sign.left .num, .portrait .sign.right .num { font-size: 16px; overflow: visible; white-space: nowrap; }
+
+/* портрет: передний план чуть шире и ниже экрана, чтобы факел и фонарь не закрывали инвентарь и магию */
+@media (max-aspect-ratio: 1/1) {
+	#fg { bottom: -9%; left: -6%; right: -6%; }
+}
+
+/* десктоп: передний план по краям экрана лежит под игрой, чтобы листва не закрывала кольцо магии и панели */
+@media (min-aspect-ratio: 1/1) {
+	#fg { z-index: 0; }
+}

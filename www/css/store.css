@@ -1,0 +1,59 @@
+/* Генерируется rebranding/tools/export_www.py (css) из store-layout.json: ячейки запаса по стадиям жилой линии (px кадра спрайта 100x106,7). */
+.resources .block:nth-child(1) { left: 38.08px; top: 112.00px; }
+.resources .block:nth-child(2) { left: 38.08px; top: 101.80px; }
+.resources .block:nth-child(3) { left: 38.08px; top: 91.60px; }
+.resources .block:nth-child(4) { left: 48.28px; top: 112.00px; }
+.resources .block:nth-child(5) { left: 48.28px; top: 101.80px; }
+.resources .block:nth-child(6) { left: 48.28px; top: 91.60px; }
+.resources .block:nth-child(7) { left: 58.48px; top: 112.00px; }
+.resources .block:nth-child(8) { left: 58.48px; top: 101.80px; }
+.resources .block:nth-child(9) { left: 58.48px; top: 91.60px; }
+.grain2 .resources .block:nth-child(1) { left: 38.70px; top: 106.62px; }
+.grain2 .resources .block:nth-child(2) { left: 38.70px; top: 96.42px; }
+.grain2 .resources .block:nth-child(3) { left: 38.70px; top: 86.22px; }
+.grain2 .resources .block:nth-child(4) { left: 38.70px; top: 76.02px; }
+.grain2 .resources .block:nth-child(5) { left: 48.90px; top: 106.62px; }
+.grain2 .resources .block:nth-child(6) { left: 48.90px; top: 96.42px; }
+.grain2 .resources .block:nth-child(7) { left: 48.90px; top: 86.22px; }
+.grain2 .resources .block:nth-child(8) { left: 48.90px; top: 76.02px; }
+.grain2 .resources .block:nth-child(9) { left: 59.10px; top: 106.62px; }
+.grain2 .resources .block:nth-child(10) { left: 59.10px; top: 96.42px; }
+.grain2 .resources .block:nth-child(11) { left: 59.10px; top: 86.22px; }
+.grain2 .resources .block:nth-child(12) { left: 59.10px; top: 76.02px; }
+.grain3 .resources .block:nth-child(1) { left: 32.72px; top: 102.88px; }
+.grain3 .resources .block:nth-child(2) { left: 32.72px; top: 92.68px; }
+.grain3 .resources .block:nth-child(3) { left: 32.72px; top: 82.48px; }
+.grain3 .resources .block:nth-child(4) { left: 32.72px; top: 72.28px; }
+.grain3 .resources .block:nth-child(5) { left: 42.92px; top: 102.88px; }
+.grain3 .resources .block:nth-child(6) { left: 42.92px; top: 92.68px; }
+.grain3 .resources .block:nth-child(7) { left: 42.92px; top: 82.48px; }
+.grain3 .resources .block:nth-child(8) { left: 42.92px; top: 72.28px; }
+.grain3 .resources .block:nth-child(9) { left: 53.12px; top: 102.88px; }
+.grain3 .resources .block:nth-child(10) { left: 53.12px; top: 92.68px; }
+.grain3 .resources .block:nth-child(11) { left: 53.12px; top: 82.48px; }
+.grain3 .resources .block:nth-child(12) { left: 53.12px; top: 72.28px; }
+.grain3 .resources .block:nth-child(13) { left: 63.32px; top: 102.88px; }
+.grain3 .resources .block:nth-child(14) { left: 63.32px; top: 92.68px; }
+.grain3 .resources .block:nth-child(15) { left: 63.32px; top: 82.48px; }
+.grain3 .resources .block:nth-child(16) { left: 63.32px; top: 72.28px; }
+.grain4 .resources .block:nth-child(1) { left: 32.98px; top: 102.88px; }
+.grain4 .resources .block:nth-child(2) { left: 32.98px; top: 92.68px; }
+.grain4 .resources .block:nth-child(3) { left: 32.98px; top: 82.48px; }
+.grain4 .resources .block:nth-child(4) { left: 32.98px; top: 72.28px; }
+.grain4 .resources .block:nth-child(5) { left: 43.18px; top: 102.88px; }
+.grain4 .resources .block:nth-child(6) { left: 43.18px; top: 92.68px; }
+.grain4 .resources .block:nth-child(7) { left: 43.18px; top: 82.48px; }
+.grain4 .resources .block:nth-child(8) { left: 43.18px; top: 72.28px; }
+.grain4 .resources .block:nth-child(9) { left: 53.38px; top: 102.88px; }
+.grain4 .resources .block:nth-child(10) { left: 53.38px; top: 92.68px; }
+.grain4 .resources .block:nth-child(11) { left: 53.38px; top: 82.48px; }
+.grain4 .resources .block:nth-child(12) { left: 53.38px; top: 72.28px; }
+.grain4 .resources .block:nth-child(13) { left: 63.58px; top: 102.88px; }
+.grain4 .resources .block:nth-child(14) { left: 63.58px; top: 92.68px; }
+.grain4 .resources .block:nth-child(15) { left: 63.58px; top: 82.48px; }
+.grain4 .resources .block:nth-child(16) { left: 63.58px; top: 72.28px; }
+.grain4 .resources .block:nth-child(17) { left: 16.27px; top: 102.88px; }
+.grain4 .resources .block:nth-child(18) { left: 16.27px; top: 92.68px; }
+.grain4 .resources .block:nth-child(19) { left: 16.27px; top: 82.48px; }
+.grain4 .resources .block:nth-child(20) { left: 16.27px; top: 72.28px; }
+.resources .block { width: 9px; height: 9px; }

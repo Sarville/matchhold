@@ -27,8 +27,13 @@ define(['app/eventmanager', 'app/gamestate'], function(E, State) {
 			btn = G.make("hidden button litBorder " + loot)
 				.append(G.make())
 				.data('lootName', loot)
-				.appendTo(el())
 				.append(G.make());
+			// кнопки плавают вправо: первый в списке стоит крайним справа, зелье здоровья всегда первое
+			if(loot == 'healthPotion') {
+				btn.prependTo(el());
+			} else {
+				btn.appendTo(el());
+			}
 			if(!require('app/gamecontent').LootType[loot].large) {
 				btn.append(G.make()).append(G.make());
 			} else {

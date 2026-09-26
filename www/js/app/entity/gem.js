@@ -4,7 +4,8 @@ define(['app/entity/worldentity'],
 	var Gem = function() { };
 	Gem.prototype = new WorldEntity({
 		className: 'gem',
-		spriteName: 'gem'
+		spriteName: 'gem',
+		animationFrames: 1 // в новом листе один кадр на состояние кристалла (строка = число кристаллов)
 	});
 	Gem.constructor = Gem;
 	

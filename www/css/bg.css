@@ -1,0 +1,39 @@
+/* Генерируется rebranding/tools/export_www.py (css). Не править руками. */
+.stage1 #bg .far.day { background-image: url(../img/v2/bg/s1_far_day_land.webp); }
+.stage1 #bg .far.night { background-image: url(../img/v2/bg/s1_far_night_land.webp); }
+.stage1 #bg .mid.day { background-image: url(../img/v2/bg/s1_mid_day_land.webp); }
+.stage1 #bg .mid.night { background-image: url(../img/v2/bg/s1_mid_night_land.webp); }
+.stage2 #bg .far.day { background-image: url(../img/v2/bg/s2_far_day_land.webp); }
+.stage2 #bg .far.night { background-image: url(../img/v2/bg/s2_far_night_land.webp); }
+.stage2 #bg .mid.day { background-image: url(../img/v2/bg/s2_mid_day_land.webp); }
+.stage2 #bg .mid.night { background-image: url(../img/v2/bg/s2_mid_night_land.webp); }
+.stage3 #bg .far.day { background-image: url(../img/v2/bg/s3_far_day_land.webp); }
+.stage3 #bg .far.night { background-image: url(../img/v2/bg/s3_far_night_land.webp); }
+.stage3 #bg .mid.day { background-image: url(../img/v2/bg/s3_mid_day_land.webp); }
+.stage3 #bg .mid.night { background-image: url(../img/v2/bg/s3_mid_night_land.webp); }
+.stage4 #bg .far.day { background-image: url(../img/v2/bg/s4_far_day_land.webp); }
+.stage4 #bg .far.night { background-image: url(../img/v2/bg/s4_far_night_land.webp); }
+.stage4 #bg .mid.day { background-image: url(../img/v2/bg/s4_mid_day_land.webp); }
+.stage4 #bg .mid.night { background-image: url(../img/v2/bg/s4_mid_night_land.webp); }
+#fg .day { background-image: url(../img/v2/bg/fg_day_land.webp); }
+#fg .night { background-image: url(../img/v2/bg/fg_night_land.webp); }
+@media (max-aspect-ratio: 1/1) {
+.stage1 #bg .far.day { background-image: url(../img/v2/bg/s1_far_day_port.webp); }
+.stage1 #bg .far.night { background-image: url(../img/v2/bg/s1_far_night_port.webp); }
+.stage1 #bg .mid.day { background-image: url(../img/v2/bg/s1_mid_day_port.webp); }
+.stage1 #bg .mid.night { background-image: url(../img/v2/bg/s1_mid_night_port.webp); }
+.stage2 #bg .far.day { background-image: url(../img/v2/bg/s2_far_day_port.webp); }
+.stage2 #bg .far.night { background-image: url(../img/v2/bg/s2_far_night_port.webp); }
+.stage2 #bg .mid.day { background-image: url(../img/v2/bg/s2_mid_day_port.webp); }
+.stage2 #bg .mid.night { background-image: url(../img/v2/bg/s2_mid_night_port.webp); }
+.stage3 #bg .far.day { background-image: url(../img/v2/bg/s3_far_day_port.webp); }
+.stage3 #bg .far.night { background-image: url(../img/v2/bg/s3_far_night_port.webp); }
+.stage3 #bg .mid.day { background-image: url(../img/v2/bg/s3_mid_day_port.webp); }
+.stage3 #bg .mid.night { background-image: url(../img/v2/bg/s3_mid_night_port.webp); }
+.stage4 #bg .far.day { background-image: url(../img/v2/bg/s4_far_day_port.webp); }
+.stage4 #bg .far.night { background-image: url(../img/v2/bg/s4_far_night_port.webp); }
+.stage4 #bg .mid.day { background-image: url(../img/v2/bg/s4_mid_day_port.webp); }
+.stage4 #bg .mid.night { background-image: url(../img/v2/bg/s4_mid_night_port.webp); }
+#fg .day { background-image: url(../img/v2/bg/fg_day_port.webp); }
+#fg .night { background-image: url(../img/v2/bg/fg_night_port.webp); }
+}

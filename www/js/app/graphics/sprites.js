@@ -1,14 +1,14 @@
 define(function() {
 
-	var CDN_PATH = "https://glmedia.doublespeakgames.com/";
+	var CDN_PATH = "";
 	var spriteinfo = {
-		// Buildings
-		blacksmith: ['buildings', 0],
-		bricklayer: ['buildings', 640],
-		sawmill: ['buildings', 960],
-		shack: ['buildings', 1600],
-		tower: ['buildings', 1920],
-		weaver: ['buildings', 2320],
+		// Buildings (лист v2: 100x107 на строку; порядок строк: blacksmith 0-7, bricklayer 8-11, sawmill 12-19, shack 20-23, gem 24-27 + tower 28, weaver 29-32)
+		blacksmith: ['v2/buildings.webp', 0],
+		bricklayer: ['v2/buildings.webp', 856],
+		sawmill: ['v2/buildings.webp', 1284],
+		shack: ['v2/home.webp', 0],
+		tower: ['v2/tower.webp', 0],
+		weaver: ['v2/buildings.webp', 3103],
 
 		// Monsters
 		demon: ['monsters', 0],
@@ -32,7 +32,7 @@ define(function() {
 		buttonicons: ['icons', 60],
 		dragoneffects: ['icons', 88],
 		fireball: ['icons', 176],
-		gem: ['icons', 183],
+		gem: ['v2/tower.webp', 0],
 		heart: ['icons', 279],
 		items: ['icons', 335],
 		menu: ['icons', 363],
@@ -45,8 +45,8 @@ define(function() {
 		treasurechest: ['icons', 1011],
 
 		// Tiles
-		tilesday: ['tiles', 0],
-		tilesnight: ['tiles', 468],
+		tilesday: ['v2/tiles.webp', 0],
+		tilesnight: ['v2/tiles.webp', 468],
 
 		// Dragon
 		dragon: ['dragonsprite', 0],
@@ -70,7 +70,7 @@ define(function() {
 		spriteImage.onload = function() {
 			spritesheets[sheetName] = true;
 		};
-		spriteImage.src = CDN_PATH + "img/" + sheetName + ".png";
+		spriteImage.src = CDN_PATH + "img/" + sheetName + (sheetName.indexOf('.') < 0 ? ".png" : "");
 	}
 
 	function getInfo(spriteName) {

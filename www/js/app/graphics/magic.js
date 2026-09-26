@@ -36,6 +36,7 @@ define(['app/eventmanager', 'app/gamestate'], function(E, State) {
 	function states() {
 		if(_states == null) {
 			var G = require('app/graphics/graphics');
+			// активные заклинания: кружочки на нижнем рельсе рамки (art.css)
 			_states = G.make('states');
 			G.addToBoard(_states);
 		}

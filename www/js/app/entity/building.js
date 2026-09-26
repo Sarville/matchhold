@@ -72,7 +72,8 @@ define(['app/entity/worldentity', 'app/entity/block', 'app/gamecontent'], functi
 	};
 	
 	Building.prototype.dudeSpot = function() {
-		return this.p() + this.el().width() / 2;
+		// Герой встаёт правее двери в слоте (центр + 30, у жилой линии шире: +40), у башни у края мира не дальше 453
+		return Math.min(this.p() + (this.width() > 90 ? 40 : 30), 453);
 	};
 	
 	Building.prototype.getReplaces = function(State) {
@@ -83,4 +84,4 @@ define(['app/entity/worldentity', 'app/entity/block', 'app/gamecontent'], functi
 	};
 	
 	return Building;
-});
+});

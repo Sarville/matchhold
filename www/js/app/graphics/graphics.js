@@ -6,13 +6,15 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 	
 	var MAX_HEARTS = 14;
 	var HEALTH_PER_HEART = 10;
-	var MIN_SCREEN_WIDTH = 600, MIN_SCREEN_HEIGHT = 650, PORTRAIT_HEIGHT = 725;
+	// Логический размер сцены (art.css): десктоп 760x795 с боковыми панелями, телефон 600x870 (сердца и опыт на рельсах рамки)
+	var MIN_SCREEN_WIDTH = 760, MIN_SCREEN_HEIGHT = 865, PORTRAIT_WIDTH = 600, PORTRAIT_HEIGHT = 940, MAX_SCALE = 1.5; // высота с запасом 50 на полосу меню
+	var STAGE_LEVELS = [1, 7, 14, 21]; // этап фона (s1..s4) по уровню героя
 	
 	var textStore;
 	var _ww = null, _wh = null;
 	var _bossHealth = null;
 	var styleSheet = null;
-	var currentScale = null;
+	var currentScale = null, currentLoadScale = null, currentHeight = null;
 	var heartInfo = { total: 0, big: 0 };
 	var imageLoaded = false;
 	var isDragon = false;
@@ -361,34 +363,35 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 	
 	var scaleSheet = null;
 	function scaleToViewport() {
-		var widthScale = document.documentElement.clientWidth / MIN_SCREEN_WIDTH,
-			heightScale = document.documentElement.clientHeight /
-				(require('app/gameboard').options.mobile ? PORTRAIT_HEIGHT : MIN_SCREEN_HEIGHT);
+		var mobile = require('app/gameboard').options.mobile;
+		var widthScale = document.documentElement.clientWidth / (mobile ? PORTRAIT_WIDTH : MIN_SCREEN_WIDTH),
+			heightScale = document.documentElement.clientHeight / (mobile ? PORTRAIT_HEIGHT : MIN_SCREEN_HEIGHT);
+		// Экран загрузки остаётся 600x650 и только уменьшается, сцена игры ещё и растёт (арт векторно-мягкий, x2)
+		var loadScale = Math.min(1, document.documentElement.clientWidth / 600, document.documentElement.clientHeight / 650);
+		var minScale = Math.min(MAX_SCALE, widthScale, heightScale);
+		var sizeKey = document.documentElement.clientHeight;
 
 		if(!scaleSheet) {
 			scaleSheet = newStylesheet();
 		}
 
-		var minScale = widthScale  < heightScale ? widthScale : heightScale;
-		if(minScale != currentScale && minScale < 1) {
+		if(minScale != currentScale || loadScale != currentLoadScale || sizeKey != currentHeight) {
+			currentHeight = sizeKey;
 			currentScale = minScale;
-			scaleSheet.cssRules.length > 0 && scaleSheet.deleteRule(0);
-			Graphics.addStyleRule('#loadingScreen, #gameContainer', 
-				'transform-origin: 50% 0 0;' +
-				'-webkit-transform-origin: 50% 0 0;' +
-				'-moz-transform-origin: 50% 0 0;' +
-				'-ms-transform-origin: 50% 0 0;' +
-				'-o-transform-origin: 50% 0 0;' +
-				'transform: scale(' + minScale +');' +
-				'-webkit-transform: scale(' + minScale +');' +
-				'-moz-transform: scale(' + minScale +');' +
-				'-ms-transform: scale(' + minScale +');' +
-				'-o-transform: scale(' + minScale +');',
-				scaleSheet
-			);
-		} else if(minScale != currentScale && Graphics.isScaled()) {
-			currentScale = null;
-			scaleSheet.cssRules.length > 0 && scaleSheet.deleteRule(0);
+			currentLoadScale = loadScale;
+			while(scaleSheet.cssRules.length > 0) {
+				scaleSheet.deleteRule(0);
+			}
+			var rule = function(scale) {
+				return 'transform-origin: 50% 0 0;' +
+					'-webkit-transform-origin: 50% 0 0;' +
+					'transform: scale(' + scale +');' +
+					'-webkit-transform: scale(' + scale +');';
+			};
+			Graphics.addStyleRule('#loadingScreen', rule(loadScale), scaleSheet);
+			// сцена по центру экрана по вертикали (фон виден выше и ниже)
+			var top = Math.max(0, (document.documentElement.clientHeight - (mobile ? PORTRAIT_HEIGHT - 37.5 : MIN_SCREEN_HEIGHT - 37.5) * minScale) / 2); // нижней полосы меню больше нет: доска сдвинута вниз на 18,75 (было 25)
+			Graphics.addStyleRule('#gameContainer', rule(minScale) + 'top: ' + Math.round(top) + 'px;', scaleSheet);
 		}
 	}
 	
@@ -477,7 +480,7 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 		},
 		
 		isScaled: function() {
-			return currentScale != null;
+			return currentScale != null && currentScale != 1;
 		},
 		
 		isReady: function() {
@@ -604,7 +607,7 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 			var el = entity.el();
 			var pos = entity.p();
 			var height = (Math.abs(pos - Graphics.worldWidth() / 2) / (Graphics.worldWidth() / 2)) * 30;
-			var left = (pos - (el.width() / 2)),
+			var left = Math.max(0, pos - (el.width() / 2)),
 				top = Math.floor(height);
 			el.css({
 				'transform': 'translate3d(' + left + 'px, ' + top + 'px, 0)',
@@ -624,7 +627,7 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 		},
 		
 		phaseTransition: function(celestial, callback) {
-			var left = celestial.p() - (celestial.el().width() / 2);
+			var left = Math.max(0, celestial.p() - (celestial.el().width() / 2));
 			celestial.el().css({
 				'transform': 'translate3d(' + left + 'px, ' + (Graphics.worldHeight() + 10) + 'px, 0)',
 				'-webkit-transform': 'translate3d(' + left + 'px, ' + (Graphics.worldHeight() + 10) + 'px, 0)',
@@ -677,7 +680,7 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 				var replaces = building.getReplaces(require('app/gamestate'));
 				if(replaces) {
 					replaces.el().data('upgrade', building);
-					Graphics.markUpgrading(replaces, true);
+					Graphics.markUpgrading(replaces, true, Object.keys(building.options.type.cost).length);
 				}
 			}
 		},
@@ -731,9 +734,9 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 			};
 		},
 		
-		markUpgrading: function(building, upgrading) {
+		markUpgrading: function(building, upgrading, numTypes) {
 			if(upgrading) {
-				building.el().addClass('upgrading');
+				building.el().addClass('upgrading up' + (numTypes || 1));
 			} else {
 				building.el().removeClass('upgrading');
 			}
@@ -774,7 +777,7 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 		sinkBuilding: function(building) {
 			var el = building.el();
 			$('.resourceBars', el).removeClass('sunk');
-			el.stop().css('bottom', '-80px');
+			el.stop().css('bottom', '-' + el.height() + 'px');
 			var replaces = building.getReplaces(require('app/gamestate'));
 			if(replaces) {
 				replaces.el().removeClass('sunk');
@@ -793,6 +796,7 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 			var healthContainer = $('.statusContainer');
 			if(healthContainer.length == 0) {
 				healthContainer =  $('<div>').addClass('statusContainer')
+					.append($('<div>').addClass('vine day'), $('<div>').addClass('vine night'))
 					.append($('<div>').addClass('hearts')).appendTo('.gameBoard');
 			}
 			return healthContainer;
@@ -801,15 +805,49 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 		updateExperience: function(xp, toLevel) {
 			var xpBar = $('.xpBar');
 			if(xpBar.length == 0) {
-				xpBar = $('<div>').addClass('xpBar').addClass('litBorder')
-					.addClass('hidden').append($('<div>').addClass('mask'))
-					.append($('<div>').addClass('nightSprite'))
-					.append($('<div>').addClass('fill').addClass('hidden')).appendTo('.gameBoard');
+				xpBar = $('<div>').addClass('xpBar')
+					.addClass('hidden').append($('<div>').addClass('mask')
+						.append($('<div>').addClass('fill').addClass('hidden'))).appendTo('.gameBoard');
 			}
 			xpBar.find('.fill').css('height', (xp / toLevel * 100) + "%");
 			setTimeout(function() {
 				$('.xpBar, .fill').removeClass('hidden');
 			}, 100);
+			Graphics.updateSigns();
+		},
+		
+		// Этап фона по уровню героя и числа на столбиках (слева день, справа уровень)
+		updateSigns: function(dayNumber) {
+			var State = require('app/gamestate');
+			var stage = 1;
+			STAGE_LEVELS.forEach(function(level, i) {
+				if(State.level >= level) {
+					stage = i + 1;
+				}
+			});
+			var body = $('body');
+			for(var i = 1; i <= STAGE_LEVELS.length; i++) {
+				body.toggleClass('stage' + i, i == stage);
+			}
+			var setNum = function(sign, value) {
+				var val = $('.sign.' + sign + ' .val');
+				if(val.length > 0 && val.text() != String(value)) {
+					var first = val.text() == '';
+					val.text(value);
+					if(!first) {
+						var num = val.parent().removeClass('roll');
+						num.css('left'); // перезапуск анимации
+						num.addClass('roll');
+						if(sign == 'right') {
+							var s = $('.sign.right').removeClass('swing');
+							s.css('left');
+							s.addClass('swing');
+						}
+					}
+				}
+			};
+			setNum('right', State.level);
+			setNum('left', dayNumber || State.dayNumber);
 		},
 		
 		numHearts: function() {
@@ -998,6 +1036,7 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 		},
 		
 		handleDayBreak: function(dayNumber) {
+			Graphics.updateSigns(dayNumber);
 			var txt = Graphics.getText('DAY');
 			var notifier;
 			if(isDragon) {
@@ -1022,6 +1061,7 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 		},
 		
 		enablePlayButton: function() {
+			$('.menuContinue').text(Graphics.getText('CONTINUE'));
 			$('#loadingScreen .saveSpinner').addClass('hidden');
 			Graphics.drawSaveSlots();
 		},
