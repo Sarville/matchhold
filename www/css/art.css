@@ -22,6 +22,10 @@
 }
 #bg .night, #fg .night { opacity: 0; }
 .night #bg .night, .night #fg .night { opacity: 1; }
+#bg .drbg, #fg .drbg { opacity: 0; }   /* бой с драконом: свой фон поверх дня/ночи */
+.dragonBg #bg .drbg, .dragonBg #fg .drbg { opacity: 1; }
+.dragonBg #fg .day, .dragonBg #fg .night { opacity: 0; }
+.dragonBg .celestial { opacity: 0; }
 
 /* ---------- сцена ---------- */
 #gameContainer { margin-left: -241.5px; }
@@ -368,7 +372,9 @@
 	left: 0; top: 0;
 	background: url(../img/v2/heart_fill.webp) 0 0 / 41px 41px no-repeat;
 }
-.statusContainer .bigheart .bar { filter: hue-rotate(48deg) saturate(1.5) brightness(1.15); }
+.statusContainer .bigheart .mask { background-image: url(../img/v2/heartbig_socket_day.webp); }
+.statusContainer .bigheart .mask.nightSprite { background-image: url(../img/v2/heartbig_socket_night.webp); }
+.statusContainer .bigheart .bar { background-image: url(../img/v2/heartbig_fill.webp); }
 .statusContainer .sword, .statusContainer .shield { margin: 0 auto; position: relative; z-index: 1; }
 .statusContainer .shield { position: absolute; top: -35px; left: 13px; }
 
@@ -573,9 +579,8 @@
 .night .spells > .phaseChange { background-image: url(../img/v2/spell_phase_change.webp), url(../img/v2/slot_night.webp);  background-position: center, center; }
 /* иконки заклинаний: светлый контур и мягкое свечение, чтобы читались на тёмной полости */
 .spells > div { filter: drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.5)); }
-/* resetBoard: арта пока нет, остаётся старый значок в кольце */
-.spells > .resetBoard { background-image: url(../img/icons.png), url(../img/v2/slot_day.webp); background-position: 12px -782px, center; background-size: auto, 100% 100%; }
-.night .spells > .resetBoard { background-image: url(../img/icons.png), url(../img/v2/slot_night.webp); background-position: 12px -822px, center; }
+.spells > .resetBoard { background-image: url(../img/v2/spell_reset_board.webp), url(../img/v2/slot_day.webp); background-position: center, center; }
+.night .spells > .resetBoard { background-image: url(../img/v2/spell_reset_board.webp), url(../img/v2/slot_night.webp); background-position: center, center; }
 /* активные заклинания: кружочки по центру нижнего рельса рамки (несколько эффектов встают в ряд) */
 .states, .night .states {
 	position: absolute;
@@ -595,9 +600,11 @@
 	filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55));
 }
 .states > .haste { background-image: url(../img/v2/spell_haste.webp), url(../img/v2/slot_day.webp); }
-.states > .freezeTime, .states > .frozen { background-image: url(../img/v2/spell_freeze_time.webp), url(../img/v2/slot_day.webp); }
+.states > .freezeTime { background-image: url(../img/v2/spell_freeze_time.webp), url(../img/v2/slot_day.webp); }
+.states > .frozen { background-image: url(../img/v2/state_frozen.webp), url(../img/v2/slot_day.webp); }
 .night .states > .haste { background-image: url(../img/v2/spell_haste.webp), url(../img/v2/slot_night.webp); }
-.night .states > .freezeTime, .night .states > .frozen { background-image: url(../img/v2/spell_freeze_time.webp), url(../img/v2/slot_night.webp); }
+.night .states > .freezeTime { background-image: url(../img/v2/spell_freeze_time.webp), url(../img/v2/slot_night.webp); }
+.night .states > .frozen { background-image: url(../img/v2/state_frozen.webp), url(../img/v2/slot_night.webp); }
 
 /* ---------- мелочи поверх нового фона ---------- */
 .tile.effect_explosive > div { border-radius: 12px; }
@@ -648,15 +655,18 @@
 .menuOpen.paused:before, .menuOpen #pauseIcon { display: none; }
 .dayNotifier { color: #fff; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7), 0 0 2px rgba(0, 0, 0, 0.8); }
 .celestial {
-	width: 46px; height: 46px;
+	/* за зданиями, как в оригинале (z-index не трогаем); свечение запечено в самой картинке (128x128,
+	   диск ~46% холста), поэтому CSS drop-shadow не нужен — раньше он вылезал за .world и обрезался краем */
+	width: 100px; height: 100px;   /* box больше картинки диска ради самого свечения; JS центрирует по el.width() */
+	top: -14px;   /* поднимает всю траекторию выше (тот же размах); безопасно — в sky_sun/sky_moon запас прозрачного края у картинки больше этого сдвига */
 	transform: translate3d(0px, 180px, 0px);
 	background-size: 100% 100% !important;
 	background-repeat: no-repeat !important;
 	background-position: 0 0 !important;
-	background-image: radial-gradient(circle closest-side, #fffbe2 0, #fff0a0 34%, #ffd45a 52%, rgba(255, 204, 70, 0.45) 74%, rgba(255, 204, 70, 0) 100%);
+	background-image: url(../img/v2/sky_sun.webp);
 }
 .night .celestial {
-	background-image: radial-gradient(circle closest-side, #ffffff 0, #eef2ff 40%, #cfd9f5 58%, rgba(170, 195, 255, 0.4) 78%, rgba(170, 195, 255, 0) 100%);
+	background-image: url(../img/v2/sky_moon.webp);
 }
 .celestial.noTransition { transition: none; }
 .resourceEffect { border: 0; border-radius: 4px; box-shadow: 0 0 6px 1px rgba(255, 255, 255, 0.5); }
@@ -679,6 +689,8 @@
 }
 .portrait .statusContainer .heart .mask.nightSprite, .portrait .statusContainer .bigheart .mask.nightSprite { display: none; }
 .portrait .statusContainer .heart .bar, .portrait .statusContainer .bigheart .bar { background: url(../img/v2/heart_plain.webp) 0 0 / 44px auto no-repeat; }
+.portrait .statusContainer .bigheart .mask { background-image: url(../img/v2/heartbig_plain.webp); }
+.portrait .statusContainer .bigheart .bar { background-image: url(../img/v2/heartbig_plain.webp); }
 .portrait .xpBar, .portrait.night .xpBar { margin-left: 0; width: 40px; }
 .portrait .xpBar::before, .portrait .xpBar::after { display: none; }
 .portrait .xpBar .mask { top: 6px; bottom: 6px; width: 18px; margin-left: -9px; border-radius: 9px; }
@@ -761,8 +773,6 @@
 .portrait .magic .button, .portrait.night .magic .button { width: 78px; height: 78px; }
 .portrait .magic .button.open { width: 200px; height: 200px; }
 .portrait .spells > div { width: 74px; height: 74px; margin: -37px 0 0 -37px; background-size: 60px 60px, 100% 100%; }
-.portrait .spells > .resetBoard { background-position: 17px -777px, center; }
-.portrait.night .spells > .resetBoard { background-position: 17px -817px, center; }
 /* портрет */
 .portrait .states > div, .portrait.night .states > div { width: 40px; height: 40px; background-size: 27px 27px, 100% 100%; }
 /* столбики с табличками крупнее */
@@ -778,3 +788,12 @@
 @media (min-aspect-ratio: 1/1) {
 	#fg { z-index: 0; }
 }
+
+/* титульный лист: эмблема + слово, 1200x334 (x2) */
+#loadingScreen { background-size: 600px auto; }
+
+/* ---------- герой: лист 4 x 13 ячеек 64x56 (x3 в hero.webp), ряды как в старом monsters.png; ночью тот же лист темнее ---------- */
+.dude { width: 64px; height: 56px; background-image: url(../img/v2/hero.webp); background-size: 256px auto; }
+.dude .animationLayer.nightSprite { display: none; }
+.night .dude { filter: brightness(0.84) saturate(0.92); }
+.dude .heldBlock { right: 17px; top: 34px; }

@@ -193,7 +193,7 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 		getStats().removeClass('down');
 		BoardGraphics.el().removeClass('dragonFight');
 		var b = Graphics.get('body');
-		b.removeClass('night');
+		b.removeClass('night dragonBg');
 		setTimeout(function() {
 			b.addClass('fadeOut');
 			EventManager.trigger('prestige');
@@ -429,7 +429,7 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 			loaded = false;
 			isDragon = false;
 			_bossHealth = null
-			$('body').removeClass('night').toggleClass('ios', opts.ios);
+			$('body').removeClass('night dragonBg').toggleClass('ios', opts.ios);
 
 			// iOS doesn't give enough priority to requestAnimationFrame
 			// CSS animations totally lock out the animation loop
@@ -606,7 +606,7 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 		moveCelestial: function(entity) {
 			var el = entity.el();
 			var pos = entity.p();
-			var height = (Math.abs(pos - Graphics.worldWidth() / 2) / (Graphics.worldWidth() / 2)) * 30;
+			var height = (Math.abs(pos - Graphics.worldWidth() / 2) / (Graphics.worldWidth() / 2)) * 16;   // амплитуда дуги (была 30): подняли траекторию, реже пересекается со зданиями
 			var left = Math.max(0, pos - (el.width() / 2)),
 				top = Math.floor(height);
 			el.css({
@@ -749,6 +749,7 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 			var el = building.el();
 			var replaces = building.getReplaces(require('app/gamestate'));
 			if(replaces) {
+				Graphics.markUpgrading(replaces, false);   // иначе .upgrading.upN (margin-bottom +) специфичнее .sunk (margin-bottom -) и старое здание не уезжает под землю, а зависает
 				replaces.el().addClass('sunk');
 			}
 			$('.resourceBars', el).addClass('sunk');
@@ -1041,6 +1042,7 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 			var notifier;
 			if(isDragon) {
 				changeTiles(['clay', 'cloth', 'grain'], '', 'dragonFight');
+				$('body').removeClass('dragonBg');
 				isDragon = false;
 				Graphics.setBossHealth(0, 0);
 			}
@@ -1120,6 +1122,7 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 				dragon.setPosture('idle', 500);
 				BoardGraphics.el().addClass(tiltClass);
 				changeTiles(['clay', 'cloth', 'grain'], 'dragonFight', '');
+				$('body').addClass('dragonBg');
 			}, 1000);
 			setTimeout(function() {
 				Graphics.setBossHealth(dragon.hp(), dragon.getMaxHealth());

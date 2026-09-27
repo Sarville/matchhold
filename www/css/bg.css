@@ -17,6 +17,9 @@
 .stage4 #bg .mid.night { background-image: url(../img/v2/bg/s4_mid_night_land.webp); }
 #fg .day { background-image: url(../img/v2/bg/fg_day_land.webp); }
 #fg .night { background-image: url(../img/v2/bg/fg_night_land.webp); }
+#bg .far.drbg { background-image: url(../img/v2/bg/dragon_far_land.webp); }
+#bg .mid.drbg { background-image: url(../img/v2/bg/dragon_mid_land.webp); }
+#fg .drbg { background-image: url(../img/v2/bg/dragon_fg_land.webp); }
 @media (max-aspect-ratio: 1/1) {
 .stage1 #bg .far.day { background-image: url(../img/v2/bg/s1_far_day_port.webp); }
 .stage1 #bg .far.night { background-image: url(../img/v2/bg/s1_far_night_port.webp); }
@@ -36,4 +39,7 @@
 .stage4 #bg .mid.night { background-image: url(../img/v2/bg/s4_mid_night_port.webp); }
 #fg .day { background-image: url(../img/v2/bg/fg_day_port.webp); }
 #fg .night { background-image: url(../img/v2/bg/fg_night_port.webp); }
+#bg .far.drbg { background-image: url(../img/v2/bg/dragon_far_port.webp); }
+#bg .mid.drbg { background-image: url(../img/v2/bg/dragon_mid_port.webp); }
+#fg .drbg { background-image: url(../img/v2/bg/dragon_fg_port.webp); }
 }

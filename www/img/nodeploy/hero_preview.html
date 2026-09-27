@@ -1,0 +1,30 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Герой: анимации</title>
+<style>
+body{margin:0;padding:16px;font:14px system-ui;background:#6f8f5f;color:#fff}
+body.n{background:#1c2340}
+h1{font-size:18px;margin:0 0 8px}
+label{margin-right:12px}
+#g{display:flex;flex-wrap:wrap;gap:12px}
+.c{background:rgba(0,0,0,.18);border-radius:8px;padding:8px;text-align:center;width:264px}
+.s{width:256px;height:224px;background:url(../v2/hero.webp) 0 0/1024px auto no-repeat;image-rendering:auto}
+.n .s{filter:brightness(.84) saturate(.92)}
+.s.a{animation:f var(--d,.6s) steps(4) infinite}
+@keyframes f{from{background-position-x:0}to{background-position-x:-1024px}}
+.c.hold .s{animation-play-state:paused}
+</style>
+<h1>Герой: 13 рядов листа, 4 кадра, ячейка 64×56 (x4)</h1>
+<label><input type=checkbox id=n> ночь</label>
+<label>скорость <input type=range id=sp min=2 max=12 value=6> <span id=v>6</span> к/с</label>
+<label><input type=checkbox id=st> стоп-кадры (клик по кадру: следующий)</label>
+<div id=g></div>
+<script>
+const N=["0 idle","1 идёт вправо","2 идёт влево (зеркало)","3 удар мечом вправо (кадр 1 = попадание)","4 удар мечом влево","5 смерть вправо","6 смерть влево","7 появление из земли","8 стройка","9 несёт вправо","10 сундук","11 удар кулаком вправо","12 удар кулаком влево"];
+const g=document.getElementById('g');
+N.forEach((t,r)=>{const c=document.createElement('div');c.className='c';c.innerHTML=`<div class="s a" style="background-position-y:${-r*224}px"></div><div>${t}</div>`;g.append(c);
+ c.firstChild.onclick=()=>{if(!st.checked)return;const s=c.firstChild;s.f=((s.f||0)+1)%4;s.style.backgroundPositionX=-s.f*256+'px'}});
+const st=document.getElementById('st'),n=document.getElementById('n'),sp=document.getElementById('sp');
+function upd(){document.body.classList.toggle('n',n.checked);document.getElementById('v').textContent=sp.value;
+ document.querySelectorAll('.s').forEach(s=>{s.classList.toggle('a',!st.checked);s.style.setProperty('--d',4/sp.value+'s')})}
+[n,sp,st].forEach(e=>e.oninput=upd);upd();
+</script>

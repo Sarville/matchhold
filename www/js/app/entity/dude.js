@@ -150,6 +150,11 @@ define(['app/eventmanager', 'app/entity/worldentity', 'app/graphics/graphics',
 		return !W.hasEffect('haste') ? speed / 2 : speed / 8;
 	};
 	
+	// ячейка спрайта 64x56 шире героя: дальность боя считается по прежним 34 px
+	dude.prototype.getHitboxWidth = function() {
+		return 34;
+	};
+	
 	dude.prototype.hasSword = function() {
 		return this.sword > 0;
 	};

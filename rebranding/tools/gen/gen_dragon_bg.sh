@@ -1,0 +1,29 @@
+#!/bin/bash
+# Фон боя с драконом: far/mid/fg, land и port. Запуск: S=<папка логов> bash tools/gen/gen_dragon_bg.sh
+cd /home/user/projects/matchhold/rebranding || exit 1
+S=${S:-/tmp/claude-1000/-home-user-projects-matchhold/f6ddb6fb-bf5a-42c9-8333-431a964eaff3/scratchpad}
+NIGHT='Cozy fantasy match-3 game art at night, now a dark boss-fight mood. Same warm, soft, matte hand-painted 3D look as the attached art (NO glossy plastic highlights). Ash-purple and blood-red twilight, deep indigo shadows, glowing ember-orange accents.'
+NEG='Avoid: text, letters, numbers, logos, watermark, signature, UI overlay, photorealism, harsh gloss, lens flare, pixel art, thick black outlines, extra objects, multiple views, collage, characters, dragons, birds, frame, gore.'
+gen() { # out refs size prompt
+  codex exec -m gpt-5.6-terra -c model_reasoning_effort=low --sandbox workspace-write \
+  "Use the built-in image_gen tool (imagegen skill) to generate ONE image. The attached images are references: follow them where the prompt says so, otherwise use them for mood, palette and material only. Target size $3 (resize/cover-crop with ImageMagick if the native size differs, no stretching). PNG. $4 $NEG Save the final PNG to exactly: /home/user/projects/matchhold/rebranding/$1 . Do not overwrite existing files. Print the saved path and dimensions." -i $2 \
+  > "$S/$(basename $1).log" 2>&1
+}
+E=out/env; B=$E/bg
+N=refs/ref-night-layout.png
+FARL="[NIGHT] FAR background layer for a dragon boss fight, wide 2:1, fully opaque: a stormy blood-red and ash-purple twilight sky, heavy dark clouds lit from below by distant fire, distant black volcanic mountains with faint lava veins, a dim burning-village glow on the horizon, a few floating embers. Very soft, hazy, low contrast, nothing sharp, same soft depth-of-field as the attached far layer. The central 40% of the width is calm, dark and low-contrast (soft clouds and haze only, no bright spots). The first attached image shows the layer style and framing of the normal night far layer; the second is the mood reference."
+gen $B/bg_dragon_far_land_v1.png "$B/bg_s4_far_night_land_v1.png $N" 4320x2160 "$NIGHT $FARL"
+# мидл и передний план land + far port параллельно
+MIDL="[NIGHT] MIDDLE layer for a dragon boss fight, wide 2:1, on a solid flat #FF00FF background (no gradient, no fringe, nothing else pink or magenta), to sit over the first attached far layer. Ground-level scenery at the same eye level as a game board in the middle: on the LEFT and on the RIGHT side (each only the outer 25-28% of the width) a cluster of black volcanic cliffs with glowing lava cracks and the ruined arch of a stone bridge and a few broken pillars, charred dead trees, ash-grey ground strip filling the bottom 28% of the canvas across the full width with a few glowing embers. Everything above the rocks and the entire central 44% of the width above the ground strip is solid #FF00FF (sky is not drawn). Muted, hazy, LOW contrast, simplified details, soft focus, must NOT distract from a game board in the center. Crisp clean silhouette edges against the magenta."
+gen $B/bg_dragon_mid_land_v1.png "$B/bg_dragon_far_land_v1.png $B/bg_s4_mid_night_land_v1.png" 4320x2160 "$NIGHT $MIDL" &
+FGL="[NIGHT] Out-of-focus FOREGROUND layer for a dragon boss fight, wide 2:1, on a solid flat #FF00FF background (no gradient, no fringe, nothing else pink or magenta): only a few sparse blurry black volcanic rocks with glowing orange lava cracks, charred grass blades and drifting embers in the bottom-left and bottom-right corners and along the very bottom edge; the top and the middle of the canvas are entirely solid #FF00FF. Every rock and blade ends with its own soft organic outline, no straight cut edges. Strong depth-of-field blur (bokeh), soft edges. The attached image shows the size and sparseness of the normal foreground."
+gen $E/fg/fg_dragon_land_v1.png "$E/fg/fg_night_land_v2.png $B/bg_dragon_far_land_v1.png" 4320x2160 "$NIGHT $FGL" &
+FARP="[NIGHT] Vertical 1:2 version of the attached far layer for a tall phone screen: the same stormy blood-red and ash-purple sky, burning-village glow and volcanic mountains, recomposed. Fully opaque. Keep the vertical band from 25% to 75% of the height calm, low-contrast and empty (soft clouds and haze only). Sky in the top 25%, mountains and glow in the bottom 25%. Same soft depth-of-field."
+gen $B/bg_dragon_far_port_v1.png "$B/bg_dragon_far_land_v1.png $B/bg_s4_far_night_port_v1.png" 1440x2880 "$NIGHT $FARP" &
+wait
+MIDP="[NIGHT] Vertical 1:2 MIDDLE layer for a tall phone screen for a dragon boss fight, on a solid flat #FF00FF background (no gradient, no fringe, nothing else pink or magenta), to sit over the attached far layer. Same scenery as the first attached land mid layer (black volcanic cliffs with glowing lava cracks, a ruined stone bridge arch, broken pillars, dead trees, ash ground) recomposed: a small cluster of cliffs at the bottom-left and bottom-right, an ash ground strip along the bottom 14%, nothing in the top 70% and nothing in the middle. Muted, hazy, low contrast, soft focus. Crisp clean silhouette edges against the magenta."
+gen $B/bg_dragon_mid_port_v1.png "$B/bg_dragon_mid_land_v1.png $B/bg_dragon_far_port_v1.png" 1440x2880 "$NIGHT $MIDP" &
+FGP="[NIGHT] Out-of-focus FOREGROUND layer for a tall phone screen (vertical 1:2) on a solid flat #FF00FF background (no gradient, no fringe, nothing else pink or magenta). VERY SMALL and sparse: two small blurry tufts of charred grass and black volcanic rock with glowing orange lava cracks at the bottom-left and bottom-right corners, each about 18% of the width and 7% of the height, right at the bottom edge. NOTHING at the top, nothing in the middle. Every element ends with a soft organic outline. Strong bokeh blur."
+gen $E/fg/fg_dragon_port_v1.png "$E/fg/fg_night_port_v3_a.png $B/bg_dragon_far_port_v1.png" 1440x2880 "$NIGHT $FGP" &
+wait
+echo DONE

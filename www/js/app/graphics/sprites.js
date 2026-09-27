@@ -12,8 +12,8 @@ define(function() {
 
 		// Monsters
 		demon: ['monsters', 0],
-		dude: ['monsters', 602],
-		dudenight: ['monsters', 1018],
+		dude: ['v2/hero.webp', 0],
+		dudenight: ['v2/hero.webp', 0],
 		earthelemental: ['monsters', 1434],
 		fireelemental: ['monsters', 1952],
 		harmour: ['monsters', 2239],
