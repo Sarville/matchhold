@@ -8,8 +8,9 @@ define(['app/action/attack'], function(Attack) {
 	
 	FastAttack.prototype.doFrameAction = function(frame) {
 		if(frame == 1 || frame == 3) {
+			var hit = this.hitEvent();
 			this.target.takeDamage(this._entity.getDamage(), this._entity);
-			require('app/eventmanager').trigger(this._entity.hasSword() ? 'sharpHit' : 'bluntHit');
+			require('app/eventmanager').trigger(hit);
 		}
 		if(frame == 3) {
 			this._entity.action = null;

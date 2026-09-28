@@ -49,6 +49,18 @@ define(['app/eventmanager', 'app/audio/webaudioprovider', 'app/audio/htmlaudiopr
 		Slash: {
 			file: 'slash'
 		},
+		ShieldHit: {
+			file: 'shieldhit'
+		},
+		MonsterHit: {
+			file: 'monsterhit'
+		},
+		ArrowHit: {
+			file: 'arrowhit'
+		},
+		BiteHit: {
+			file: 'bite'
+		},
 		BlockUp: {
 			file: 'blockup'
 		},
@@ -249,6 +261,10 @@ define(['app/eventmanager', 'app/audio/webaudioprovider', 'app/audio/htmlaudiopr
 			E.bind('tilesCleared', GameAudio.play.bind(this, 'Match'));
 			E.bind('bluntHit', GameAudio.play.bind(this, 'Blunt'));
 			E.bind('sharpHit', GameAudio.play.bind(this, 'Slash'));
+			E.bind('shieldHit', GameAudio.play.bind(this, 'ShieldHit'));
+			E.bind('monsterHit', GameAudio.play.bind(this, 'MonsterHit'));
+			E.bind('arrowHit', GameAudio.play.bind(this, 'ArrowHit'));
+			E.bind('biteHit', GameAudio.play.bind(this, 'BiteHit'));
 			E.bind('blockDown', GameAudio.play.bind(this, 'BlockDown'));
 			E.bind('blockUp', GameAudio.play.bind(this, 'BlockUp'));
 			E.bind('death', GameAudio.play.bind(this, 'Die'));

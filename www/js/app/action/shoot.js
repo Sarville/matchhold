@@ -38,7 +38,7 @@ define(['app/action/action', 'app/entity/projectile'], function(Action, Projecti
 			Graphics.fireArrow(projectile, function() {
 				// Check for hit, deal damage
 				if(Math.abs(end - _action.target.p()) <= 5) {
-					require('app/eventmanager').trigger(_action._entity.options.fire ? 'explodeFire' :'sharpHit');
+					require('app/eventmanager').trigger(_action._entity.options.fire ? 'explodeFire' : (_action.target.shield > 0 ? 'shieldHit' : 'arrowHit'));
 					_action.target.takeDamage(_action._entity.getDamage(), _action._entity);
 				}
 			});

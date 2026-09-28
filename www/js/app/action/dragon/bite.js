@@ -17,8 +17,9 @@ define(['app/action/action'], function(Action) {
 		var target = this.target;
 		this.timeouts.push(setTimeout(function() {
 			if(entity.distanceFrom(target) < 5) {
+				var hit = target.shield > 0 ? 'shieldHit' : 'biteHit';
 				target.takeDamage(entity.getDamage(), entity);
-				require('app/eventmanager').trigger('sharpHit');
+				require('app/eventmanager').trigger(hit);
 			}
 			entity.action = null;
 		}, 800));

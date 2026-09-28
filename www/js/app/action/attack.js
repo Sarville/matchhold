@@ -21,9 +21,20 @@ define(['app/action/action'], function(Action) {
 		entity.animationOnce(animation);
 	};
 	
+	Attack.prototype.hitEvent = function() {
+		if(this.target.shield > 0) {
+			return 'shieldHit';
+		}
+		// The hero is the only target with a shield property, so a target without one means the hero is attacking
+		if(this.target.shield !== undefined) {
+			return 'monsterHit';
+		}
+		return this._entity.hasSword() ? 'sharpHit' : 'bluntHit';
+	};
+	
 	Attack.prototype.doFrameAction = function(frame) {
 		if(frame == 1) {
-			require('app/eventmanager').trigger(this._entity.hasSword() ? 'sharpHit' : 'bluntHit');
+			require('app/eventmanager').trigger(this.hitEvent());
 			this.target.takeDamage(this._entity.getDamage(), this._entity);
 		} else if(frame == 3) {
 			this._entity.action = null;
