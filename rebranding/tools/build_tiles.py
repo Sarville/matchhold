@@ -12,10 +12,13 @@ LEVELS = dict(grain=4, stone=9, wood=9, clay=4, cloth=4, mana=1)
 DAY1 = dict(grain="grain_1_v2", wood="wood_1_v2", stone="stone_1_v2", clay="clay_1_v2", cloth="cloth_1_v8", mana="mana_1_v2")
 DAYV = {"cloth_3": 2, "cloth_4": 2, "wood_2": 2, "wood_4": 2, "wood_8": 2, "wood_9": 3}  # остальные v1
 NIGHT1 = dict(grain="grain_1_v1", stone="stone_1_v2", wood="wood_1_v1", clay="clay_1_v3", cloth="cloth_1_v1", mana="mana_1_v1")
-NIGHTV = {"clay_3": 2, "stone_2": 5, "stone_3": 3, "wood_2": 2, "wood_3": 2}  # ур. 2-3 мечей и щитов: явные отличия (сессия 3)
+NIGHTV = {"clay_3": 2, "stone_2": 5, "stone_3": 3, "wood_2": 2, "wood_3": 2,
+          "cloth_2": 2, "clay_2": 2, "grain_4": 2, "clay_4": 2}  # сессия 7: ящер зелёный -> песочный (путался с grain),
+          # паутина оранжевая -> красная, демон красно-оранжевый -> зелёный огонь (путался с огненными мечами stone),
+          # зелье импа зелёное -> синее + другая форма (путалось с grain)
 # glow ночью: цвет класса, у отдельных иконок свой (по сюжету)
 G = dict(grain=(90, 220, 120), stone=(110, 170, 235), wood=(235, 165, 75), clay=(255, 125, 70), cloth=(165, 115, 255), mana=(225, 85, 205))
-GO = {"grain_4": (255, 110, 50), "clay_3": (90, 165, 255), "cloth_3": (255, 150, 50),
+GO = {"clay_2": (255, 70, 55), "clay_3": (90, 165, 255), "clay_4": (70, 130, 235), "cloth_3": (255, 150, 50),
       **{f"stone_{i}": (255, 120, 60) for i in (4, 5, 6)}, **{f"stone_{i}": (140, 200, 255) for i in (7, 8, 9)},
       **{f"wood_{i}": (255, 205, 90) for i in (7, 8, 9)}}
 DRAGON = dict(grain=((90, 230, 130), 0), clay=((120, 190, 255), 3), cloth=((255, 170, 50), 4))  # цвет, колонка

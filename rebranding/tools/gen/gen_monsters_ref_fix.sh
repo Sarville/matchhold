@@ -1,0 +1,13 @@
+#!/bin/bash
+cd /home/user/projects/matchhold/rebranding || exit 1
+S=${S:-/tmp/claude-1000/-home-user-projects-matchhold/d6945f1c-fd00-403e-a79e-f106200f409c/scratchpad}
+NIGHT='[NIGHT] Cozy fantasy match-3 game art at night. Same warm, soft, matte hand-painted 3D look as the day art (chunky rounded forms, soft ambient occlusion, NO glossy plastic highlights). Deep indigo and navy shadows, cool moonlight from the top-left, warm torch-orange accents, soft rim light and a gentle glow on key details. Thin outline slightly darker than the object own hue, never black. Clean, readable silhouette against dark backgrounds.'
+gen() {
+  codex exec -m gpt-5.6-terra -c model_reasoning_effort=low --sandbox workspace-write \
+  "Use the built-in image_gen tool (imagegen skill) to generate ONE image. The attached references are for overall style/lighting/matte look only (first: layout reference; second and third: two already-approved monsters in this same game, for palette richness and finish quality, and for chunky chibi proportions), not for this character's own design. Target size $2 (resize/cover-crop with ImageMagick if the native size differs, no stretching). PNG. $NIGHT Monster character reference sheet on a completely flat, solid, uniform #$3 background with NO texture, no gradient, no white patches, no holes, no fringe, edge to edge: $4. Three poses side by side with clear gaps, all facing right, all the same scale and the same ground line: neutral standing, mid-move, and an attack pose. Chunky rounded shapes, matte hand-painted 3D look, same outline weight in every pose, readable silhouette. Cute-menacing, no gore, no blood. Avoid: text, letters, numbers, labels, grid, logos, watermark, photorealism, glossy plastic, pixel art, thick black outlines, ground shadow, background scenery, extra characters, colour matching the key #$3 anywhere on the character. Save the final PNG to exactly: /home/user/projects/matchhold/rebranding/$1 . Do not overwrite existing files. Print the saved path and dimensions." -i refs/ref-night-layout.png out/anim/monsters/zombie/zombie_ref.png out/anim/monsters/skeleton/skeleton_ref.png \
+  > "$S/$(basename "$1" .png).log" 2>&1
+}
+gen "out/anim/monsters/demon/demon_ref_v2.png" "3072x1024" "00FFFF" "a small chubby chibi horned demon, dark red skin, bat wings folded, small flames around the horns, glowing orange eyes, big round cute-menacing proportions like a mischievous toddler demon, short stubby limbs, about 2.5 heads tall" &
+gen "out/anim/monsters/earthElemental/earthElemental_ref_v2.png" "3072x1024" "FF00FF" "a big moss-covered stone golem, glowing green eyes, heavy fists" &
+wait
+echo DONE

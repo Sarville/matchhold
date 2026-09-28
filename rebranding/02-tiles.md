@@ -236,23 +236,23 @@ STYLE `NIGHT`. Иконки светлее плашки, с мягким **glow 
 | `grain_1` | zombie | a small mossy gravestone with a hand reaching from the earth, green mist |
 | `grain_2` | hauntedArmour | an empty knight helmet on a stand with glowing green eyes |
 | `grain_3` | earthElemental | a mossy stone golem head with a green glow |
-| `grain_4` | demon | a horned demonic eye with red-orange flame |
+| `grain_4` | demon | a horned demonic eye with **green** flame (не красно-оранжевый — сливался с огненными мечами stone, решение сессии 7) |
 
-### clay → мелкие и водные (4), оранжевый glow (для waterElemental голубой)
+### clay → мелкие и водные (4), оранжевый glow (для waterElemental и imp голубой)
 
 | ID | Монстр | SUBJECT |
 |---|---|---|
 | `clay_1` | rat | a rat hole with two glowing red eyes |
-| `clay_2` | spider | a spider on a web |
+| `clay_2` | spider | a spider on a web, **rust-red** (не оранжево-терракотовый, решение сессии 7) |
 | `clay_3` | waterElemental | a water drop with a face, blue glow |
-| `clay_4` | imp | a flask of green potion with a tiny imp inside |
+| `clay_4` | imp | a **faceted hexagonal** flask of **blue** potion with a tiny imp inside (не округлая зелёная — сливалась с grain, решение сессии 7) |
 
 ### cloth → нежить и огонь (4), фиолетовый glow
 
 | ID | Монстр | SUBJECT |
 |---|---|---|
 | `cloth_1` | skeleton | a skull with crossed bones, dim violet glow |
-| `cloth_2` | lizardman | a swamp vine and a scaly lizard head |
+| `cloth_2` | lizardman | a swamp vine and a scaly lizard head, **sand/tan scales** (не зелёный — совпадал с зелёными grain-иконками, решение сессии 7) |
 | `cloth_3` | fireElemental | a flame with a face, orange glow |
 | `cloth_4` | warlock | a dark portal with golden horns and violet magic |
 
