@@ -321,7 +321,7 @@
 .statusContainer {
 	left: -107px;
 	top: 0;
-	width: 56px;
+	width: 64px;
 	height: auto;
 	padding: 30px 0;
 	box-sizing: border-box;
@@ -343,9 +343,9 @@
 .statusContainer .vine {
 	position: absolute;
 	left: -29px; top: -12px; bottom: -12px;
-	width: 72px;
+	width: 150px;   /* шире плашки: перекидывается к раме доски, а не обрывается в воздухе */
 	background-size: 72px 1000px;
-	background-repeat: repeat-y;
+	background-repeat: repeat;
 	pointer-events: none;
 	transition: opacity 1400ms linear;
 }
@@ -355,7 +355,7 @@
 .statusContainer .hearts { position: relative; }
 .statusContainer .heart, .statusContainer .bigheart {
 	position: relative;
-	width: 41px; height: 41px;
+	width: 50px; height: 50px;
 	margin: 0 auto -2px;
 }
 .statusContainer .heart.empty, .statusContainer .bigheart.empty { opacity: 1; }
@@ -370,13 +370,12 @@
 .statusContainer .heart .bar, .statusContainer .bigheart .bar {
 	z-index: 1;
 	left: 0; top: 0;
-	background: url(../img/v2/heart_fill.webp) 0 0 / 41px 41px no-repeat;
+	background: url(../img/v2/heart_fill.webp) 0 0 / 50px 50px no-repeat;
 }
 .statusContainer .bigheart .mask { background-image: url(../img/v2/heartbig_socket_day.webp); }
 .statusContainer .bigheart .mask.nightSprite { background-image: url(../img/v2/heartbig_socket_night.webp); }
 .statusContainer .bigheart .bar { background-image: url(../img/v2/heartbig_fill.webp); }
-.statusContainer .sword, .statusContainer .shield { margin: 0 auto; position: relative; z-index: 1; }
-.statusContainer .shield { position: absolute; top: -35px; left: 13px; }
+/* щит и меч живут на верхней планке доски — см. .gear ниже */
 
 /* ---------- опыт (правая панель) ---------- */
 .xpBar, .night .xpBar {
@@ -695,13 +694,12 @@
 .portrait .xpBar::before, .portrait .xpBar::after { display: none; }
 .portrait .xpBar .mask { top: 6px; bottom: 6px; width: 18px; margin-left: -9px; border-radius: 9px; }
 .portrait .xpBar .fill { left: 3px; right: 3px; bottom: 3px; border-radius: 6px; }
-/* щит и меч: постоянная тонкая панель на верхней планке поля; сами полоски заливаются поверх бледных слотов */
-.gear { display: none; }
-.portrait .gear {
+/* щит и меч: постоянная тонкая панель на верхней планке поля (и на десктопе, и в портрете); сами полоски заливаются поверх бледных слотов */
+.gear {
 	display: block;
 	opacity: 0;   /* щит и меч есть только ночью */
 	position: absolute;
-	left: 182.75px; top: -39.5px;
+	left: 176px; top: -39.5px;   /* десктоп: доска 480px (8×60), планка центрирована */
 	width: 128px; height: 36px;
 	box-sizing: border-box;
 	z-index: 5;
@@ -711,17 +709,18 @@
 	background: rgba(58, 36, 20, 0.28);
 	transition: opacity 1400ms linear, border-color 1400ms linear, background-color 1400ms linear;
 }
-.portrait.night .gear { opacity: 1; border: 2px solid rgba(206, 212, 240, 0.95); background: rgba(5, 8, 24, 0.72); }
-.portrait .gear .slot {
+.portrait .gear { left: 182.75px; }   /* портрет: доска 490px (7×70) */
+.night .gear { opacity: 1; border: 2px solid rgba(206, 212, 240, 0.95); background: rgba(5, 8, 24, 0.72); }
+.gear .slot {
 	position: absolute;
 	top: 3px;
 	width: 30px; height: 30px;
 	opacity: 0.5;
 	filter: grayscale(0.6) drop-shadow(0 0 2px rgba(255, 255, 255, 0.55));
 }
-.portrait .gear .slot.shield { left: 20.25px; background: url(../img/v2/gear_shield.webp) 0 0 / 30px 270px no-repeat; }
-.portrait .gear .slot.sword { left: 74.25px; background: url(../img/v2/gear_sword.webp) 0 0 / 30px 270px no-repeat; }
-.portrait .statusContainer .shield, .portrait .statusContainer .sword {
+.gear .slot.shield { left: 20.25px; background: url(../img/v2/gear_shield.webp) 0 0 / 30px 270px no-repeat; }
+.gear .slot.sword { left: 74.25px; background: url(../img/v2/gear_sword.webp) 0 0 / 30px 270px no-repeat; }
+.statusContainer .shield, .statusContainer .sword {
 	position: absolute;
 	top: -39.5px;
 	margin: 0;
@@ -734,12 +733,14 @@
 	opacity: 0;
 	transition: opacity 1400ms linear;
 }
-.portrait.night .statusContainer .shield, .portrait.night .statusContainer .sword { opacity: 1; }
-.portrait .statusContainer .shield > div, .portrait .statusContainer .sword > div { filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 5px rgba(235, 242, 255, 0.6)); }
+.night .statusContainer .shield, .night .statusContainer .sword { opacity: 1; }
+.statusContainer .shield > div, .statusContainer .sword > div { filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 5px rgba(235, 242, 255, 0.6)); }
+.statusContainer .shield { left: 303.25px; }   /* десктоп: совмещено со слотом .gear .slot.shield */
+.statusContainer .sword { left: 357.25px; }
 .portrait .statusContainer .shield { left: 247.75px; }
 .portrait .statusContainer .sword { left: 301.75px; }
-.portrait .statusContainer .shield > div { background: url(../img/v2/gear_shield.webp) 0 0 / 30px 270px no-repeat; }
-.portrait .statusContainer .sword > div { background: url(../img/v2/gear_sword.webp) 0 0 / 30px 270px no-repeat; }
+.statusContainer .shield > div { background: url(../img/v2/gear_shield.webp) 0 0 / 30px 270px no-repeat; }
+.statusContainer .sword > div { background: url(../img/v2/gear_sword.webp) 0 0 / 30px 270px no-repeat; }
 .wood2 .gear .slot.shield, .wood2 .statusContainer .shield > div { background-position: 0 -30px; }
 .stone2 .gear .slot.sword, .stone2 .statusContainer .sword > div { background-position: 0 -30px; }
 .wood3 .gear .slot.shield, .wood3 .statusContainer .shield > div { background-position: 0 -60px; }

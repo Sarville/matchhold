@@ -1,8 +1,9 @@
-Gridland
+Matchhold
 ==========
-A Weird Little Time Waster by doublespeak games
+Match. Build. Survive.
 
-[Click to play](http://gridland.doublespeakgames.com)
+Based on Gridland by doublespeak games (MPL 2.0).
+
 
 ### Build
 `brew cask install ant`

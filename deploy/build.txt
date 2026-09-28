@@ -80,7 +80,6 @@ js/app/audio/htmlaudioprovider.js
 js/app/audio/htmlwebaudioprovider.js
 js/app/audio/audio.js
 js/app/graphics/share.js
-js/app/graphics/donate.js
 js/app/visibility.js
 js/app/keysequencer.js
 js/app/graphics/difficulty.js
