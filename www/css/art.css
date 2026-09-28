@@ -798,6 +798,11 @@
 .night .dude { filter: brightness(0.84) saturate(0.92); }
 .dude .heldBlock { right: 17px; top: 34px; }
 
+/* ---------- дракон: тело 204x164 x10 рядов (dragon.webp), голова 81x30 x2 (dragon_head.webp), шея 24x24 x2 (dragon_neck.webp); background-size = логическая ширина (не x3 исходника), браузер уменьшает сам ---------- */
+.dragon { background-image: url(../img/v2/dragon.webp); background-size: 816px auto; }
+.dragon .head { background-image: url(../img/v2/dragon_head.webp); background-size: 243px auto; }
+.dragon .neck { background-image: url(../img/v2/dragon_neck.webp); background-size: 24px auto; }
+
 /* ---------- монстры: лист 4 кадра x N рядов на своего монстра (не общий monsters.png), background-size ширина = 4 x логическая ширина, высота auto ---------- */
 .zombie { background-image: url(../img/v2/monsters/zombie.webp); background-size: 128px auto; }
 .skeleton { background-image: url(../img/v2/monsters/skeleton.webp); background-size: 220px auto; }

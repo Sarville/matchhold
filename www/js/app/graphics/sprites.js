@@ -49,9 +49,9 @@ define(function() {
 		tilesnight: ['v2/tiles.webp', 468],
 
 		// Dragon
-		dragon: ['dragonsprite', 0],
-		dragonhead: ['dragonsprite', 1640],
-		dragonneck: ['dragonsprite', 1670]
+		dragon: ['v2/dragon.webp', 0],
+		dragonhead: ['v2/dragon_head.webp', 0],
+		dragonneck: ['v2/dragon_neck.webp', 0]
 	};
 
 	var spritesheets = {};

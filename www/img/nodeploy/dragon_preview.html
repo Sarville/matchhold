@@ -1,0 +1,78 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Дракон: анимации</title>
+<link rel="stylesheet" href="../../css/main.css">
+<link rel="stylesheet" href="../../css/art.css">
+<style>
+body{margin:0;padding:16px;font:14px system-ui;background:#1c2340;color:#fff}
+h1{font-size:18px;margin:0 0 8px}
+.stage{position:relative;background:rgba(255,255,255,.08);width:220px;height:180px;overflow:visible;margin:8px 0}
+.dragon{position:absolute!important;left:8px;bottom:8px;background-repeat:no-repeat}
+.dragon .neck,.dragon .head{background-repeat:no-repeat}
+#grid{display:flex;flex-wrap:wrap;gap:10px}
+.cell{background:rgba(0,0,0,.35);border-radius:6px;padding:6px;text-align:center;width:236px}
+.lbl{font-size:11px;opacity:.85}
+</style>
+<h1>Дракон: тело по рядам (0..9), голова, шея</h1>
+<label>ряд тела
+ <select id=row>
+  <option value=0 selected>0 idle</option>
+  <option value=1>1 fly</option>
+  <option value=2>2 landing</option>
+  <option value=3>3 windup</option>
+  <option value=4>4 buffet</option>
+  <option value=5>5 idle-flip</option>
+  <option value=6>6 fly-flip</option>
+  <option value=7>7 landing-flip</option>
+  <option value=8>8 windup-flip</option>
+  <option value=9>9 buffet-flip</option>
+ </select>
+ кадр <select id=frame><option>0</option><option>1</option><option>2</option><option>3</option></select>
+ <button id=play>play/stop</button>
+</label>
+<div id=big class=stage><div class="dragon" id=dbig>
+  <div class=neck><div class=neck><div class=neck><div class=head></div></div></div></div>
+</div></div>
+<h1>Все 10 рядов x 4 кадра (сетка)</h1>
+<div id=grid></div>
+<h1>Голова: 3 позы x 2 (низ = зеркало)</h1>
+<div id=heads style="display:flex;gap:8px"></div>
+<h1>Шея: сегмент x 2 (зеркало)</h1>
+<div id=necks style="display:flex;gap:8px"></div>
+<script>
+const rowSel=document.getElementById('row'),frameSel=document.getElementById('frame'),dbig=document.getElementById('dbig'),playBtn=document.getElementById('play');
+function applyBig(){
+  const row=+rowSel.value, frame=+frameSel.value;
+  dbig.style.backgroundPosition=(-(frame*204))+'px '+(-(row*164))+'px';
+}
+let timer=null,f=0;
+playBtn.onclick=()=>{
+  if(timer){clearInterval(timer);timer=null;return;}
+  timer=setInterval(()=>{f=(f+1)%4;frameSel.value=f;applyBig();},220);
+};
+[rowSel,frameSel].forEach(e=>e.onchange=applyBig);
+applyBig();
+
+const grid=document.getElementById('grid');
+for(let row=0;row<10;row++){
+  const c=document.createElement('div');c.className='cell';
+  const stage=document.createElement('div');stage.className='stage';stage.style.width='220px';stage.style.height='160px';
+  const d=document.createElement('div');d.className='dragon';
+  d.style.backgroundPosition='0px '+(-(row*164))+'px';
+  stage.appendChild(d);c.appendChild(stage);
+  const lbl=document.createElement('div');lbl.className='lbl';lbl.textContent='ряд '+row;c.appendChild(lbl);
+  grid.appendChild(c);
+}
+
+const heads=document.getElementById('heads');
+for(let r=0;r<2;r++)for(let k=0;k<3;k++){
+  const stage=document.createElement('div');stage.style.cssText='position:relative;width:90px;height:40px;background:rgba(255,255,255,.08)';
+  const h=document.createElement('div');h.style.cssText='position:absolute;left:5px;top:5px;width:81px;height:30px;background-image:url(../v2/dragon_head.webp);background-size:243px auto;background-position:'+(-(k*81))+'px '+(-(r*30))+'px';
+  stage.appendChild(h);heads.appendChild(stage);
+}
+const necks=document.getElementById('necks');
+for(let r=0;r<2;r++){
+  const stage=document.createElement('div');stage.style.cssText='position:relative;width:34px;height:34px;background:rgba(255,255,255,.08)';
+  const n=document.createElement('div');n.style.cssText='position:absolute;left:5px;top:5px;width:24px;height:24px;background-image:url(../v2/dragon_neck.webp);background-size:24px auto;background-position:0px '+(-(r*24))+'px';
+  stage.appendChild(n);necks.appendChild(stage);
+}
+</script>
