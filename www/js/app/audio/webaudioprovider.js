@@ -4,23 +4,23 @@ define(function() {
 	var musicVolume = null;
 	var effectsVolume = null;
 	
+	function randomPart(count, exclude) {
+		// Pick a random part index, never repeating the one that just finished
+		if(count <= 1) return 0;
+		var n = Math.floor(Math.random() * (count - 1));
+		return n >= exclude ? n + 1 : n;
+	}
+
 	function createSoundSource(sound, partNum) {
 		var source = context.createBufferSource();
 		if(sound.partsBuffer) {
 			sound.playingPart = partNum;
 			source.buffer = sound.partsBuffer[sound.playingPart];
-			if(partNum < sound.parts - 1) {
-				// Play the next part
+			if(sound.music) {
+				// Randomly switch to a different part each time one finishes
 				source.onended = function() {
-					WebAudioProvider.play(sound, partNum + 1);
+					WebAudioProvider.play(sound, randomPart(sound.parts, partNum));
 				};
-			} else {
-				if(sound.music) {
-					// Loop
-					source.onended = function() {
-						WebAudioProvider.play(sound, 0);
-					};
-				}
 			}
 		} else {
 			source.buffer = sound.buffer;

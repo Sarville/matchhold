@@ -23,6 +23,7 @@ define(['app/eventmanager', 'app/audio/webaudioprovider', 'app/audio/htmlaudiopr
 		},
 		NightMusic: {
 			file: 'theme-night',
+			parts: 4,
 			music: true,
 			silentIf: function() {
 				return !require('app/engine').isNight();
