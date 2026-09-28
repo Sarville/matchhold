@@ -11,7 +11,6 @@
 }
 #bg { z-index: -1; overflow: hidden; }
 #fg { z-index: 2; overflow: hidden; }
-.titleScreen #bg, .titleScreen #fg { opacity: 0; }
 #bg > div, #fg > div {
 	position: absolute;
 	left: 0; top: 0; right: 0; bottom: 0;
@@ -631,27 +630,7 @@
 	transition: background-color 1400ms linear, box-shadow 1400ms linear;
 }
 .night .menuBtn span { background: #ebc86e; box-shadow: 0 -7px 0 #ebc86e, 0 7px 0 #ebc86e; }
-.menuBar {
-	top: 0; bottom: auto;
-	z-index: 102;
-	height: 370px; max-height: 100%;
-	padding-top: 68px;
-	border-top: 0;
-	border-bottom: 2px solid;
-	background-color: #fff;
-	transform: translateY(-110%);
-}
-.night .menuBar { background-color: #000; }
-.menuBar.open, .night .menuBar.open { box-shadow: 0 4px 12px 2px rgba(0, 0, 0, 0.45); }
-.menuBar .menuContinue {
-	position: absolute; left: 12px; right: 64px; top: 8px;
-	height: 44px; line-height: 40px;
-	text-align: center; font-size: 1.35em;
-	border: 2px solid; border-radius: 10px;
-	cursor: pointer; user-select: none;
-}
-.menuBar .menuContinue:hover { box-shadow: inset 0 0 6px 2px rgba(128, 128, 128, 0.35); }
-.menuOpen.paused:before, .menuOpen #pauseIcon { display: none; }
+.layerOpen.paused:before, .layerOpen #pauseIcon { display: none; }
 .dayNotifier { color: #fff; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7), 0 0 2px rgba(0, 0, 0, 0.8); }
 .celestial {
 	/* за зданиями, как в оригинале (z-index не трогаем); свечение запечено в самой картинке (128x128,
@@ -789,9 +768,6 @@
 @media (min-aspect-ratio: 1/1) {
 	#fg { z-index: 0; }
 }
-
-/* титульный лист: эмблема + слово, 1200x334 (x2) */
-#loadingScreen { background-size: 600px auto; }
 
 /* ---------- герой: лист 4 x 13 ячеек 64x56 (x3 в hero.webp), ряды как в старом monsters.png; ночью тот же лист темнее ---------- */
 .dude { width: 64px; height: 56px; background-image: url(../img/v2/hero.webp); background-size: 256px auto; }

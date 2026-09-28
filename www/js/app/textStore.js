@@ -1,10 +1,10 @@
 define(function() {
 	
-	var TextStore = function(locale) {
+	var TextStore = function(locale, onReady) {
 		var _this = this;
-		locale = locale || 'en';
-		require(['app/locale/' + locale], function(l) {
+		require(['app/locale/' + (locale || 'en')], function(l) {
 			_this.locale = l;
+			onReady && onReady();
 		});
 	};
 	

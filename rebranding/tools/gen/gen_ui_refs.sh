@@ -1,0 +1,18 @@
+#!/bin/bash
+# Сессия 9: референсы главного экрана и панели настроек (UI). Результат: out/ui/ref_*.png
+cd /home/user/projects/matchhold/rebranding || exit 1
+S=${S:-/tmp/claude-1000/-home-user-projects-matchhold/456a5f4f-8f4d-4746-a28d-81a3dc95d3bb/scratchpad}
+STYLE='Cozy fantasy village match-3 mobile game UI. Same warm, soft, matte hand-painted look as the attached game screenshot (second image): chestnut wood planks with brass rivets and iron corner brackets, cream stone-tile buttons with a soft bevel, ivy vines, warm gold accents, thin outlines slightly darker than the object own hue (never black), NO glossy plastic highlights. Bright sunny storybook village scene.'
+gen() { # out refs prompt
+  [ -f "$1" ] && return
+  codex exec -m gpt-5.6-terra -c model_reasoning_effort=low --sandbox workspace-write \
+  "Use the built-in image_gen tool (imagegen skill) to generate ONE image: a full mobile phone screen UI mockup, portrait 9:19.5, size about 1080x2340 (resize with ImageMagick if needed, never crop or stretch). PNG. $3 Save the final PNG to exactly: /home/user/projects/matchhold/rebranding/$1 . Do not overwrite existing files. Print the saved path and dimensions." -i $2 \
+  > "$S/$(basename $1).log" 2>&1
+}
+MAIN="$STYLE MAIN MENU screen (title screen). Top: the game logo MATCHHOLD as chunky golden embossed lettering with a dark brown outline, the emblem (first image: castle shield with hammer and sword) at its side or above; the letter O of the wordmark is replaced by a round wooden coin or tile with a resource icon (log, stone, brick, cloth or grain), plus a small row of the game resource tiles as decoration, keep the word highly readable. Middle: three wide wooden-plank save slot cards, each showing 'Day 12', a row of small red hearts, and small round icon buttons (export, delete); the third slot is empty and says 'New game'. Bottom: a wide cream tile-style Settings button with a gear icon, plus a small round language flag button RU/EN. In the top right corner a small round gear button is NOT needed. Background: the sunny village meadow with a stone bridge, no game board. Text in Russian (Cyrillic): logo МАТЧХОЛД, 'День 12', 'Новая игра', 'Настройки'."
+SET="$STYLE SETTINGS PANEL as a modal popup card over a dimmed blurred village background: big wooden-plank panel with brass rivets, ivy on a corner, rounded. Content top to bottom: (1) a wide highlighted primary button 'Продолжить' at the very top, then a clear gap; (2) music volume: a music-note icon, a nice carved wooden slider bar with a green filled part and a round brass draggable knob; (3) sound effects volume: a speaker icon and the same slider; (4) 'Сложность' label with a pretty pill toggle (green Casual side / red Normal side, a round knob in the middle, tiny sword and leaf icons), (5) language switch RU | EN as a two-segment pill, (6) three cream tile buttons in a column: 'Как играть', 'Отключить рекламу' with a small crossed-out ad icon, 'Другие игры'; (7) a button 'Выйти в меню' in muted red-brown at the bottom. Text in Russian (Cyrillic). Everything must fit a phone width with comfortable touch sizes."
+gen out/ui/ref_main_v1.png "out/ui/refs/game_style.jpg out/ui/refs/emblem.png" "$MAIN" &
+gen out/ui/ref_main_v2.png "out/ui/refs/game_style.jpg out/ui/refs/emblem.png" "$MAIN Variant: logo centered above, emblem large in the middle behind the slots faded, slots stacked beneath." &
+gen out/ui/ref_settings_v1.png "out/ui/refs/game_style.jpg out/ui/refs/cur_settings.jpg" "$SET" &
+gen out/ui/ref_settings_v2.png "out/ui/refs/game_style.jpg out/ui/refs/cur_settings.jpg" "$SET Variant: darker leather-and-wood look with gold trim, buttons as wide cream stone plates." &
+wait; echo DONE

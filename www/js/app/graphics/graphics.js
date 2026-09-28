@@ -1,8 +1,8 @@
 define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
         'app/graphics/gameboard', 'app/graphics/world', 'app/graphics/resources', 
-        'app/graphics/loot', 'app/graphics/magic', 'app/graphics/audio', 'app/graphics/sprites'], 
+        'app/graphics/loot', 'app/graphics/magic', 'app/graphics/sprites', 'app/ui'], 
 		function($, EventManager, TextStore, Options, BoardGraphics, WorldGraphics, ResourceGraphics,
-				LootGraphics, MagicGraphics, AudioGraphics, Sprites) {
+				LootGraphics, MagicGraphics, Sprites, UI) {
 	
 	var MAX_HEARTS = 14;
 	var HEALTH_PER_HEART = 10;
@@ -14,7 +14,7 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 	var _ww = null, _wh = null;
 	var _bossHealth = null;
 	var styleSheet = null;
-	var currentScale = null, currentLoadScale = null, currentHeight = null;
+	var currentScale = null, currentHeight = null;
 	var heartInfo = { total: 0, big: 0 };
 	var imageLoaded = false;
 	var isDragon = false;
@@ -107,9 +107,6 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 				break;
 			case 'magic':
 				module = MagicGraphics;
-				break;
-			case 'audio':
-				module = AudioGraphics;
 				break;
 		}
 		
@@ -222,143 +219,87 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 		};
 	}
 	
+	function slotButton(className, textKey, click) {
+		return $('<button type="button">').addClass('rbtn ' + className).attr('title', Graphics.getText(textKey))
+			.html(UI.icon(className)).on('click', function() { click(); return false; });
+	}
+	
 	function drawSlot(slotInfo, slotIndex) {
-		var slot = Graphics.make('saveSlot').data('slotIndex', slotIndex);
-		var buttons = [];
-		var slotSide = Graphics.make('slotSide').appendTo(slot);
-		if(slotInfo === 'empty') {
-			slot.addClass('empty');
-			slotSide.text(Graphics.getText('NEWGAME'));
-			buttons.push({
-				className: 'import',
-				text: 'IMPORT',
-				click: drawImport.bind(slot, slot)
-			});
-		} else { 
-			var heartInfo = getNumHearts(slotInfo.maxHealth);
-			for(var heartNum = 0; heartNum < heartInfo.total; heartNum++) {
-				Graphics.make('full ' + (heartNum < heartInfo.big ? 'bigheart' : 'heart'))
-					.append(Graphics.make('mask'))
-					.appendTo(slotSide);
-			}
-			buttons = buttons.concat([
-				{
-					className: 'export',
-					text: 'EXPORT',
-					click: drawExport.bind(slot, slot)
-				}, {
-					className: 'delete',
-					text: 'DELETE',
-					click: drawDelete.bind(slot, slot)
-				}
-			]);
-			var day = Graphics.make('day').text(Graphics.getText('DAY') + ' ' + slotInfo.day);
+		var empty = slotInfo === 'empty';
+		var slot = Graphics.make('saveSlot' + (empty ? ' empty' : '')).data('slotIndex', slotIndex);
+		var info = Graphics.make('slotInfo').appendTo(slot);
+		var buttons = Graphics.make('slotButtons');
+		if(empty) {
+			info.append(Graphics.make('slotTitle').text(Graphics.getText('NEWGAME')));
+			buttons.append(slotButton('import', 'IMPORT', drawImport.bind(null, slotIndex)));
+		} else {
+			var day = Graphics.make('slotTitle').text(Graphics.getText('DAY') + ' ' + slotInfo.day);
 			if(slotInfo.prestiged) {
 				day.prepend(Graphics.make('star'));
 			}
-			slotSide.append(day);
-		}
-		slot.append(Graphics.make('infoSide').click(function() {return false;}));
-		drawSlotButtons(slotSide, buttons);
-		
-		slot.on("click touchstart", function(e) {
-			if(e.target.tagName != 'TEXTAREA') {
-				require('app/audio/audio').play('Click');
-				EventManager.trigger('slotChosen', [slotIndex]);
-				$('#loadingScreen').addClass('hidden');
-				setTimeout(function() {
-					$('#loadingScreen').remove();
-				}, 1000);
+			var hearts = Graphics.make('slotHearts');
+			var heartInfo = getNumHearts(slotInfo.maxHealth);
+			for(var heartNum = 0; heartNum < heartInfo.total; heartNum++) {
+				Graphics.make(heartNum < heartInfo.big ? 'bigheart' : 'heart').appendTo(hearts);
 			}
+			info.append(day).append(hearts);
+			buttons.append(slotButton('export', 'EXPORT', drawExport.bind(null, slotIndex)))
+				.append(slotButton('delete', 'DELETE', drawDelete.bind(null, slotIndex)));
+		}
+		slot.append(buttons).on('click', function() {
+			require('app/audio/audio').play('Click');
+			EventManager.trigger('slotChosen', [slotIndex]);
+			$('#loadingScreen').addClass('hidden');
+			setTimeout(function() {
+				$('#loadingScreen').remove();
+			}, 1000);
 		});
 		
 		return slot;
 	}
 	
-	function drawSlotButtons(slot, buttons) {
-		var buttonList = Graphics.make('buttons', 'ul');
-		for(var i in buttons) {
-			var buttonInfo = buttons[i];
-			buttonList.append(Graphics.make(buttonInfo.className, 'li')
-				.on('click touchstart', buttonInfo.click).attr('title', Graphics.getText(buttonInfo.text)));
-		}
-		buttonList.appendTo(slot);
-	}
-	
-	function drawImport(slot) {
+	function drawImport(slotIndex) {
 		EventManager.trigger('click', ['import']);
-		slot.addClass('bigView flipped');
-		var infoSide = slot.find('.infoSide');
-		infoSide.append(Graphics.make('labelText').text(Graphics.getText('IMPORT_CODE')));
-		infoSide.append(Graphics.make('exportCode', 'textarea'));
-		drawSlotButtons(infoSide, [{
-			className: 'confirm',
-			text: 'CONFIRM',
-			click: doImport.bind(slot, slot)
-		}, {
-			className: 'cancel',
-			text: 'CANCEL',
-			click: cancelSlotAction.bind(slot, slot)
-		}]);
-		return false;
+		var code = Graphics.make('codeBox', 'textarea').attr('spellcheck', 'false');
+		UI.modal({
+			title: 'IMPORT', text: 'IMPORT_CODE', body: code,
+			buttons: [
+				{ text: 'CONFIRM', cls: 'ok', click: function() { EventManager.trigger('importSlot', [slotIndex, code.val()]); } },
+				{ text: 'CANCEL' }
+			]
+		});
 	}
 	
-	function drawExport(slot) {
+	function drawExport(slotIndex) {
 		EventManager.trigger('click', ['export']);
-		slot.addClass('bigView flipped');
-		var infoSide = slot.find('.infoSide');
-		infoSide.append(Graphics.make('labelText').text(Graphics.getText('EXPORT_CODE')));
-		infoSide.append(Graphics.make('exportCode', 'textarea').text(
-			require('app/gamestate').getExportCode(slot.data('slotIndex'))
-		).attr('readonly', true));
-		drawSlotButtons(infoSide, [{
-			className: 'confirm',
-			text: 'CONFIRM',
-			click: cancelSlotAction.bind(slot, slot)
-		}]);
-		return false;
+		var code = Graphics.make('codeBox', 'textarea').attr('readonly', true)
+			.text(require('app/gamestate').getExportCode(slotIndex));
+		UI.modal({
+			title: 'EXPORT', text: 'EXPORT_CODE', body: code,
+			buttons: [
+				{ text: 'COPY', cls: 'ok', click: function() {
+					code.select();
+					try { document.execCommand('copy'); } catch(e) {}
+					$(this).text(Graphics.getText('COPIED'));
+					return false;
+				} },
+				{ text: 'CLOSE' }
+			]
+		});
 	}
 	
-	function drawDelete(slot) {
+	function drawDelete(slotIndex) {
 		EventManager.trigger('click', ['delete']);
-		slot.addClass('confirmDelete flipped');
-		var infoSide = slot.find('.infoSide');
-		infoSide.append(Graphics.make('confirmText').text(Graphics.getText('ARE_YOU_SURE')));
-		drawSlotButtons(infoSide, [{
-			className: 'confirm',
-			text: 'CONFIRM',
-			click: doDelete.bind(slot, slot)
-		}, {
-			className: 'cancel',
-			text: 'CANCEL',
-			click: cancelSlotAction.bind(slot, slot)
-		}]);
-		return false;
-	}
-	
-	function doDelete(slot) {
-		var slotIndex = slot.data('slotIndex');
-		EventManager.trigger('deleteSlot', [slotIndex]);
-		Graphics.get('.saveSlot:nth-child(' + (slotIndex + 1) + ')').before(drawSlot('empty', slotIndex));
-		slot.remove();
-		return false;
-	}
-	
-	function doImport(slot) {
-		var slotIndex = slot.data('slotIndex');
-		var importCode = slot.find('textarea').val();
-		EventManager.trigger('importSlot', [slotIndex, importCode]);
-		return false;
-	}
-	
-	function cancelSlotAction(slot) {
-		var wasEmpty = slot.hasClass('empty');
-		slot.removeClass('flipped');
-		setTimeout(function() {
-			slot.find('.infoSide').empty();
-			slot.attr('class', 'saveSlot' + (wasEmpty ? ' empty' : ''));
-		}, 500);
-		return false;
+		UI.modal({
+			title: 'ARE_YOU_SURE', text: 'DELETE_TEXT',
+			buttons: [
+				{ text: 'DELETE', cls: 'danger', click: function() {
+					EventManager.trigger('deleteSlot', [slotIndex]);
+					Graphics.replaceSlot(slotIndex, 'empty');
+				} },
+				{ text: 'CANCEL' }
+			]
+		});
 	}
 	
 	var scaleSheet = null;
@@ -366,8 +307,6 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 		var mobile = require('app/gameboard').options.mobile;
 		var widthScale = document.documentElement.clientWidth / (mobile ? PORTRAIT_WIDTH : MIN_SCREEN_WIDTH),
 			heightScale = document.documentElement.clientHeight / (mobile ? PORTRAIT_HEIGHT : MIN_SCREEN_HEIGHT);
-		// Экран загрузки остаётся 600x650 и только уменьшается, сцена игры ещё и растёт (арт векторно-мягкий, x2)
-		var loadScale = Math.min(1, document.documentElement.clientWidth / 600, document.documentElement.clientHeight / 650);
 		var minScale = Math.min(MAX_SCALE, widthScale, heightScale);
 		var sizeKey = document.documentElement.clientHeight;
 
@@ -375,10 +314,9 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 			scaleSheet = newStylesheet();
 		}
 
-		if(minScale != currentScale || loadScale != currentLoadScale || sizeKey != currentHeight) {
+		if(minScale != currentScale || sizeKey != currentHeight) {
 			currentHeight = sizeKey;
 			currentScale = minScale;
-			currentLoadScale = loadScale;
 			while(scaleSheet.cssRules.length > 0) {
 				scaleSheet.deleteRule(0);
 			}
@@ -388,7 +326,6 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 					'transform: scale(' + scale +');' +
 					'-webkit-transform: scale(' + scale +');';
 			};
-			Graphics.addStyleRule('#loadingScreen', rule(loadScale), scaleSheet);
 			// сцена по центру экрана по вертикали (фон виден выше и ниже)
 			var top = Math.max(0, (document.documentElement.clientHeight - (mobile ? PORTRAIT_HEIGHT - 37.5 : MIN_SCREEN_HEIGHT - 37.5) * minScale) / 2); // нижней полосы меню больше нет: доска сдвинута вниз на 18,75 (было 25)
 			Graphics.addStyleRule('#gameContainer', rule(minScale) + 'top: ' + Math.round(top) + 'px;', scaleSheet);
@@ -438,7 +375,7 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 				requestAnimationFrame = fallbackAnimationFrame;
 			}
 			
-			textStore = new TextStore();
+			textStore = new TextStore(Options.get('lang'), UI.applyLang);
 			
 			initStylesheet();
 			scaleToViewport();
@@ -472,9 +409,6 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 			ResourceGraphics.init();
 			LootGraphics.init();
 			MagicGraphics.init();
-			if(!require('app/engine').isSilent()) {
-				AudioGraphics.init();
-			}
 
 			requestAnimationFrame(doEntityAnimation);
 		},
@@ -489,6 +423,10 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 		
 		getText: function(key) {
 			return textStore.get(key);
+		},
+		
+		setLocale: function(lang, cb) {
+			textStore = new TextStore(lang, cb);
 		},
 		
 		attachHandler: function(moduleName, event, element, handler) {
@@ -573,10 +511,6 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 		
 		addToBoard: function(entity) {
 			$('.gameBoard').append(entity.el ? entity.el() : entity);
-		},
-		
-		addToMenu: function(entity) {
-			$('.menuBar').append(entity.el ? entity.el() : entity);
 		},
 		
 		hide: function(entity) {
@@ -1063,8 +997,7 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 		},
 		
 		enablePlayButton: function() {
-			$('.menuContinue').text(Graphics.getText('CONTINUE'));
-			$('#loadingScreen .saveSpinner').addClass('hidden');
+			$('#loadingScreen').addClass('ready');
 			Graphics.drawSaveSlots();
 		},
 		
@@ -1138,13 +1071,12 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 		},
 		
 		drawSaveSlots: function() {
-			var saveSlots = Graphics.make('saveSlots', 'ul');
+			var saveSlots = $('.saveSlots').empty();
 			for(var i = 0; i < 3; i++) {
 				var slotInfo = require('app/gamestate').getSlotInfo(i);
 				var slot = drawSlot(slotInfo, i);
 				saveSlots.append(slot);
 			}
-			Graphics.get('#loadingScreen').append(saveSlots);
 		},
 		
 		replaceSlot: function(slotIndex, slotInfo) {

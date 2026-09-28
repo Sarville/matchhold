@@ -3,7 +3,8 @@ define(['jquery'], function($) {
 	var gameOptions = {
 		musicVolume: 1,
 		effectsVolume: 1,
-		casualMode: false
+		casualMode: false,
+		lang: /^ru/i.test(navigator.language || '') ? 'ru' : 'en'
 	};
 	
 	var GameOptions = {

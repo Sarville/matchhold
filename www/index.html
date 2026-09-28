@@ -25,6 +25,7 @@
 		<link rel="stylesheet" type="text/css" href="css/art.css" />
 		<link rel="stylesheet" type="text/css" href="css/bg.css" />
 		<link rel="stylesheet" type="text/css" href="css/store.css" />
+		<link rel="stylesheet" type="text/css" href="css/ui.css" />
 		<script type="text/javascript" data-main="js/app" src="js/lib/require.js"></script>
 		<style>
 			@viewport {
@@ -56,34 +57,55 @@
 		<div id="fg"><div class="day"></div><div class="night"></div><div class="drbg"></div></div>
 		<div id="test" nodeploy></div>
 		<div id="pauseIcon"></div>
-		<div id="loadingScreen">
-			<div class="saveSpinner">
-				<div></div>
-				<div></div>
-				<div></div>
-				<div></div>
-				<div></div>
-				<div></div>
-				<div></div>
-				<div></div>
+		<div id="loadingScreen" data-clickable>
+			<div class="titleMain">
+				<h1 class="logo"><span class="a"></span><i class="coin"></i><span class="b"></span></h1>
+				<div class="logoTiles"><i style="--c:1"></i><i style="--c:4"></i><i style="--c:0"></i><i style="--c:3"></i><i style="--c:5"></i></div>
+				<div class="emblem"></div>
+				<div class="slotsArea">
+					<div class="loader"><i></i><p data-i18n="LOADING"></p></div>
+					<ul class="saveSlots"></ul>
+				</div>
+				<div class="titleBar">
+					<button type="button" class="btn wide" id="btnSettings"><span data-icon="gear"></span><span data-i18n="SETTINGS"></span></button>
+					<button type="button" class="btn round" id="btnLang"></button>
+				</div>
 			</div>
 		</div>
 		<div id="gameContainer"></div>
-		<div class="menuBtn"><span></span></div>
-		<div class="menuBar litBorder">
-			<div id="debug" style="position:absolute;top:5px;left:100px;" nodeploy></div>
-			<div class="saveSpinner">
-				<div></div>
-				<div></div>
-				<div></div>
-				<div></div>
-				<div></div>
-				<div></div>
-				<div></div>
-				<div></div>
+		<div class="menuBtn" data-clickable><span></span></div>
+		<div id="debug" style="position:fixed;top:5px;left:100px;" nodeploy></div>
+		<div class="saveSpinner">
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+		</div>
+		<div id="settings" class="overlay" data-clickable>
+			<div class="panel settingsPanel">
+				<button type="button" class="btn wide onlyGame" id="btnContinue" data-i18n="CONTINUE"></button>
+				<button type="button" class="btn wide onlyTitle" id="btnBack" data-i18n="BACK"></button>
+				<div class="volRow" data-opt="musicVolume"><span class="ico" data-icon="music"></span><div class="bar"><i class="fill"></i><i class="knob"></i></div></div>
+				<div class="volRow" data-opt="effectsVolume"><span class="ico" data-icon="sound"></span><div class="bar"><i class="fill"></i><i class="knob"></i></div></div>
+				<h3 class="sect"><span data-i18n="DIFFICULTY"></span></h3>
+				<div class="diff">
+					<span class="opt easy"><span data-icon="leaf"></span><span data-i18n="EASY"></span></span>
+					<span class="opt hard"><span data-icon="sword"></span><span data-i18n="NORMAL"></span></span>
+					<i class="knob"></i>
+				</div>
+				<div class="langSwitch"><button type="button" data-lang="ru">RU</button><button type="button" data-lang="en">EN</button></div>
+				<button type="button" class="btn wide" id="btnHow"><span data-icon="book"></span><span data-i18n="HOW_TO_PLAY"></span></button>
+				<button type="button" class="btn wide" id="btnAds"><span data-icon="noads"></span><span data-i18n="REMOVE_ADS"></span></button>
+				<button type="button" class="btn wide" id="btnMore"><span data-icon="gamepad"></span><span data-i18n="MORE_GAMES"></span></button>
+				<button type="button" class="btn wide danger onlyGame" id="btnExit" data-i18n="EXIT_MENU"></button>
 			</div>
-			<span class="menuHeading"></span>
-			<div class="menuContinue litBorder"></div>
+		</div>
+		<div id="modal" class="overlay" data-clickable>
+			<div class="panel modalPanel"></div>
 		</div>
 	</body>
 </html>
