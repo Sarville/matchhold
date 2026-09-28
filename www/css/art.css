@@ -800,8 +800,13 @@
 
 /* ---------- дракон: тело 204x164 x10 рядов (dragon.webp), голова 81x30 x2 (dragon_head.webp), шея 24x24 x2 (dragon_neck.webp); background-size = логическая ширина (не x3 исходника), браузер уменьшает сам ---------- */
 .dragon { background-image: url(../img/v2/dragon.webp); background-size: 816px auto; }
-.dragon .head { background-image: url(../img/v2/dragon_head.webp); background-size: 243px auto; }
-.dragon .neck { background-image: url(../img/v2/dragon_neck.webp); background-size: 24px auto; }
+/* main.css .dragon .head/.neck задают background как shorthand (старый dragonsprite.png, позиция вроде -1640px/-1700px);
+   art.css переопределяет только image - без явной position ниже голова/шея показывали бы кусок за пределами webp
+   (шея вообще не видна: JS её позицию никогда не трогает). Ряд 0 = обычный, ряд 1 (+HEAD_H/+NECK_H) = зеркальный (.dragon.flip). */
+.dragon .head { background-image: url(../img/v2/dragon_head.webp); background-size: 243px auto; background-position: 0 0; }
+.dragon.flip .head { background-position: 0 -30px; }
+.dragon .neck { background-image: url(../img/v2/dragon_neck.webp); background-size: 24px auto; background-position: 0 0; }
+.dragon.flip .neck { background-position: 0 -24px; }
 
 /* ---------- монстры: лист 4 кадра x N рядов на своего монстра (не общий monsters.png), background-size ширина = 4 x логическая ширина, высота auto ---------- */
 .zombie { background-image: url(../img/v2/monsters/zombie.webp); background-size: 128px auto; }

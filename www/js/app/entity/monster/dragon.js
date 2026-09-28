@@ -65,7 +65,7 @@ define(['app/entity/monster/monster', 'app/action/actionfactory'],
 		var dx = Math.abs(pos.x - targetPos.x);
 		var dy = Math.abs(pos.y - targetPos.y);
 		var theta = Math.atan(dy/dx);
-		return (this.options.flip ? 1 : -1) * pos.r - deg(theta);
+		return (this._mirror ? 1 : -1) * pos.r - deg(theta);
 	}
 	
 	function explodeSegment(segment) {
@@ -80,7 +80,10 @@ define(['app/entity/monster/monster', 'app/action/actionfactory'],
 	
 	var Dragon = function(options) {
 		this.options = $.extend({}, this.options, {}, options);
-		
+		// Тело (dragon.webp) сгенерировано лицом ВПРАВО в неотражённых рядах 0-4; options.flip выбирает
+		// сторону мира (где дракон приземляется), а не то, куда он смотрит - для отрисовки нужно обратное.
+		this._mirror = !this.options.flip;
+
 		this.maxHealth = 1000;
 		this.damage = 4;
 		this.xp = 5000;
@@ -113,7 +116,7 @@ define(['app/entity/monster/monster', 'app/action/actionfactory'],
 			var G = require('app/graphics/graphics');
 			this._segments = [];
 			this._el = Monster.prototype.el.call(this);
-			if(this.options.flip) this._el.addClass('flip');
+			if(this._mirror) this._el.addClass('flip');
 			this._segments.push(G.make('neck').appendTo(this._el));
 			this._segments.push(G.make('neck').appendTo(this._segments[0]));
 			this._segments.push(G.make('neck').appendTo(this._segments[1]));
@@ -172,7 +175,7 @@ define(['app/entity/monster/monster', 'app/action/actionfactory'],
 				this.headState = this.animateHead;
 				this.headFrame = 0;
 			}
-			var y = this.options.flip ? this.headHeight() : 0;
+			var y = this._mirror ? this.headHeight() : 0;
 			y += require('app/graphics/sprites').getOffset('dragonhead');
 			require('app/graphics/graphics').updateSpritePos(
 				this._segments[3], 
@@ -183,24 +186,26 @@ define(['app/entity/monster/monster', 'app/action/actionfactory'],
 	};
 	
 	Dragon.prototype.animation = function(row, stopTempAnimations, stepFunction) {
-		row += this.options.flip ? ANIMATION_ROWS : 0;
+		row += this._mirror ? ANIMATION_ROWS : 0;
 		Monster.prototype.animation.call(this, row, stopTempAnimations, stepFunction);
 	};
-	
+
 	Dragon.prototype.animationOnce = function(row, stepFunction) {
-		row += this.options.flip ? ANIMATION_ROWS : 0;
+		row += this._mirror ? ANIMATION_ROWS : 0;
 		Monster.prototype.animationOnce.call(this, row, stepFunction);
 	};
-	
+
 	Dragon.prototype.setNeckMount = function(pos) {
 		pos = pos || headMount;
 		var css = {
 			top: pos.y + 'px'
 		};
-		if(this.options.flip) {
+		if(this._mirror) {
 			css.right = pos.x + 'px';
+			css.left = '';
 		} else {
 			css.left = pos.x + 'px';
+			css.right = '';
 		}
 		this._segments[0].css(css);
 	};
@@ -297,23 +302,23 @@ define(['app/entity/monster/monster', 'app/action/actionfactory'],
 				for(var i = this._segments.length; i > 0; i--) {
 					var r;
 					if(!isNaN(pos[i][0])) {
-						setSegmentPosture(this._segments[i - 1], pos[i], this.options.flip);
+						setSegmentPosture(this._segments[i - 1], pos[i], this._mirror);
 						r = pos[i][0];
 					} else {
 						r = 0;
 						dynamicPos = pos[i];
 					}
-	
+
 					if(i < this._segments.length) {
-						headPos = translate(rotate(headPos, r * (this.options.flip ? -1 : 1)), 
-								pos[i][1] * (this.options.flip ? -1 : 1), 0);
+						headPos = translate(rotate(headPos, r * (this._mirror ? -1 : 1)),
+								pos[i][1] * (this._mirror ? -1 : 1), 0);
 					}
 				}
-				
+
 				var dragonPos = this.el().position();
 				this.animateHead = pos[0];
 				var left;
-				if(this.options.flip) {
+				if(this._mirror) {
 					left = dragonPos.left + this.width() - headMount.x + headPos.x - 20;
 				} else {
 					left = headMount.x + dragonPos.left + headPos.x + 10;
@@ -333,8 +338,8 @@ define(['app/entity/monster/monster', 'app/action/actionfactory'],
 				    	}), 
 					    dynamicPos[1]
 				    ];
-					setSegmentPosture(this._segments[this._segments.length - 1], newPos, this.options.flip);
-					if(this.options.flip) {
+					setSegmentPosture(this._segments[this._segments.length - 1], newPos, this._mirror);
+					if(this._mirror) {
 						this.absHeadPos.r = 180 + newPos[0] - headPos.r;
 					} else {
 						this.absHeadPos.r = -newPos[0] - headPos.r;
