@@ -799,16 +799,16 @@
 .dude .heldBlock { right: 17px; top: 34px; }
 
 /* ---------- монстры: лист 4 кадра x N рядов на своего монстра (не общий monsters.png), background-size ширина = 4 x логическая ширина, высота auto ---------- */
-.zombie { background-image: url(../img/v2/monsters/zombie.webp); background-size: 64px auto; }
-.skeleton { background-image: url(../img/v2/monsters/skeleton.webp); background-size: 108px auto; }
-.hauntedArmour { background-image: url(../img/v2/monsters/hauntedArmour.webp); background-size: 280px auto; }
-.demon { background-image: url(../img/v2/monsters/demon.webp); background-size: 288px auto; }
-.rat { background-image: url(../img/v2/monsters/rat.webp); background-size: 160px auto; }
-.spider { background-image: url(../img/v2/monsters/spider.webp); background-size: 240px auto; }
-.waterElemental { background-image: url(../img/v2/monsters/waterElemental.webp); background-size: 212px auto; }
-.imp { background-image: url(../img/v2/monsters/imp.webp); background-size: 120px auto; }
-.lizardman { background-image: url(../img/v2/monsters/lizardman.webp); background-size: 128px auto; }
-.fireElemental { background-image: url(../img/v2/monsters/fireElemental.webp); background-size: 120px auto; }
-.warlock { background-image: url(../img/v2/monsters/warlock.webp); background-size: 96px auto; }
-.earthElemental { background-image: url(../img/v2/monsters/earthElemental.webp); background-size: 232px auto; }
-.lich { background-image: url(../img/v2/monsters/lich.webp); background-size: 164px auto; }
+.zombie { background-image: url(../img/v2/monsters/zombie.webp); background-size: 128px auto; }
+.skeleton { background-image: url(../img/v2/monsters/skeleton.webp); background-size: 220px auto; }
+.hauntedArmour { background-image: url(../img/v2/monsters/hauntedArmour.webp); background-size: 372px auto; }
+.demon { background-image: url(../img/v2/monsters/demon.webp); background-size: 216px auto; }
+.rat { background-image: url(../img/v2/monsters/rat.webp); background-size: 468px auto; }
+.spider { background-image: url(../img/v2/monsters/spider.webp); background-size: 408px auto; }
+.waterElemental { background-image: url(../img/v2/monsters/waterElemental.webp); background-size: 412px auto; }
+.imp { background-image: url(../img/v2/monsters/imp.webp); background-size: 128px auto; }
+.lizardman { background-image: url(../img/v2/monsters/lizardman.webp); background-size: 236px auto; }
+.fireElemental { background-image: url(../img/v2/monsters/fireElemental.webp); background-size: 220px auto; }
+.warlock { background-image: url(../img/v2/monsters/warlock.webp); background-size: 168px auto; }
+.earthElemental { background-image: url(../img/v2/monsters/earthElemental.webp); background-size: 236px auto; }
+.lich { background-image: url(../img/v2/monsters/lich.webp); background-size: 236px auto; }

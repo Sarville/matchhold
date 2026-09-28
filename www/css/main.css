@@ -1640,116 +1640,116 @@ body.paused:before {
 }
 
 .zombie {
-	height: 32px;
-	width: 16px;
-}
-
-.zombie .healthBar {
-	margin-left: -7px;
-}
-
-.hauntedArmour {
-	height: 49px;
-	width: 70px;
-}
-
-.hauntedArmour .healthBar {
-	margin-left: 20px;
-}
-
-.earthElemental {
-	height: 74px;
-	width: 58px;
-}
-
-.earthElemental .healthBar {
-	margin-left: 14px;
-}
-
-.demon {
-	height: 86px;
-	width: 72px;
-}
-
-.demon .healthBar {
-	margin-left: 6px;
-}
-
-.rat {
-	height: 13px;
-	width: 40px;
-}
-
-.rat .healthBar {
-	margin-left: 5px;
-}
-
-.spider {
-	height: 38px;
-	width: 60px;
-}
-
-.spider .healthBar {
-	margin-left: 15px;	
-}
-
-.waterElemental {
-	height: 39px;
-	width: 53px;
-}
-
-.waterElemental .healthBar {
-	margin-left: 20px;
-}
-
-.imp {
-	height: 60px;
-	width: 30px;
-}
-
-.imp .healthBar {
-	margin-left: 0px;
-}
-
-.skeleton {
-	height: 32px;
-	width: 27px;
-}
-
-.skeleton .healthBar {
-	margin-left: -2px;
-}
-
-.lizardman {
-	height: 35px;
+	height: 65px;
 	width: 32px;
 }
 
-.lizardman .healthBar {
+.zombie .healthBar {
 	margin-left: 1px;
 }
 
+.hauntedArmour {
+	height: 65px;
+	width: 93px;
+}
+
+.hauntedArmour .healthBar {
+	margin-left: 31.5px;
+}
+
+.earthElemental {
+	height: 76px;
+	width: 59px;
+}
+
+.earthElemental .healthBar {
+	margin-left: 14.5px;
+}
+
+.demon {
+	height: 65px;
+	width: 54px;
+}
+
+.demon .healthBar {
+	margin-left: 12px;
+}
+
+.rat {
+	height: 38px;
+	width: 117px;
+}
+
+.rat .healthBar {
+	margin-left: 43.5px;
+}
+
+.spider {
+	height: 65px;
+	width: 102px;
+}
+
+.spider .healthBar {
+	margin-left: 36px;	
+}
+
+.waterElemental {
+	height: 76px;
+	width: 103px;
+}
+
+.waterElemental .healthBar {
+	margin-left: 36.5px;
+}
+
+.imp {
+	height: 65px;
+	width: 32px;
+}
+
+.imp .healthBar {
+	margin-left: 1px;
+}
+
+.skeleton {
+	height: 65px;
+	width: 55px;
+}
+
+.skeleton .healthBar {
+	margin-left: 12.5px;
+}
+
+.lizardman {
+	height: 65px;
+	width: 59px;
+}
+
+.lizardman .healthBar {
+	margin-left: 14.5px;
+}
+
 .fireElemental {
-	height: 41px;
-	width: 30px;
+	height: 76px;
+	width: 55px;
 }
 
 .fireElemental .healthBar {
-	margin-left: 0px;
+	margin-left: 12.5px;
 }
 
 .warlock {
-	height: 37px;
-	width: 24px;
+	height: 65px;
+	width: 42px;
 }
 
 .warlock .healthBar {
-	margin-left: -3px;
+	margin-left: 6px;
 }
 
 .lich {
-	height: 60px;
-	width: 41px;
+	height: 86px;
+	width: 59px;
 	transition: opacity 300ms linear;
 	-webkit-transition: opacity 300ms linear;
 	-moz-transition: opacity 300ms linear;
