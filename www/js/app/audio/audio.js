@@ -198,6 +198,7 @@ define(['app/eventmanager', 'app/audio/webaudioprovider', 'app/audio/htmlaudiopr
 	}
 	
 	function crossFade(outSound, inSound, time) {
+		provider.enter && provider.enter(sounds[inSound]);
 		provider.crossFade(sounds[outSound], sounds[inSound], time);
 	}
 	
@@ -205,7 +206,6 @@ define(['app/eventmanager', 'app/audio/webaudioprovider', 'app/audio/htmlaudiopr
 		if(!playingMusic) {
 			playingMusic = true;
 			GameAudio.play('DayMusic');
-			GameAudio.play('NightMusic');
 		}
 	}
 	
@@ -235,11 +235,11 @@ define(['app/eventmanager', 'app/audio/webaudioprovider', 'app/audio/htmlaudiopr
 		}
 	}
 	
-	// новая игра+: день и ночь снова с первого трека
+	// новая игра+: день и ночь снова с первого трека (следующий вход в трек начнёт с первой части)
 	function restartMusic() {
-		if(playingMusic && provider.restart) {
-			provider.restart(sounds.DayMusic);
-			provider.restart(sounds.NightMusic);
+		if(playingMusic && provider.reset) {
+			provider.reset(sounds.DayMusic);
+			provider.reset(sounds.NightMusic);
 		}
 	}
 	

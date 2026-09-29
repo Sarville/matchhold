@@ -156,17 +156,27 @@ define(function() {
 		
 		stop: function(sound) {
 			if(sound.currentSource) {
+				sound.currentSource.onended = null;
 				sound.currentSource.stop(0);
 			}
 		},
 		
-		// заново с первой части, без автоперехода на случайную из onended
-		restart: function(sound) {
-			if(sound.currentSource) {
-				sound.currentSource.onended = null;
-				sound.currentSource.stop(0);
+		// вход трека с частями: с начала следующей части из мешка (первый раз - с первой), тихо, громкость поднимет crossFade
+		enter: function(sound) {
+			if(!sound.parts) {
+				return;
 			}
-			WebAudioProvider.play(sound);
+			WebAudioProvider.stop(sound);
+			WebAudioProvider.play(sound, sound.bag ? nextPart(sound) : null);
+			if(sound.volume) {
+				sound.volume.gain.value = 0;
+			}
+		},
+		
+		// сброс: следующий вход снова с первой части
+		reset: function(sound) {
+			WebAudioProvider.stop(sound);
+			sound.bag = null;
 		},
 		
 		fadeOut: function(sound, time) {
@@ -197,6 +207,7 @@ define(function() {
 			// уходящий трек может быть не загружен: тогда просто вводим входящий
 			if(isSoundReady(inSound) && inSound.volume) {
 				var out = isSoundReady(outSound) && outSound.volume;
+				var outSource = outSound.currentSource;
 				(function fade() {
 					if(out) {
 						out.gain.value = Math.max(out.gain.value - 0.1, 0);
@@ -204,6 +215,9 @@ define(function() {
 					inSound.volume.gain.value = Math.min(inSound.volume.gain.value + 0.1, 1);
 					if((out && out.gain.value > 0) || inSound.volume.gain.value < 1) {
 						setTimeout(fade, time / 10);
+					} else if(outSound.parts && outSound.currentSource === outSource) {
+						// ушедший трек не играет вхолостую, иначе его части расходуются впустую
+						WebAudioProvider.stop(outSound);
 					}
 				})();
 			}
