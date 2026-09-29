@@ -1,8 +1,8 @@
 define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
         'app/graphics/gameboard', 'app/graphics/world', 'app/graphics/resources', 
-        'app/graphics/loot', 'app/graphics/magic', 'app/graphics/sprites', 'app/ui'], 
+        'app/graphics/loot', 'app/graphics/magic', 'app/graphics/sprites', 'app/ui', 'app/graphics/ending'], 
 		function($, EventManager, TextStore, Options, BoardGraphics, WorldGraphics, ResourceGraphics,
-				LootGraphics, MagicGraphics, Sprites, UI) {
+				LootGraphics, MagicGraphics, Sprites, UI, Ending) {
 	
 	var MAX_HEARTS = 14;
 	var HEALTH_PER_HEART = 10;
@@ -133,49 +133,15 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 		}, 300);
 	}
 	
-	var getStats = (function() {
-		var _stats = null;
-		return function(counts) {
-			var list;
-			if(_stats == null) {
-				_stats = Graphics.make().attr('id', 'endGame');
-				_stats.append($('<h2>').text(textStore.get('CLEAR')));
-				_stats.append($('<ul>').addClass('menu')
-					.append($('<li>').text(textStore.get('CONTINUE')).on('click touchstart', continueGame))
-					.append($('<li>').text(textStore.get('NEWGAMEPLUS')).on('click touchstart', newGamePlus)));
-				list = $('<ul>').addClass('counts').appendTo(_stats);
-				Graphics.get('body').append(_stats);
-				_stats.css('left');
-			} else {
-				list = $('ul.list', _stats);
-				if(counts) {
-					list.empty();
-				}
-			}
-			
-			if(counts) {
-				for(var key in counts) {
-					list.append($('<li>')
-						.append($('<span>').text(textStore.get(key) || 0))
-						.append($('<span>').text(counts[key]))
-					);
-				}
-			}
-			
-			return _stats;
-		};
-	})();
-	
 	function gameOver(counts) {
 		Graphics.get('body').addClass('bigExplosion');
 		setTimeout(function() {
-			getStats(counts).addClass('down');
+			Ending.play(counts, continueGame, newGamePlus);
 		}, 2000);
 	}
 	
 	function continueGame() {
 		EventManager.trigger('phaseChange', [false]);
-		getStats().removeClass('down');
 		BoardGraphics.el().removeClass('dragonFight');
 		var b = Graphics.get('body');
 		setTimeout(function() {
@@ -187,7 +153,6 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 	}
 	
 	function newGamePlus() {
-		getStats().removeClass('down');
 		BoardGraphics.el().removeClass('dragonFight');
 		var b = Graphics.get('body');
 		b.removeClass('night dragonBg');

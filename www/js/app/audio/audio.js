@@ -9,12 +9,16 @@ define(['app/eventmanager', 'app/audio/webaudioprovider', 'app/audio/htmlaudiopr
 	var playingMusic = false;
 	var longloadTimer = false;
 	var playingBossMusic = false;
+	var playingEnding = false;
+	var playingMenu = false;
+	var endingFrom = null;
+	var noMusic = false;
 	var CDN_PATH = "";
 	
 	var sounds = {
 		DayMusic: {
 			file: 'theme-day',
-			parts: 4,
+			parts: 5,
 			music: true,
 			silentIf: function() {
 				return require('app/engine').isNight();
@@ -23,16 +27,34 @@ define(['app/eventmanager', 'app/audio/webaudioprovider', 'app/audio/htmlaudiopr
 		},
 		NightMusic: {
 			file: 'theme-night',
-			parts: 4,
+			parts: 5,
 			music: true,
 			silentIf: function() {
 				return !require('app/engine').isNight();
+			}
+		},
+		MenuMusic: {
+			file: 'theme-menu',
+			music: true,
+			onLatePlay: function() {
+				!playingMenu && GameAudio.stop('MenuMusic');
 			}
 		},
 		BossMusic: {
 			file: 'theme-boss',
 			music: true,
 			noPlay: true
+		},
+		EndingMusic: {
+			file: 'theme-ending',
+			music: true,
+			lazy: true,
+			silentIf: function() {
+				return true;
+			},
+			onLatePlay: function() {
+				playingEnding && crossFade(endingFrom, 'EndingMusic', 1500);
+			}
 		},
 		Click: {
 			file: 'click'
@@ -194,7 +216,76 @@ define(['app/eventmanager', 'app/audio/webaudioprovider', 'app/audio/htmlaudiopr
 		playingBossMusic = true;
 	}
 	
+	// музыка главного меню стартует с первого жеста (до него браузер не даёт играть) и гаснет, когда загружена игра
+	function startMenu() {
+		if(!playingMenu && !noMusic && document.body.className.indexOf('titleScreen') >= 0) {
+			playingMenu = true;
+			GameAudio.play('MenuMusic');
+		}
+	}
+	
+	function stopMenu() {
+		if(playingMenu) {
+			playingMenu = false;
+			if(provider.fadeOut) {
+				provider.fadeOut(sounds.MenuMusic, 1500);
+			} else {
+				GameAudio.stop('MenuMusic');
+			}
+		}
+	}
+	
+	// новая игра+: день и ночь снова с первого трека
+	function restartMusic() {
+		if(playingMusic && provider.restart) {
+			provider.restart(sounds.DayMusic);
+			provider.restart(sounds.NightMusic);
+		}
+	}
+	
+	// титры: трек грузится заранее (при вызове дракона), а не при старте игры
+	function prefetchEnding() {
+		var s = sounds.EndingMusic;
+		if(!noMusic && !s.requested && provider && format != null) {
+			s.requested = true;
+			loadSound(s);
+		}
+	}
+	
+	function startEnding() {
+		if(playingEnding || noMusic || !provider || format == null) {
+			return;
+		}
+		playingEnding = true;
+		prefetchEnding();
+		GameAudio.play('EndingMusic');
+		var from = playingBossMusic ? 'BossMusic' : (require('app/engine').isNight() ? 'NightMusic' : 'DayMusic');
+		endingFrom = from;
+		crossFade(from, 'EndingMusic', 1500);
+		setTimeout(function() {
+			if(from == 'BossMusic') {
+				GameAudio.stop('BossMusic');
+			}
+		}, 1800);
+	}
+	
+	function stopEnding(inSound) {
+		if(!playingEnding) {
+			return false;
+		}
+		playingEnding = false;
+		playingBossMusic = false;
+		crossFade('EndingMusic', inSound, 1200);
+		setTimeout(function() {
+			GameAudio.stop('EndingMusic');
+		}, 1500);
+		return true;
+	}
+	
 	function changeMusic(isNight) {
+		if(stopEnding(isNight ? 'NightMusic' : 'DayMusic')) {
+			return;
+		}
 		if(playingBossMusic) {
 			crossFade('BossMusic', isNight ? 'NightMusic' : 'DayMusic', 500);
 			GameAudio.stop('BossMusic');
@@ -235,19 +326,32 @@ define(['app/eventmanager', 'app/audio/webaudioprovider', 'app/audio/htmlaudiopr
 					format = chooseFormat();
 					if(provider != null && format != null) {
 						toLoad = 0;
+						noMusic = !!options.nomusic;
 						for(s in sounds) {
-							if(!options.nomusic || !sounds[s].music) {
+							if(!sounds[s].lazy && (!options.nomusic || !sounds[s].music)) {
 								loadSound(sounds[s]);
 							}
 						}
 						E.bind('dayBreak', startMusic);
+						E.bind('gameLoaded', stopMenu);
+						if(!options.nomusic) {
+							['mousedown', 'touchstart', 'keydown'].forEach(function(ev) {
+								document.addEventListener(ev, startMenu, true);
+							});
+						}
 					}
 				} catch(e) {
 					console.error('Failed to init audio. Your browser sucks.');
 					return;
 				}
 			} else {
-				crossFade(playingBossMusic ? 'BossMusic' : 'NightMusic', 'DayMusic', 700);
+				restartMusic();
+				if(!stopEnding('DayMusic')) {
+					crossFade(playingBossMusic ? 'BossMusic' : 'NightMusic', 'DayMusic', 700);
+					if(playingBossMusic) {
+						setTimeout(GameAudio.stop.bind(GameAudio, 'BossMusic'), 900);
+					}
+				}
 			}
 			playingBossMusic = false;
 			
@@ -291,6 +395,8 @@ define(['app/eventmanager', 'app/audio/webaudioprovider', 'app/audio/htmlaudiopr
 			E.bind('segmentExplode', GameAudio.play.bind(this, 'SegmentExplode'));
 			E.bind('dragonExplode', GameAudio.play.bind(this, 'DragonExplode'));
 			E.bind('callDragon', startBossMusic.bind(this));
+			E.bind('callDragon', prefetchEnding);
+			E.bind('endingStart', startEnding);
 			E.bind('lichSpell', GameAudio.play.bind(this, 'LichSpell'));
 			
 			GameAudio.setMusicVolume(require('app/gameoptions').get('musicVolume'));

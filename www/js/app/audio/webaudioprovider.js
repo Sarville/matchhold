@@ -4,11 +4,30 @@ define(function() {
 	var musicVolume = null;
 	var effectsVolume = null;
 	
-	function randomPart(count, exclude) {
-		// Pick a random part index, never repeating the one that just finished
-		if(count <= 1) return 0;
-		var n = Math.floor(Math.random() * (count - 1));
-		return n >= exclude ? n + 1 : n;
+	// Части играют в случайном порядке без повторов, пока не сыграны все; новый круг не начинается с только что сыгранной
+	function shuffledParts(count, skip, last) {
+		var bag = [];
+		for(var i = 0; i < count; i++) {
+			if(i !== skip) {
+				bag.push(i);
+			}
+		}
+		for(i = bag.length - 1; i > 0; i--) {
+			var k = Math.floor(Math.random() * (i + 1)), t = bag[i];
+			bag[i] = bag[k];
+			bag[k] = t;
+		}
+		if(bag.length > 1 && bag[bag.length - 1] === last) {
+			bag.unshift(bag.pop());
+		}
+		return bag;
+	}
+
+	function nextPart(sound) {
+		if(!sound.bag.length) {
+			sound.bag = shuffledParts(sound.parts, -1, sound.playingPart);
+		}
+		return sound.bag.pop();
 	}
 
 	function createSoundSource(sound, partNum) {
@@ -19,7 +38,7 @@ define(function() {
 			if(sound.music) {
 				// Randomly switch to a different part each time one finishes
 				source.onended = function() {
-					WebAudioProvider.play(sound, randomPart(sound.parts, partNum));
+					WebAudioProvider.play(sound, nextPart(sound));
 				};
 			}
 		} else {
@@ -50,6 +69,7 @@ define(function() {
 			sound.deferred = false;
 			if(sound.playRequested) {
 				WebAudioProvider.play(sound);
+				sound.onLatePlay && sound.onLatePlay();
 			}
 		} else {
 			callback(sound.file);
@@ -117,6 +137,10 @@ define(function() {
 		},
 		
 		play: function(sound, partNum) {
+			if(partNum == null && sound.parts) {
+				// свежий старт: всегда с первой части
+				sound.bag = shuffledParts(sound.parts, 0, 0);
+			}
 			sound.playingPart = partNum || 0;
 			if(isSoundReady(sound)) {
 				var source = sound.currentSource = createSoundSource(sound, sound.playingPart);
@@ -136,6 +160,27 @@ define(function() {
 			}
 		},
 		
+		// заново с первой части, без автоперехода на случайную из onended
+		restart: function(sound) {
+			if(sound.currentSource) {
+				sound.currentSource.onended = null;
+				sound.currentSource.stop(0);
+			}
+			WebAudioProvider.play(sound);
+		},
+		
+		fadeOut: function(sound, time) {
+			var gain = sound.volume ? sound.volume.gain : null;
+			(function fade() {
+				if(gain && gain.value > 0) {
+					gain.value = Math.max(gain.value - 0.1, 0);
+					setTimeout(fade, time / 10);
+				} else {
+					WebAudioProvider.stop(sound);
+				}
+			})();
+		},
+		
 		setMusicVolume: function(v) {
 			if(musicVolume) {
 				musicVolume.gain.value = v;
@@ -149,13 +194,15 @@ define(function() {
 		},
 		
 		crossFade: function(outSound, inSound, time) {
-			if(isSoundReady(outSound) && isSoundReady(inSound)) {
+			// уходящий трек может быть не загружен: тогда просто вводим входящий
+			if(isSoundReady(inSound) && inSound.volume) {
+				var out = isSoundReady(outSound) && outSound.volume;
 				(function fade() {
-					outSound.volume.gain.value -= 0.1;
-					outSound.volume.gain.value = outSound.volume.gain.value < 0 ? 0 : outSound.volume.gain.value;
-					inSound.volume.gain.value += 0.1;
-					inSound.volume.gain.value = inSound.volume.gain.value > 1 ? 1 : inSound.volume.gain.value;
-					if(outSound.volume.gain.value > 0) {
+					if(out) {
+						out.gain.value = Math.max(out.gain.value - 0.1, 0);
+					}
+					inSound.volume.gain.value = Math.min(inSound.volume.gain.value + 0.1, 1);
+					if((out && out.gain.value > 0) || inSound.volume.gain.value < 1) {
 						setTimeout(fade, time / 10);
 					}
 				})();

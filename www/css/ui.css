@@ -3,7 +3,7 @@
 @font-face { font-family: 'Alegreya SC'; font-weight: 700; src: url(../fonts/AlegreyaSC-700.woff2) format('woff2'); font-display: swap; }
 @font-face { font-family: 'Alegreya SC'; font-weight: 900; src: url(../fonts/AlegreyaSC-900.woff2) format('woff2'); font-display: swap; }
 
-#loadingScreen, .overlay, #endGame, #pauseIcon {
+#loadingScreen, .overlay, #pauseIcon {
 	font: 500 min(4.6vw, 2.6vh)/1.2 'Alegreya SC', Georgia, serif;
 	color: #fff1d0;
 	text-shadow: 0 .08em 0 #4a2a10;
@@ -179,25 +179,56 @@ button { font-family: inherit; }
 .langSwitch button { width: 4.3em; padding: .35em 0; border: 0; font-size: 1.1em; font-weight: 700; color: #4a2a10; background: #ead2a2; text-shadow: none; cursor: pointer; }
 .langSwitch button.on { color: #fff1d0; background: #4a2c18; text-shadow: 0 .06em 0 #000; }
 
-/* ---------- конец игры ---------- */
-#endGame {
-	position: fixed; left: 50%; top: 0; z-index: 101; box-sizing: border-box;
-	width: min(22em, 92vw); height: auto; padding: 0 .3em .4em;
-	border-style: solid; border-width: 1.9em; border-image: url(../img/v2/frame_day.webp) 92 fill / 1.9em stretch;
-	background: linear-gradient(#7a4c2a, #5a3620); box-shadow: none;
-	transform: translate(-50%, -120%);
+/* ---------- титры и итоги после дракона ---------- */
+#credits {
+	position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 105; overflow: hidden;
+	font: 500 min(4.6vw, 2.6vh)/1.2 'Alegreya SC', Georgia, serif; color: #fff1d0; text-shadow: 0 .08em 0 #000;
+	-webkit-user-select: none; user-select: none;
+	background: radial-gradient(ellipse at 50% 40%, #241610, #0a0604 75%);
+	opacity: 0; transition: opacity 1500ms linear;
 }
-#endGame.down, #endGame.down { transform: translate(-50%, 4vh); }
-#endGame h2 { margin: 0 0 .5em; font-size: 1.6em; font-weight: 900; color: #ffd76a; }
-#endGame ul.counts { margin: 0 0 .8em; }
-#endGame ul.counts li { font-size: 1em; line-height: 1.5; }
-#endGame { display: flex; flex-direction: column; }
-#endGame ul.menu { order: 2; position: static; display: flex; flex-direction: column; gap: .6em; }
-#endGame ul.menu li {
-	border: .12em solid #c99a3e; border-radius: .7em; padding: .55em 1em; line-height: 1.2; font-size: 1.1em; font-weight: 700; color: #4a2a10; text-shadow: none;
-	background: linear-gradient(#fff4dc, #ead2a2); box-shadow: 0 .15em 0 #8a5a22;
-}
-#endGame ul.menu li:hover { box-shadow: 0 .15em 0 #8a5a22; }
+#credits.open { opacity: 1; }
+.crScroll { position: absolute; top: 0; left: 0; right: 0; padding: 0 1em; text-align: center; will-change: transform; }
+.crItem { opacity: 0; transform: translateY(.8em); transition: opacity 700ms ease-out, transform 700ms ease-out; }
+.crItem.in { opacity: 1; transform: none; }
+.crTitle { margin-bottom: 1.6em; font-size: 3em; font-weight: 900; line-height: 1; color: #ffd76a; text-shadow: 0 .05em 0 #8a5a22, 0 0 .6em rgba(255, 190, 70, .55); }
+.crHead { margin: 4em 0 .6em; font-size: 2em; font-weight: 900; color: #ffd76a; text-shadow: 0 .05em 0 #8a5a22, 0 0 .5em rgba(255, 190, 70, .4); }
+.crLead { font-size: 1.35em; font-weight: 700; color: #f3dfb5; }
+.crAfter { margin-bottom: 1.4em; }
+.crBig { margin: .1em 0; font-size: 3.6em; font-weight: 900; line-height: 1.05; color: #fff1d0; text-shadow: 0 .05em 0 #8a5a22, 0 0 .5em rgba(255, 190, 70, .35); font-variant-numeric: lining-nums; }
+.crMon { position: relative; width: min(22em, 92vw); height: 8em; margin: 0 auto; }
+.crSprite { position: absolute; background-repeat: no-repeat; left: 50%; bottom: .3em; transform: translateX(-50%) scale(1.8); transform-origin: 50% 100%; transition: opacity 800ms ease-out, filter 800ms ease-out; }
+.crMon.melt .crSprite { opacity: 0; filter: blur(.25em) brightness(1.6); }
+.crMName, .crMNum { position: absolute; bottom: 1.5em; font-weight: 900; white-space: nowrap; }
+.crMName { left: 0; bottom: 2.14em; font-size: 1.4em; color: #f3dfb5; opacity: 0; transform: translateX(-.8em); transition: opacity 700ms ease-out, transform 700ms ease-out; }
+.crMNum { left: 50%; font-size: 2em; color: #ffd76a; font-variant-numeric: lining-nums; opacity: 0; transform: translateX(-50%) scale(.6); transition: opacity 500ms ease-out, transform 500ms ease-out, left 800ms ease-in-out; }
+.crMon.num .crMNum { opacity: 1; transform: translateX(-50%) scale(1); }
+.crMon.slide .crMNum { left: calc(100% - 2.2em); }
+.crMon.slide .crMName { opacity: 1; transform: none; }
+.crRes { display: flex; align-items: center; justify-content: center; gap: .5em; margin: .5em 0; font-size: 2em; font-weight: 900; color: #ffd76a; font-variant-numeric: lining-nums; }
+.crRes .gi, .crRes .crIco { flex: none; margin: 0; }
+.crRes .gi { --s: 1.6em; }
+.crRes span { min-width: 3.4em; text-align: left; }
+.crIco { display: inline-block; width: 1.5em; height: 1.5em; background: center / contain no-repeat; }
+.crRow { display: flex; justify-content: space-between; gap: .6em; width: min(22em, 92vw); margin: .5em auto; font-size: 1.3em; font-weight: 700; text-align: left; }
+.crRow b { color: #ffd76a; font-weight: 900; font-variant-numeric: lining-nums; }
+.crThanks { margin-bottom: 0; }
+.crSkip { position: absolute; top: .8em; right: .8em; z-index: 2; width: auto; font-size: 1em; opacity: 0; pointer-events: none; transition: opacity 600ms linear; }
+.crSkip.show { opacity: 1; pointer-events: auto; }
+
+#endStats { z-index: 110; background: rgba(10, 6, 4, .9); }
+.endPanel { width: min(24em, 94vw); height: min(40em, 92vh); display: flex; flex-direction: column; overflow: hidden; }
+.endPanel h2 { margin: 0 0 .4em; text-align: center; font-size: 1.6em; font-weight: 900; color: #ffd76a; }
+.endBody { flex: 1 1 auto; min-height: 0; overflow-y: auto; margin-bottom: .7em; padding-right: .3em; -webkit-overflow-scrolling: touch; }
+.endBody h3 { margin: .9em 0 .3em; font-size: 1.2em; font-weight: 900; color: #ffd76a; border-bottom: .08em solid #c99a3e; }
+.endBody h3:first-child { margin-top: 0; }
+.stRow { display: flex; align-items: center; gap: .4em; padding: .12em 0; font-size: 1.05em; }
+.stRow span { flex: 1; }
+.stRow b { font-weight: 900; font-variant-numeric: lining-nums; color: #fff1d0; }
+.stRow.total span, .stRow.total b { color: #ffd76a; font-weight: 900; }
+.stRow .gi { --s: 1.3em; margin: 0; }
+.stRow .crIco { width: 1.3em; height: 1.3em; }
+.endPanel .btnRow { flex: none; }
 
 /* ---------- индикатор сохранения ---------- */
 .saveSpinner div, .night .saveSpinner div { background-color: #f2b93a; }

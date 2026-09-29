@@ -85,6 +85,9 @@ define(['app/eventmanager', 'app/entity/loot/treasurechest', 'app/gamestate', 'a
 				GameState.items[lootName] = num;
 				E.trigger('lootUsed', [lootName, num]);
 				Content.LootType[lootName].onUse();
+				if(lootName == 'healthPotion' || lootName == 'manaPotion') {
+					GameState.count('POTION_' + lootName, 1);
+				}
 			}
 		}
 	};

@@ -378,6 +378,8 @@ define(['jquery', 'app/eventmanager', 'app/analytics', 'app/graphics/graphics', 
 	}
 	
 	function addMana(num) {
+		GameState.count('GATHERED', num);
+		GameState.count('GATHERED_mana', num);
 		GameState.mana = GameState.mana ? GameState.mana + num : num;
 		if(GameState.mana > GameState.maxMana()) {
 			GameState.mana = GameState.maxMana();
@@ -567,6 +569,9 @@ define(['jquery', 'app/eventmanager', 'app/analytics', 'app/graphics/graphics', 
 					}
 					EventManager.trigger('monsterKilled', [entity]);
 					GameState.count('KILLED', 1);
+					if(!entity.isBoss) {
+						GameState.count('KILLED_' + entity.options.monsterClass, 1);
+					}
 					stuff.splice(i, 1);
 					i--;
 				} else if(entity.lootable) {
