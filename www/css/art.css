@@ -636,7 +636,7 @@
 	/* за зданиями, как в оригинале (z-index не трогаем); свечение запечено в самой картинке (128x128,
 	   диск ~46% холста), поэтому CSS drop-shadow не нужен — раньше он вылезал за .world и обрезался краем */
 	width: 100px; height: 100px;   /* box больше картинки диска ради самого свечения; JS центрирует по el.width() */
-	top: -14px;   /* поднимает всю траекторию выше (тот же размах); безопасно — в sky_sun/sky_moon запас прозрачного края у картинки больше этого сдвига */
+	top: -26px;   /* поднимает траекторию; диск в картинке начинается с ~27% высоты бокса, поэтому в зените (translateY 0) он ещё не режется краем .world */
 	transform: translate3d(0px, 180px, 0px);
 	background-size: 100% 100% !important;
 	background-repeat: no-repeat !important;
@@ -799,3 +799,31 @@
 .warlock { background-image: url(../img/v2/monsters/warlock.webp); background-size: 168px auto; }
 .earthElemental { background-image: url(../img/v2/monsters/earthElemental.webp); background-size: 236px auto; }
 .lich { background-image: url(../img/v2/monsters/lich.webp); background-size: 236px auto; }
+
+/* HP-бары монстров: над фигурой (--hb = высота фигуры), тёмный трог, золотая рамка, красная заливка */
+.monster .healthBar {
+	position: absolute; left: 50%; bottom: var(--hb, 40px); margin: 0 0 0 -15px;
+	width: 30px; height: 4px; box-sizing: content-box;
+	border: 1px solid #e8c56a; border-radius: 3px; background: #2b1a12;
+	box-shadow: 0 1px 0 rgba(0,0,0,.45); pointer-events: none;
+}
+.monster .healthBar > div { background: linear-gradient(#e8574b, #b02f2f); border-radius: 2px; }
+.zombie { --hb: 40px } .rat { --hb: 27px } .skeleton { --hb: 37px } .hauntedArmour { --hb: 37px }
+.lizardman { --hb: 40px } .spider { --hb: 39px } .earthElemental { --hb: 44px } .fireElemental { --hb: 45px }
+.waterElemental { --hb: 45px } .demon { --hb: 38px } .warlock { --hb: 37px } .imp { --hb: 40px } .lich { --hb: 49px }
+.dragon .healthBar { display: none; }
+.bossHealth { border: 2px solid #e8c56a; border-radius: 5px; background: #2b1a12; height: 8px; opacity: .95; box-shadow: 0 2px 6px rgba(0,0,0,.5); }
+.bossHealth div { background: linear-gradient(#e8574b, #b02f2f); border-radius: 3px; }
+
+/* Снаряды и боевые эффекты (сессия 10): полоса 2 кадра, слева остриё влево, справа вправо */
+.arrow .projectileInner, .fireball .projectileInner, .arcane .projectileInner { background-color: transparent; background-repeat: no-repeat; background-position: 0 0; }
+.arrow .projectileInner { width: 32px; height: 6.3px; margin: -3px 0 0 -14px; background-image: url(../img/v2/fx/arrow.webp); background-size: 64px 6.3px; }
+.fireball .projectileInner { width: 28px; height: 11.3px; margin: -6px 0 0 -10px; background-image: url(../img/v2/fx/firebolt.webp); background-size: 56px 11.3px; }
+.arcane .projectileInner { width: 28px; height: 8.3px; margin: -4px 0 0 -10px; background-image: url(../img/v2/fx/arcane.webp); background-size: 56px 8.3px; }
+.arrow.right .projectileInner { background-position: -32px 0; }
+.fireball.right .projectileInner, .arcane.right .projectileInner { background-position: -28px 0; }
+.dragonFireball { width: 28px; height: 11.3px; background: url(../img/v2/fx/firebolt.webp) 0 0 / 56px 11.3px no-repeat; }
+.fireBoom, .segmentExplosion, .dragonExplosion, .explosion { background: url(../img/v2/fx/burst.webp) center / 100% 100% no-repeat; border-radius: 0; }
+.iceBeam:before { background: url(../img/v2/fx/orb_ice.webp) center / 100% 100% no-repeat; }
+.fireBlast:before { background: url(../img/v2/fx/orb_fire.webp) center / 100% 100% no-repeat; }
+.worldEffect.iceBlock, .worldEffect.fire { background-image: url(../img/v2/fx/effects.webp); background-size: 120px 176px; }

@@ -540,7 +540,7 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 		moveCelestial: function(entity) {
 			var el = entity.el();
 			var pos = entity.p();
-			var height = (Math.abs(pos - Graphics.worldWidth() / 2) / (Graphics.worldWidth() / 2)) * 16;   // амплитуда дуги (была 30): подняли траекторию, реже пересекается со зданиями
+			var height = (Math.abs(pos - Graphics.worldWidth() / 2) / (Graphics.worldWidth() / 2)) * 8;   // амплитуда дуги (была 30): подняли траекторию, реже пересекается со зданиями
 			var left = Math.max(0, pos - (el.width() / 2)),
 				top = Math.floor(height);
 			el.css({

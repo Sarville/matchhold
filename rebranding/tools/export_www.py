@@ -5,7 +5,7 @@
 import os, subprocess, sys
 from concurrent.futures import ProcessPoolExecutor
 import numpy as np
-from PIL import Image, ImageDraw, ImageChops
+from PIL import Image, ImageDraw, ImageChops, ImageFilter
 from scipy import ndimage as ndi
 
 OUT = "../www/img/v2/"
@@ -220,7 +220,29 @@ def brand():
     print("   title bbox", bb); T.save("../www/img/title.png")
 
 
+# ---------- сессия 10: снаряды и боевые эффекты (стрела, огненный/тёмный снаряд, вспышка, шары луча, огонь, лёд) ----------
+def fx():
+    F = "out/fx/"; os.makedirs(OUT + "fx", exist_ok=True)
+    def strip(name, w, key):   # полоса 2 кадра: остриё влево | остриё вправо (исходник смотрит вправо)
+        a = trim(keyed(F + name + "_v1.png", key)); a = sz(a, w * 3); h = a.height
+        s = Image.new("RGBA", (a.width * 2, h), (0, 0, 0, 0)); s.alpha_composite(a.transpose(Image.FLIP_LEFT_RIGHT), (0, 0)); s.alpha_composite(a, (a.width, 0))
+        save(s, f"fx/{name}.webp"); print("    cell css", w, "x", round(h / 3, 1))
+    strip("arrow", 32, "FF00FF"); strip("firebolt", 28, "00FF00"); strip("arcane", 28, "00FF00")
+    save(sz(trim(keyed(F + "burst_v1.png", "00FF00")), 256), "fx/burst.webp")
+    save(sz(trim(keyed(F + "orb_fire_v1.png", "00FF00")), 96), "fx/orb_fire.webp")
+    save(sz(trim(keyed(F + "orb_ice_v1.png", "FF00FF")), 96), "fx/orb_ice.webp")
+    # лист эффектов на земле: 120x176 логич. (сверху 88 пустых под смещение dragoneffects), ряд 0 лёд (1 кадр), ряд 1 огонь (4 кадра), кадр 30x44
+    W, H = 90, 132; sheet = Image.new("RGBA", (W * 4, 528), (0, 0, 0, 0))
+    ia = sz(trim(keyed(F + "iceblock_v1.png", "FF00FF")), h=124)
+    sheet.alpha_composite(ia, ((W - ia.width) // 2, 264 + H - 4 - ia.height))
+    fl = keyed(F + "flames_v1.png", "00FF00"); cells = [trim(fl.crop((x, y, x + 512, y + 512))) for y in (0, 512) for x in (0, 512)]
+    k = 124 / max(c.height for c in cells)
+    for i, c in enumerate(cells):
+        c = c.resize((round(c.width * k), round(c.height * k)), Image.LANCZOS); sheet.alpha_composite(c, (i * W + (W - c.width) // 2, 396 + H - 4 - c.height))
+    save(sheet, "fx/effects.webp")
+
+
 if __name__ == "__main__":
     groups = sys.argv[1:] or ["board", "tiles", "world", "hud", "icons2", "brand", "bg", "css"]
     for g in groups:
-        print("==", g); {"board": board, "tiles": world, "world": world, "hud": hud, "icons2": icons2, "brand": brand, "bg": bg, "css": css}[g]()
+        print("==", g); {"board": board, "tiles": world, "world": world, "hud": hud, "icons2": icons2, "brand": brand, "fx": fx, "bg": bg, "css": css}[g]()

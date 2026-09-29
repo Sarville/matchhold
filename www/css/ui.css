@@ -231,7 +231,7 @@ button { font-family: inherit; }
 .pauseBadge:after { right: 32%; }
 
 /* ---------- маркер приоритетного здания ---------- */
-.world .star { background: none !important; width: 26px; height: 26px; margin-left: -5px; top: 48px; }
+.world .star { background: none !important; width: 26px; height: 26px; margin-left: -5px; top: 24px; }
 .world .star:before {
 	content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0;
 	background: url(../img/v2/star.webp) center / contain no-repeat;

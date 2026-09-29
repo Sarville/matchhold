@@ -13,7 +13,7 @@ define(['app/entity/monster/monster', 'app/action/actionfactory', 'app/graphics/
 	Warlock.prototype = new Monster({
 		monsterClass: 'warlock',
 		spriteName: 'warlock',
-		arrowClass: 'arrow fireball',
+		arrowClass: 'arrow arcane',
 		speed: 50,
 		arrowSpeed: 7
 	});
