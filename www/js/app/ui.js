@@ -61,7 +61,7 @@ define(['jquery', 'app/eventmanager', 'app/gameoptions'], function($, E, O) {
 		if(layers.length && layers[layers.length - 1].el.is('#modal')) {
 			pop();
 		}
-		var el = $('#modal'), box = el.find('.panel').empty();
+		var el = $('#modal'), box = el.find('.panel').empty().attr('class', 'panel modalPanel ' + (o.cls || ''));
 		box.append($('<h2>').text(t(o.title)));
 		if(o.text) {
 			box.append($('<p>').text(t(o.text)));
@@ -79,6 +79,38 @@ define(['jquery', 'app/eventmanager', 'app/gameoptions'], function($, E, O) {
 				});
 		});
 		push(el);
+	}
+
+	function tokens(text) {
+		var out = $('<span>');
+		text.split(/\{(\w+)\}/).forEach(function(part, i) {
+			if(i % 2 == 0) {
+				out.append(document.createTextNode(part));
+			} else if(part == 'star') {
+				out.append('<i class="gi gs"></i>');
+			} else {
+				var i = $('<i class="gi">')[0];
+				i.style.setProperty('--c', part.charAt(1));
+				i.style.setProperty('--r', part.charAt(0) == 'n' ? 9 : 0);
+				out.append(i);
+			}
+		});
+		return out.contents();
+	}
+
+	function guide() {
+		var body = $('<div class="guideBody">');
+		t('GUIDE').forEach(function(sec) {
+			var s = $('<section>').appendTo(body);
+			s.append($('<h3>').text(sec.h));
+			if(sec.img) {
+				s.append($('<img class="guideImg" alt="">').attr('src', 'img/guide/' + sec.img + '.webp'));
+			}
+			sec.p.forEach(function(line) {
+				s.append($('<p>').append(tokens(line)));
+			});
+		});
+		modal({ title: 'HOW_TO_PLAY', cls: 'guidePanel', body: body, buttons: [{ text: 'CLOSE' }] });
 	}
 
 	function soon(title) {
@@ -222,7 +254,7 @@ define(['jquery', 'app/eventmanager', 'app/gameoptions'], function($, E, O) {
 		$('#btnContinue, #btnBack').on('click', pop);
 		$('#btnLang').on('click', function() { setLang(O.get('lang') == 'ru' ? 'en' : 'ru'); });
 		$('.langSwitch button').on('click', function() { setLang($(this).data('lang')); });
-		$('#btnHow').on('click', function() { soon('HOW_TO_PLAY'); });
+		$('#btnHow').on('click', guide);
 		$('#btnMore').on('click', function() { soon('MORE_GAMES'); });
 		$('#btnExit').on('click', confirmExit);
 		$('#btnAds').on('click', function() {

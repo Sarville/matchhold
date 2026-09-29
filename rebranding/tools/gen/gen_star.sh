@@ -1,0 +1,6 @@
+#!/bin/bash
+# Маркер приоритетного здания: золотая звезда (замена чёрной 16px из icons.png)
+cd /home/user/projects/matchhold/rebranding || exit 1
+codex exec -m gpt-5.6-terra -c model_reasoning_effort=low --sandbox workspace-write \
+"Use the built-in image_gen tool (imagegen skill) to generate ONE image. The attached image is a style reference only (warm, soft, matte hand-painted 3D fantasy game UI, honey gold and chestnut brown). Target size 512x512, PNG. A single game marker icon: a plump five-pointed star with softly rounded tips, honey gold with a lighter yellow centre bevel and warm orange-brown shading at the bottom edges, thin chestnut-brown outline (not black), matte, NO glossy plastic highlights. Fills about 85% of the canvas, upright, centered. The whole background is a solid flat #FF00FF (no gradient, no shadow, no fringe); nothing else in the artwork is pink or magenta. One object only, no ground shadow, no text. Avoid: text, letters, logos, watermark, photorealism, lens flare, pixel art, thick black outlines, extra objects. Save the final PNG to exactly: /home/user/projects/matchhold/rebranding/out/ui/star/star_v1.png . Do not overwrite existing files. Print the saved path and dimensions." -i out/ui/ref_main_v2.png \
+> out/ui/star/star_v1.log 2>&1

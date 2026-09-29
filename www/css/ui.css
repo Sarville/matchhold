@@ -3,7 +3,7 @@
 @font-face { font-family: 'Alegreya SC'; font-weight: 700; src: url(../fonts/AlegreyaSC-700.woff2) format('woff2'); font-display: swap; }
 @font-face { font-family: 'Alegreya SC'; font-weight: 900; src: url(../fonts/AlegreyaSC-900.woff2) format('woff2'); font-display: swap; }
 
-#loadingScreen, .overlay, #endGame {
+#loadingScreen, .overlay, #endGame, #pauseIcon {
 	font: 500 min(4.6vw, 2.6vh)/1.2 'Alegreya SC', Georgia, serif;
 	color: #fff1d0;
 	text-shadow: 0 .08em 0 #4a2a10;
@@ -201,3 +201,56 @@ button { font-family: inherit; }
 
 /* ---------- индикатор сохранения ---------- */
 .saveSpinner div, .night .saveSpinner div { background-color: #f2b93a; }
+
+/* кнопки титула появляются вместе со слотами, когда игра загружена */
+.titleBar { opacity: 0; pointer-events: none; transition: opacity 400ms linear; }
+.ready .titleBar { opacity: 1; pointer-events: auto; }
+
+/* ---------- пауза при сворачивании ---------- */
+#pauseIcon {
+	position: fixed; left: 50%; top: 50%; z-index: 2000; box-sizing: border-box;
+	width: min(17em, 84vw); padding: .3em .3em .5em; text-align: center; cursor: pointer;
+	border-style: solid; border-width: 1.9em; border-image: url(../img/v2/frame_day.webp) 92 fill / 1.9em stretch;
+	background: linear-gradient(#7a4c2a, #5a3620);
+	transform: translate(-50%, -50%);
+	animation: pauseIn 250ms ease-out;
+}
+.night #pauseIcon { border-image-source: url(../img/v2/frame_night.webp); }
+@keyframes pauseIn { from { opacity: 0; transform: translate(-50%, -50%) scale(.92); } }
+#pauseIcon h2 { margin: .3em 0 .25em; font-size: 1.9em; font-weight: 900; color: #ffd76a; }
+#pauseIcon p { margin: 0; font-size: 1.05em; line-height: 1.25; animation: pauseHint 1600ms ease-in-out infinite; }
+@keyframes pauseHint { 50% { opacity: .55; } }
+.pauseBadge {
+	position: relative; display: block; width: 3.6em; height: 3.6em; margin: 0 auto; box-sizing: border-box; border-radius: 50%;
+	border: .14em solid #5a2f0e;
+	background: radial-gradient(circle at 35% 30%, #fff0a8, #e2a92e 55%, #9c6516);
+	box-shadow: 0 0 0 .1em #f2b93a, 0 .2em .3em rgba(0, 0, 0, .5);
+}
+.pauseBadge:before, .pauseBadge:after { content: ''; position: absolute; top: 27%; bottom: 27%; width: 13%; border-radius: .1em; background: #5a2f0e; box-shadow: 0 .05em 0 rgba(255, 240, 168, .6); }
+.pauseBadge:before { left: 32%; }
+.pauseBadge:after { right: 32%; }
+
+/* ---------- маркер приоритетного здания ---------- */
+.world .star { background: none !important; width: 26px; height: 26px; margin-left: -5px; top: 48px; }
+.world .star:before {
+	content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+	background: url(../img/v2/star.webp) center / contain no-repeat;
+	filter: drop-shadow(0 2px 2px rgba(60, 30, 0, .45));
+	animation: starBob 1200ms ease-in-out infinite;
+}
+@keyframes starBob { 50% { transform: translateY(-4px) scale(1.06); } }
+
+/* ---------- руководство ---------- */
+.guidePanel { width: min(26em, 96vw); display: flex; flex-direction: column; overflow: hidden; text-align: left; }
+.guidePanel h2 { text-align: center; }
+.guideBody { flex: 1 1 auto; min-height: 0; overflow-y: auto; margin-bottom: .7em; padding-right: .3em; -webkit-overflow-scrolling: touch; }
+.guideBody section { margin-bottom: 1em; }
+.guideBody h3 { margin: 0 0 .3em; font-size: 1.2em; font-weight: 900; color: #ffd76a; }
+.guideBody p { margin: 0 0 .35em; font-size: 1em; line-height: 1.35; }
+.guideImg { display: block; width: 100%; margin: 0 0 .5em; border-radius: .4em; border: .12em solid #c99a3e; box-sizing: border-box; }
+.gi {
+	--s: 1.5em;
+	display: inline-block; width: var(--s); height: var(--s); vertical-align: middle; margin: -.2em .05em;
+	background: url(../img/v2/tiles.webp) calc(var(--c) * var(--s) * -1) calc(var(--r) * var(--s) * -1) / calc(var(--s) * 6) calc(var(--s) * 19) no-repeat;
+}
+.gi.gs { --s: 1.2em; width: var(--s); height: var(--s); background: url(../img/v2/star.webp) center / contain no-repeat; }

@@ -21,6 +21,8 @@
 		<link rel="shortcut icon" href="favicon.ico">
 		<link rel="image_src" href="img/badge.png" />
 		<link rel="apple-touch-icon" href="img/badge.png" />
+		<link rel="preload" as="font" type="font/woff2" href="fonts/AlegreyaSC-900.woff2" crossorigin>
+		<link rel="preload" as="font" type="font/woff2" href="fonts/AlegreyaSC-700.woff2" crossorigin>
 		<link rel="stylesheet" type="text/css" href="css/main.css" />
 		<link rel="stylesheet" type="text/css" href="css/art.css" />
 		<link rel="stylesheet" type="text/css" href="css/bg.css" />
@@ -56,10 +58,11 @@
 		</div>
 		<div id="fg"><div class="day"></div><div class="night"></div><div class="drbg"></div></div>
 		<div id="test" nodeploy></div>
-		<div id="pauseIcon"></div>
+		<div id="pauseIcon"><i class="pauseBadge"></i><h2 data-i18n="PAUSED"></h2><p data-i18n="TAP_TO_RESUME"></p></div>
 		<div id="loadingScreen" data-clickable>
 			<div class="titleMain">
 				<h1 class="logo"><span class="a"></span><i class="coin"></i><span class="b"></span></h1>
+				<script>(function(){var l;try{l=JSON.parse(localStorage.gameOptions).lang}catch(e){}if(!l)l=/^ru/i.test(navigator.language||"")?"ru":"en";var q=document.querySelectorAll(".logo span");q[0].textContent=l=="ru"?"\u041c\u0410\u0422\u0427\u0425":"MATCHH";q[1].textContent=l=="ru"?"\u041b\u0414":"LD"})()</script>
 				<div class="logoTiles"><i style="--c:1"></i><i style="--c:4"></i><i style="--c:0"></i><i style="--c:3"></i><i style="--c:5"></i></div>
 				<div class="emblem"></div>
 				<div class="slotsArea">
