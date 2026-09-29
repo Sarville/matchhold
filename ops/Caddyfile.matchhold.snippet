@@ -1,0 +1,22 @@
+# Фрагменты для ОБЩЕГО Caddyfile games.sarville.online (живёт на сервере, обслуживает несколько игр).
+# НЕ заменять им файл целиком: сначала скачать живой Caddyfile, сделать diff и вставить только эти блоки
+# внутрь существующего route { ... } (порядок: forward_auth до `handle` с file_server).
+
+# --- 1. Гейт входа в игру: подпись запуска VK/OK проверяет vk-payments-matchhold.
+@vkMatchholdEntry path /vk/matchhold /vk/matchhold/
+forward_auth @vkMatchholdEntry vk-payments-matchhold:3000 {
+	uri {http.request.uri}
+}
+
+# --- 2. Вебхуки платежей (VK + OK; /ok - отдельный URL подтверждения Одноклассников) и эндпоинты игры
+#        (леджер покупок, облачные сохранения). Ставить рядом с блоками других игр, перед `handle { file_server }`.
+@matchholdPayments path /vk/matchhold-payments /vk/matchhold-payments/ok
+handle @matchholdPayments {
+	reverse_proxy vk-payments-matchhold:3000
+}
+handle /vk/matchhold-entitlements {
+	reverse_proxy vk-payments-matchhold:3000
+}
+handle /vk/matchhold-savegames {
+	reverse_proxy vk-payments-matchhold:3000
+}

@@ -45,8 +45,10 @@ define(['base64', 'app/entity/building', 'app/entity/block', 'app/eventmanager',
 		
 		load: function(slot) {
 			slot = slot || loadedSlot;
+			var raw = this.pendingRaw;
+			this.pendingRaw = null;
 			try {
-				var savedState = JSON.parse(localStorage["slot" + slot]);
+				var savedState = JSON.parse(raw || localStorage["slot" + slot]);
 				if(savedState) {
 					this.buildings = [];
 					for(var i in savedState.buildings) {
@@ -76,31 +78,36 @@ define(['base64', 'app/entity/building', 'app/entity/block', 'app/eventmanager',
 			return this;
 		},
 		
+		// JSON текущего состояния (то, что пишет save)
+		serialize: function() {
+			var state = {
+				buildings: [],
+				stores: [],
+				level: this.level,
+				xp: this.xp,
+				dayNumber: this.dayNumber,
+				items: this.items,
+				gem: this.gem,
+				mana: this.mana,
+				counts: this.counts,
+				prestige: this.prestige,
+				health: this.health,
+				prioritizedBuilding: this.prioritizedBuilding
+			};
+			for(b in this.buildings) {
+				var building = this.buildings[b];
+				state.buildings.push(Building.makeBuilding(building));
+			}
+			for(s in this.stores) {
+				var store = this.stores[s];
+				state.stores.push(Block.makeBlock(store));
+			}
+			return JSON.stringify(state);
+		},
+		
 		save: function() {
 			if(typeof Storage != 'undefined' && localStorage) {
-				var state = {
-					buildings: [],
-					stores: [],
-					level: this.level,
-					xp: this.xp,
-					dayNumber: this.dayNumber,
-					items: this.items,
-					gem: this.gem,
-					mana: this.mana,
-					counts: this.counts,
-					prestige: this.prestige,
-					health: this.health,
-					prioritizedBuilding: this.prioritizedBuilding
-				};
-				for(b in this.buildings) {
-					var building = this.buildings[b];
-					state.buildings.push(Building.makeBuilding(building));
-				}
-				for(s in this.stores) {
-					var store = this.stores[s];
-					state.stores.push(Block.makeBlock(store));
-				}
-				localStorage["slot" + loadedSlot] = JSON.stringify(state);
+				localStorage["slot" + loadedSlot] = this.serialize();
 			}
 			return this;
 		},

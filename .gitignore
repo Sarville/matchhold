@@ -3,3 +3,4 @@
 /.settings
 /push
 .DS_Store
+/node_modules

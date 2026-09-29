@@ -1,0 +1,13 @@
+{
+  "name": "matchhold-android",
+  "private": true,
+  "description": "Capacitor CLI only: wraps dist/android into the RuStore APK/AAB (see android/README.md)",
+  "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
+    "@quenary/capacitor-yandex-ads": "^1.1.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.2"
+  }
+}

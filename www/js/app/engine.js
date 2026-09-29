@@ -1,10 +1,10 @@
-define(['jquery', 'app/eventmanager', 'app/analytics', 'app/graphics/graphics', 
+define(['jquery', 'app/eventmanager', 'app/graphics/graphics', 
         'app/gamecontent', 'app/gameboard', 'app/gamestate', 'app/world', 'app/loot', 
         'app/magic', 'app/gameoptions', 'app/audio/audio',
-        'app/visibility', 'app/keysequencer', 'app/ui'], 
-		function($, EventManager, Analytics, Graphics, Content, GameBoard, 
+        'app/visibility', 'app/keysequencer', 'app/ui', 'app/platform'], 
+		function($, EventManager, Graphics, Content, GameBoard, 
 				 GameState, World, Loot, Magic, GameOptions, GameAudio,
-				 Visibility, KeySequencer, UI) {
+				 Visibility, KeySequencer, UI, Platform) {
 
 	var DRAG_THRESHOLD = 30; // in pixels
 	var MOBILE_RATIO = 16/10; // height/width
@@ -133,9 +133,10 @@ define(['jquery', 'app/eventmanager', 'app/analytics', 'app/graphics/graphics',
 		return ( location.search.indexOf( 'ignorebrowser' ) >= 0 || ( typeof Storage != 'undefined' ) );
 	}
 
-	function setPaused(p) {
+	// hold=true: paused by an ad, resumed explicitly (a click on the ad must not unpause)
+	function setPaused(p, hold) {
 		Engine.paused = p;
-		if(p) {
+		if(p && !hold) {
 			Graphics.get('body').one('click touchstart', function() {
 				EventManager.trigger('unpause');
 			});
@@ -174,13 +175,13 @@ define(['jquery', 'app/eventmanager', 'app/analytics', 'app/graphics/graphics',
 			
 			var modules = [EventManager,
 			                Visibility,
-							Analytics,
 							[GameBoard, gOptions],
 							[Graphics, { ios: isIOS() }],
 							World,
 							Loot,
 							Magic,
-							KeySequencer];
+							KeySequencer,
+							Platform];
 			if(window.location.search.indexOf('nomusic') >= 0) {
 				modules.push([GameAudio, { nomusic: true }]);
 				silent = false;
@@ -198,6 +199,7 @@ define(['jquery', 'app/eventmanager', 'app/analytics', 'app/graphics/graphics',
 				} else {
 					loaded = true;
 					Graphics.enablePlayButton();
+					Platform.ready();
 				}
 			});
 			
@@ -210,7 +212,7 @@ define(['jquery', 'app/eventmanager', 'app/analytics', 'app/graphics/graphics',
 			EventManager.bind('slotChosen', startGame);
 			EventManager.bind('deleteSlot', GameState.deleteSlot);
 			EventManager.bind('importSlot', importSlot);
-			EventManager.bind('pause', setPaused.bind(this, true));
+			EventManager.bind('pause', function(hold) { setPaused(true, hold); });
 			EventManager.bind('unpause', function() {
 				setPaused(false);
 				EventManager.trigger('afterUnpaused');

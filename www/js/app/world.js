@@ -1,8 +1,8 @@
-define(['jquery', 'app/eventmanager', 'app/analytics', 'app/graphics/graphics', 'app/entity/building', 
+define(['jquery', 'app/eventmanager', 'app/graphics/graphics', 'app/entity/building', 
 		'app/gamecontent', 'app/gamestate', 'app/action/actionfactory', 'app/entity/monster/monsterfactory',
         'app/entity/block', 'app/entity/gem', 'app/resources', 'app/entity/celestial', 'app/entity/dude',
         'app/entity/star', 'app/entity/worldeffect'], 
-		function($, EventManager, Analytics, Graphics, Building, Content, GameState, 
+		function($, EventManager, Graphics, Building, Content, GameState, 
 				ActionFactory, MonsterFactory, Block, Gem, Resources, Celestial, Dude,
 				Star, WorldEffect) {
 	
@@ -23,6 +23,10 @@ define(['jquery', 'app/eventmanager', 'app/analytics', 'app/graphics/graphics', 
 	var prioritizedBuilding = null;
 	var recorded = null;
 	var streak = 0;
+	// живут между World.init (перезапуск ночи перезагружает игру из снимка начала ночи)
+	var nightSnapshot = null;
+	var revived = false;
+	var resumeNight = false;
 	
 	var _debugMultiplier = 1;
 	multiplier = function(n) {
@@ -117,6 +121,9 @@ define(['jquery', 'app/eventmanager', 'app/analytics', 'app/graphics/graphics', 
 				}
 				gameLoop = setInterval(makeStuffHappen, 100);
 				inTransition = false;
+				if(resumeNight) {
+					resumeNightWhenReady();
+				}
 			});
 		},
 		
@@ -583,22 +590,100 @@ define(['jquery', 'app/eventmanager', 'app/analytics', 'app/graphics/graphics', 
 					i--;
 					inTransition = true;
 					GameState.count('DEATHS', 1);
-					GameState.savePersistents();
-					Graphics.fadeOut(function() {
-						setTimeout(function() {
-							stuff.length = 0;
-							Graphics.setNight(false);
-						}, 500);
-						setTimeout(function() {
-							require('app/engine').init();
-						}, 1900);
-					});
+					if(isNight) {
+						offerRevive();
+					} else {
+						defeat();
+					}
 				}
 			}
 			GameState.setIfHigher('ATONCE', numEnemies);
 		}
 		
 		hasteTick = !hasteTick;
+	}
+	
+	// Возврат к дню: перезагрузка из сохранения (там начало дня)
+	function defeat() {
+		GameState.savePersistents();
+		reloadGame();
+	}
+	
+	function reloadGame() {
+		Graphics.fadeOut(function() {
+			setTimeout(function() {
+				stuff.length = 0;
+				Graphics.setNight(false);
+			}, 500);
+			setTimeout(function() {
+				require('app/engine').init();
+			}, 1900);
+		});
+	}
+	
+	// Ночью смерть — не конец: воскрешение (один раз за попытку), потом повтор ночи, по кругу; всё за награждаемую рекламу
+	function offerRevive() {
+		var again = revived;
+		var UI = require('app/ui');
+		function ask(noAd) {
+			var body = $('<div>');
+			body.append($('<p>').text(Graphics.getText(again ? 'RETRY_TEXT' : 'REVIVE_TEXT')));
+			body.append($('<p class="hint">').text(Graphics.getText('FAIL_HINT')));
+			if(noAd) {
+				body.append($('<p class="warn">').text(Graphics.getText('AD_UNAVAILABLE')));
+			}
+			UI.modal({
+				title: 'FAIL_TITLE',
+				body: body,
+				locked: true,
+				buttons: [
+					{ text: again ? 'RETRY_BTN' : 'REVIVE_BTN', cls: 'primary', click: function() {
+						require('app/platform').showRewarded().then(function(ok) {
+							if(!ok) {
+								ask(true);
+							} else if(again) {
+								restartNight();
+							} else {
+								revive();
+							}
+						});
+					} },
+					{ text: 'RETURN_DAY', click: defeat }
+				]
+			});
+		}
+		ask(false);
+	}
+	
+	function revive() {
+		revived = true;
+		GameState.health = GameState.maxHealth();
+		wipeMonsters();
+		launchDude();
+		inTransition = false;
+	}
+	
+	function restartNight() {
+		if(!nightSnapshot) {
+			return defeat();
+		}
+		var state = JSON.parse(nightSnapshot);
+		state.counts = GameState.counts;
+		state.health = GameState.maxHealth(state.level);
+		GameState.pendingRaw = JSON.stringify(state);
+		resumeNight = true;
+		reloadGame();
+	}
+	
+	function resumeNightWhenReady() {
+		var timer = setInterval(function() {
+			if(celestial != null && dude != null && !inTransition) {
+				clearInterval(timer);
+				resumeNight = false;
+				celestialPosition = World.options.dayMoves;
+				EventManager.trigger('phaseChange', [true]);
+			}
+		}, 200);
 	}
 	
 	function runEntity(entity) {
@@ -680,12 +765,15 @@ define(['jquery', 'app/eventmanager', 'app/analytics', 'app/graphics/graphics', 
 			GameState.setIfHigher('ROW', streak);
 			GameState.save();
 			Graphics.notifySave();
+			EventManager.trigger('nightEnd');
 			EventManager.trigger('dayBreak', [GameState.dayNumber]);
 			if(casualNight) {
 				GameState.count('CASUALNIGHTS', 1);
 			}
 		} else {
 			casualNight = require('app/gameoptions').get('casualMode', false);
+			revived = false;
+			nightSnapshot = GameState.serialize();
 		}
 	}
 
@@ -740,8 +828,10 @@ define(['jquery', 'app/eventmanager', 'app/analytics', 'app/graphics/graphics', 
 		if(!Resources.loaded) {
 			Resources.init();
 			launchCelestial();
-			GameState.save();
-			Graphics.notifySave();
+			if(!resumeNight) {
+				GameState.save();
+				Graphics.notifySave();
+			}
 		}
 		Resources.setSize(rows, cols);
 	}

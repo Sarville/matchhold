@@ -1,5 +1,6 @@
-require(["app/engine"], function(Engine) {
-	
-	// Initialize the board
-	Engine.init();
+require(["app/platform", "app/engine"], function(Platform, Engine) {
+	// Platform init (SDK, cloud save, language) first, then the game
+	Platform.boot(function() {
+		Engine.init();
+	});
 });

@@ -1,0 +1,92 @@
+apply plugin: 'com.android.application'
+
+// Подпись релиза: android/keystore.properties (в .gitignore) с storeFile, storePassword, keyAlias, keyPassword.
+// Без него release-сборка ПАДАЕТ (а не молча даёт неподписанный артефакт); -PallowUnsigned=true — осознанный обход.
+def keystoreProps = new Properties()
+def keystoreFile = rootProject.file('keystore.properties')
+if (keystoreFile.exists()) {
+    keystoreProps.load(new FileInputStream(keystoreFile))
+}
+gradle.taskGraph.whenReady { graph ->
+    def release = graph.allTasks.any { it.project == project && it.name =~ /^(assemble|bundle|package)Release$/ }
+    if (release && !keystoreFile.exists() && !project.hasProperty('allowUnsigned')) {
+        throw new GradleException("android/keystore.properties не найден: release будет неподписан. См. android/README.md (раздел «Подпись»); для тестового неподписанного артефакта: -PallowUnsigned=true")
+    }
+}
+
+android {
+    namespace = "ru.sarville.matchhold"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "ru.sarville.matchhold"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+        // RuStore Console -> приложение -> «ID приложения»: rustoreConsoleAppId в android/gradle.properties
+        manifestPlaceholders = [rustoreConsoleAppId: project.findProperty("rustoreConsoleAppId") ?: "0"]
+        // R-M-… блоки из кабинета РСЯ (gradle.properties или -P); по умолчанию демо-блоки Яндекса — не платят
+        buildConfigField "String", "YANDEX_BANNER_ID", "\"${project.findProperty('yandexBannerId') ?: 'demo-banner-yandex'}\""
+        buildConfigField "String", "YANDEX_INTERSTITIAL_ID", "\"${project.findProperty('yandexInterstitialId') ?: 'demo-interstitial-yandex'}\""
+        buildConfigField "String", "YANDEX_REWARDED_ID", "\"${project.findProperty('yandexRewardedId') ?: 'demo-rewarded-yandex'}\""
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    buildFeatures {
+        buildConfig = true
+    }
+    signingConfigs {
+        if (keystoreFile.exists()) {
+            release {
+                storeFile rootProject.file(keystoreProps['storeFile'])
+                storePassword keystoreProps['storePassword']
+                keyAlias keystoreProps['keyAlias']
+                keyPassword keystoreProps['keyPassword']
+            }
+        }
+    }
+    buildTypes {
+        release {
+            if (keystoreFile.exists()) {
+                signingConfig signingConfigs.release
+            }
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    maven { url "https://artifactory-external.vkpartner.ru/artifactory/maven" } // RuStore SDK
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    implementation "ru.rustore.sdk:pay:10.5.0"
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

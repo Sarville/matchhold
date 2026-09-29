@@ -16,7 +16,7 @@ define(['jquery', 'app/eventmanager', 'app/gameoptions'], function($, E, O) {
 	};
 
 	var layers = [];
-	var sentinel = false, leaving = false, pausedByUI = false, inited = false;
+	var sentinel = false, leaving = false, pausedByUI = false, inited = false, settingsSeen = false;
 
 	function G() { return require('app/graphics/graphics'); }
 	function Eng() { return require('app/engine'); }
@@ -39,13 +39,18 @@ define(['jquery', 'app/eventmanager', 'app/gameoptions'], function($, E, O) {
 			Eng().paused = want;
 			if(!want) {
 				E.trigger('afterUnpaused');
+				if(settingsSeen) {
+					settingsSeen = false;
+					E.trigger('menuReturn');
+				}
 			}
 		}
 	}
 
-	function push(el) {
+	function push(el, locked) {
 		el.addClass('open');
-		layers.push({ el: el });
+		if(el.is('#settings') && Eng().isStarted()) settingsSeen = true;
+		layers.push({ el: el, locked: !!locked });
 		syncLayers();
 	}
 
@@ -55,6 +60,12 @@ define(['jquery', 'app/eventmanager', 'app/gameoptions'], function($, E, O) {
 			layer.el.removeClass('open');
 			syncLayers();
 		}
+	}
+
+	// закрытие «извне» (фон, Escape, назад); locked-окно закрывают только его кнопки
+	function dismiss() {
+		var top = layers[layers.length - 1];
+		if(top && !top.locked) pop();
 	}
 
 	function modal(o) {
@@ -78,7 +89,7 @@ define(['jquery', 'app/eventmanager', 'app/gameoptions'], function($, E, O) {
 					}
 				});
 		});
-		push(el);
+		push(el, o.locked);
 	}
 
 	function tokens(text) {
@@ -136,7 +147,7 @@ define(['jquery', 'app/eventmanager', 'app/gameoptions'], function($, E, O) {
 
 	function back() {
 		if(layers.length) {
-			pop();
+			dismiss();
 			return true;
 		}
 		if(Eng().isStarted()) {
@@ -266,7 +277,7 @@ define(['jquery', 'app/eventmanager', 'app/gameoptions'], function($, E, O) {
 			}
 		});
 		$('.overlay').on('click', function(e) {
-			if(e.target == this) pop();
+			if(e.target == this) dismiss();
 		});
 		$(document).on('keydown', function(e) {
 			if(e.key == 'Escape') back();
