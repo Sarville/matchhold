@@ -271,6 +271,10 @@ define(['jquery', 'app/eventmanager', 'app/graphics/graphics', 'app/entity/build
 		isNight: function() {
 			return isNight;
 		},
+
+		isResumingNight: function() {
+			return resumeNight;
+		},
 		
 		startRecording: function() {
 			console.log("Beginning resource recorder");
@@ -658,7 +662,7 @@ define(['jquery', 'app/eventmanager', 'app/graphics/graphics', 'app/entity/build
 	function revive() {
 		revived = true;
 		GameState.health = GameState.maxHealth();
-		wipeMonsters();
+		wipeMonsters(true);
 		launchDude();
 		inTransition = false;
 	}
@@ -795,11 +799,12 @@ define(['jquery', 'app/eventmanager', 'app/graphics/graphics', 'app/entity/build
 		}
 	}
 	
-	function wipeMonsters() {
+	function wipeMonsters(noLoot) {
 		for(var i in stuff) {
 			var entity = stuff[i];
 			if(entity.hostile && entity.isAlive() && !entity.isBoss) {
 				entity.wiped = true;
+				entity.noLoot = noLoot === true;
 				entity.die();
 				EventManager.trigger('monsterKilled', [entity]);
 			}

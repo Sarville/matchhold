@@ -358,16 +358,6 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 			EventManager.bind('gameOver', gameOver);
 			EventManager.bind('blockDown', dropBlock);
 			EventManager.bind('keySequenceComplete', activateHyperspace);
-			EventManager.bind('longLoad', function() {
-				Graphics.get('#loadingScreen').append(
-					Graphics.make('longload').text(Graphics.getText('LONG_LOAD')).append
-					(
-						Graphics.make('nomusic', 'a')
-							.text(Graphics.getText('NO_MUSIC'))
-							.attr('href', window.location + (window.location.search.length > 0 ? '&' : '?') + 'nomusic')
-					)
-				);
-			});
 			
 			BoardGraphics.init();
 			WorldGraphics.init();

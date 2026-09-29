@@ -1,13 +1,11 @@
 define(['app/eventmanager', 'app/audio/webaudioprovider', 'app/audio/htmlaudioprovider', 'app/audio/htmlwebaudioprovider'], 
 		function(E, WebAudioProvider, HtmlAudioProvider, HtmlWebAudioProvider) {
 	
-	var MUSIC_TIMEOUT = 30000;
 	
 	var toLoad = 0;
 	var format = null;
 	var provider = null;
 	var playingMusic = false;
-	var longloadTimer = false;
 	var playingBossMusic = false;
 	var playingEnding = false;
 	var playingMenu = false;
@@ -344,7 +342,7 @@ define(['app/eventmanager', 'app/audio/webaudioprovider', 'app/audio/htmlaudiopr
 					console.error('Failed to init audio. Your browser sucks.');
 					return;
 				}
-			} else {
+			} else if(!require('app/world').isResumingNight()) {
 				restartMusic();
 				if(!stopEnding('DayMusic')) {
 					crossFade(playingBossMusic ? 'BossMusic' : 'NightMusic', 'DayMusic', 700);
@@ -353,7 +351,10 @@ define(['app/eventmanager', 'app/audio/webaudioprovider', 'app/audio/htmlaudiopr
 					}
 				}
 			}
-			playingBossMusic = false;
+			// повтор ночи: день не включаем, ночной трек (или босс) доведёт phaseChange(true) из world.js
+			if(!require('app/world').isResumingNight()) {
+				playingBossMusic = false;
+			}
 			
 			E.bind('pause', function() { toggleMute(true); });
 			E.bind('unpause', function() { toggleMute(false); });
@@ -402,17 +403,10 @@ define(['app/eventmanager', 'app/audio/webaudioprovider', 'app/audio/htmlaudiopr
 			GameAudio.setMusicVolume(require('app/gameoptions').get('musicVolume'));
 			GameAudio.setEffectsVolume(require('app/gameoptions').get('effectsVolume'));
 			
-			longloadTimer = setTimeout(function() {
-				E.trigger('longLoad');
-			}, MUSIC_TIMEOUT);
 		},
 		
 		isReady: function() {
-			if(toLoad <= 0) { 
-				clearTimeout(longloadTimer);
-				return true;
-			}
-			return false;
+			return toLoad <= 0;
 		},
 		
 		setMusicVolume: function(volume, noSave) {

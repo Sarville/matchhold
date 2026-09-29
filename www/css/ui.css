@@ -82,15 +82,57 @@ button { font-family: inherit; }
 .ready .saveSlots { opacity: 1; }
 .loader { position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .6em; }
 .ready .loader { display: none; }
-.loader i {
-	width: 3em; height: 3em; box-sizing: border-box; border-radius: 50%;
-	border: .35em solid rgba(255, 241, 208, .3); border-top-color: #f2b93a;
-	animation: uiSpin 900ms linear infinite;
+.loader p { margin: 0; padding: 0 .6em; min-height: 2.4em; font-size: 1.05em; font-weight: 700; text-align: center; }
+/* лист героя 4 x 13 ячеек, ячейка 5.6em x 4.9em, все ряды смотрят вправо: 9 = с ношей, 1 = пустой ход; влево - scaleX(-1).
+   Цикл 5.6 с, 4 отрезка: слева к ящику с ношей, назад пустой, справа к ящику с ношей, назад пустой. */
+.track { position: relative; width: 18em; height: 5.6em; }
+.track::before {
+	content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: .5em; border-radius: .25em;
+	background: linear-gradient(#e0a94a, #a8703a); box-shadow: 0 .12em 0 #6e4420, 0 .25em .3em rgba(0, 0, 0, .3);
 }
-.loader p { margin: 0; font-size: 1.15em; font-weight: 700; }
-@keyframes uiSpin { to { transform: rotate(360deg); } }
-.longload { position: absolute; left: 0; right: 0; bottom: .5em; text-align: center; font-size: .8em; }
-.longload a { color: #ffd76a; }
+.track::after {
+	content: ''; position: absolute; left: 7.7em; bottom: .4em; width: 2.6em; height: 2.2em; box-sizing: border-box;
+	background: linear-gradient(#e2b062, #b07a3c); border: .14em solid #6e4420; border-radius: .25em;
+	box-shadow: inset 0 .25em 0 rgba(0, 0, 0, .25);
+}
+.walker { position: absolute; z-index: 1; left: 0; bottom: .3em; width: 5.6em; height: 4.9em; opacity: 0; animation: ldWalk 5.6s linear infinite; }
+.hero {
+	display: block; width: 5.6em; height: 4.9em;
+	background: url(../img/v2/hero.webp) 0 -44.1em / 22.4em auto no-repeat;
+	animation: ldStep .6s steps(4) infinite, ldRow 5.6s step-end infinite;
+}
+.walker .gi { --s: 1.8em; --r: 0; --c: 0; position: absolute; right: .8em; top: 2.3em; margin: 0; opacity: 0; }
+.walker .a { animation: ldDropA 5.6s linear infinite; }
+.walker .b { animation: ldDropB 5.6s linear infinite; }
+.loader p { animation: ldTip 2.8s linear infinite; opacity: 0; }
+@keyframes ldWalk {
+	0% { transform: translateX(-1em) scaleX(1); opacity: 0; }
+	7% { opacity: 1; }
+	25% { transform: translateX(3.4em) scaleX(1); }
+	25.01% { transform: translateX(3.4em) scaleX(-1); }
+	43% { opacity: 1; }
+	50% { transform: translateX(-1em) scaleX(-1); opacity: 0; }
+	50.01% { transform: translateX(13.4em) scaleX(-1); opacity: 0; }
+	57% { opacity: 1; }
+	75% { transform: translateX(9em) scaleX(-1); }
+	75.01% { transform: translateX(9em) scaleX(1); }
+	93% { opacity: 1; }
+	100% { transform: translateX(13.4em) scaleX(1); opacity: 0; }
+}
+@keyframes ldStep { to { background-position-x: -22.4em; } }
+@keyframes ldRow { 0%, 50% { background-position-y: -44.1em; } 25%, 75% { background-position-y: -4.9em; } }
+@keyframes ldDropA {
+	0%, 19% { transform: none; opacity: 1; }
+	25% { transform: translate(1.2em, .8em) scale(.4); opacity: 0; }
+	25.01%, 100% { transform: none; opacity: 0; }
+}
+@keyframes ldDropB {
+	0%, 50% { transform: none; opacity: 0; }
+	50.01%, 69% { transform: none; opacity: 1; }
+	75% { transform: translate(1.2em, .8em) scale(.4); opacity: 0; }
+	75.01%, 100% { transform: none; opacity: 0; }
+}
+@keyframes ldTip { 0% { opacity: 0; } 10%, 90% { opacity: 1; } 100% { opacity: 0; } }
 .titleBar { display: flex; align-items: center; gap: .6em; width: 100%; }
 
 /* ---------- слоты сохранений ---------- */
