@@ -74,9 +74,9 @@ define(['app/eventmanager'], function(E) {
 	}
 
 	function setShopVisible() {
-		var ads = document.getElementById('btnAds'), more = document.getElementById('btnMore');
+		var ads = document.getElementById('btnSupport'), more = document.getElementById('btnMore');
 		if(ads) ads.style.display = adsOff ? 'none' : '';
-		var price = document.getElementById('adsPrice');
+		var price = document.getElementById('upsellPrice');
 		if(price && provider && provider.priceKey && !price.getAttribute('data-i18n')) {
 			price.setAttribute('data-i18n', provider.priceKey);
 			try { require('app/ui').applyLang(); } catch(e) {} // поздняя загрузка провайдера; иначе подпишет ui.init

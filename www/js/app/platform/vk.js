@@ -49,7 +49,8 @@ define([], function() {
 				bridge = b;
 				b && b.subscribe(function(e) {
 					// правила VK 2.2.5: при сворачивании глушим звук и ставим паузу (pause глушит аудио)
-					if(e.detail && e.detail.type == 'VKWebAppViewHide' && require('app/engine').isStarted()) require('app/eventmanager').trigger('pause');
+					var t = e.detail && e.detail.type;
+					if(t == 'VKWebAppViewHide' || t == 'VKWebAppViewRestore') require('app/visibility').set(t == 'VKWebAppViewHide');
 				});
 				return b && timeout(b.send('VKWebAppInit'), 8000);
 			}).catch(function() {}).then(function() {

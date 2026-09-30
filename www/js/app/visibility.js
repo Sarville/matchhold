@@ -15,10 +15,13 @@ define(['app/eventmanager'], function(E) {
 		visibilityChangeEvent = "webkitvisibilitychange";
 	}
 	
+	// В игре — пауза (снимается кликом); на титуле/в меню играет только музыка, её просто глушим и возвращаем
 	function visibilityChange(visibility) {
-		if(visibility === false || (visibility == null && 
-				document[hidden] && require('app/engine').isStarted())) {
-			E.trigger('pause');
+		var gone = visibility === false || (visibility == null && document[hidden]);
+		if(require('app/engine').isStarted()) {
+			gone && E.trigger('pause');
+		} else {
+			E.trigger(gone ? 'menuMute' : 'menuUnmute');
 		}
 	}
 	
@@ -34,6 +37,10 @@ define(['app/eventmanager'], function(E) {
 	var Visibility = {
 		init: function() {
 			// Nothing to do!
+		},
+		// для платформ (VK ViewHide/ViewRestore): gone=true — приложение свернули
+		set: function(gone) {
+			visibilityChange(!gone);
 		},
 		isReady: function() {
 			return true;

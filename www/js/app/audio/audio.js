@@ -358,6 +358,8 @@ define(['app/eventmanager', 'app/audio/webaudioprovider', 'app/audio/htmlaudiopr
 			
 			E.bind('pause', function() { toggleMute(true); });
 			E.bind('unpause', function() { toggleMute(false); });
+			E.bind('menuMute', function() { toggleMute(true); });
+			E.bind('menuUnmute', function() { toggleMute(false); });
 			
 			E.bind('tileDrop', GameAudio.play.bind(this, 'TileClick'));
 			E.bind('setMusicVolume', GameAudio.setMusicVolume);

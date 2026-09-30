@@ -12,7 +12,7 @@ define(['jquery', 'app/eventmanager', 'app/gameoptions'], function($, E, O) {
 		plus: 'M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z',
 		leaf: 'M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8z',
 		sword: 'M20.49 3.51 19.78 8.46 12.00 16.24 7.76 12.00 15.54 4.22zM4.93 9.17 14.83 19.07 13.06 20.84 3.16 10.94zM7.19 14.97 9.03 16.81 5.85 19.99 4.01 18.15z',
-		noads: 'M3 6h18a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1zm1 2v8h16V8H4zM2.6 20.2L20.2 2.6l1.2 1.2L3.8 21.4z'
+		heart: 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'
 	};
 
 	var layers = [];
@@ -268,7 +268,7 @@ define(['jquery', 'app/eventmanager', 'app/gameoptions'], function($, E, O) {
 		$('#btnHow').on('click', guide);
 		$('#btnMore').on('click', function() { soon('MORE_GAMES'); });
 		$('#btnExit').on('click', confirmExit);
-		$('#btnAds').on('click', function() {
+		$('#btnSupport').on('click', function() {
 			require('app/platform').removeAds();
 		});
 		$('.overlay').on('click', function(e) {
