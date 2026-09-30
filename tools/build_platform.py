@@ -59,6 +59,9 @@ def main(name):
         html = html.replace('<head>', '<head>\n\t\t' + csp_meta(html, name), 1)
     open(idx, 'w', encoding='utf-8', newline='').write(html)
 
+    if name == 'vk':  # политика VK/OK едет с игрой (деплой dist/vk не должен её стирать): /vk/matchhold/policy
+        shutil.copytree(os.path.join('publish', 'privacy-policy', 'site', 'vk', 'matchhold', 'policy'), os.path.join(out, 'policy'))
+
     if name == 'yandex':
         zp = os.path.join('dist', 'matchhold-yandex.zip')
         with zipfile.ZipFile(zp, 'w', zipfile.ZIP_DEFLATED) as z:

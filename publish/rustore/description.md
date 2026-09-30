@@ -103,8 +103,8 @@
 | Встроенные покупки | `disable_ads` — «Отключить рекламу» (NON_CONSUMABLE), цена **150 ₽** |
 | Интеграции — платёжная | «Rustore SDK pay» |
 | Интеграции — рекламная | «Yandex Mobile Ads» |
-| Способы связи | e-mail: `TBD_CONTACT_EMAIL`; сайт/сообщество — TBD |
-| URL политики конфиденциальности | `TBD_PRIVACY_URL` (страница подготовлена: `../privacy-policy/index.html`) |
+| Способы связи | e-mail: `sarville@yandex.ru`; сайт/сообщество — TBD |
+| URL политики конфиденциальности | `https://games.sarville.online/rustore/matchhold/policy` (страница готова, заливается на сервер вручную, см. `ops/README.md`) |
 | Видео | ссылка на VK Видео — TBD (файл `../yandex/video/ru/gameplay_1920x1080.mp4` подходит для заливки) |
 
 ### Почему «Головоломки», а не «Казуальные»

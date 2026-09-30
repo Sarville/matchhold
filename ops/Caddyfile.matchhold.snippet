@@ -21,6 +21,11 @@ handle /vk/matchhold-savegames {
 	reverse_proxy vk-payments-matchhold:3000
 }
 
+# --- 2b. Политики конфиденциальности: https://games.sarville.online/<vk|yandex|rustore>/matchhold/policy - обычная статика
+#         /opt/games/site/<площадка>/matchhold/policy/index.html (зеркало publish/privacy-policy/site/). Правил Caddy не нужно:
+#         forward_auth выше ловит только /vk/matchhold и /vk/matchhold/, так что /vk/matchhold/policy открыта без подписи VK.
+#         Без слеша в конце Caddy file_server сам редиректит на /policy/.
+
 # --- 3. Защита от встраивания и MIME-sniffing для статики игры. CSP скриптов уже зашит meta-тегом в dist/vk/index.html
 #        (build_platform.py, хэши inline-скриптов); frame-ancestors в meta не работает, поэтому здесь.
 #        Проверять сразу на живом VK и OK (десктоп + мобильное приложение): если игра стала белой - убрать блок.

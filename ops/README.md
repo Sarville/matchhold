@@ -53,6 +53,15 @@ node ops/vk-payments/server.test.js
 3. Собрать билд, залить в `/opt/games/site/vk/matchhold/`, запустить контейнер `vk-payments-matchhold` с
    `VK_APP_SECRET` из окружения сервера (значение нигде не хранить в репозитории и не выводить в логи).
 
+## Политики конфиденциальности
+
+Отдельная политика на каждую площадку (тексты различаются: сервер VK/OK, облако Яндекса, локально в RuStore):
+`https://games.sarville.online/vk/matchhold/policy` (VK и OK), `.../yandex/matchhold/policy`, `.../rustore/matchhold/policy`.
+Источник — `tools/build_policy.py` (`python3 tools/build_policy.py` → `publish/privacy-policy/site/<площадка>/matchhold/policy/index.html`).
+- vk: страница попадает в `dist/vk/policy/` при `build_platform.py vk` и едет вместе с игрой в `/opt/games/site/vk/matchhold/`.
+- yandex, rustore (игры на сервере нет): `rsync -a publish/privacy-policy/site/{yandex,rustore} <сервер>:/opt/games/site/` (пути внутри уже `<площадка>/matchhold/policy/`).
+- Правки Caddy не нужны (статика). Проверить `curl -I` всех трёх URL после заливки.
+
 ## В кабинете VK / OK — вручную
 
 - Создать приложение типа «Встраиваемое приложение → Игра». URL iframe: `https://games.sarville.online/vk/matchhold/`.
