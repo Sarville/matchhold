@@ -20,3 +20,13 @@ handle /vk/matchhold-entitlements {
 handle /vk/matchhold-savegames {
 	reverse_proxy vk-payments-matchhold:3000
 }
+
+# --- 3. Защита от встраивания и MIME-sniffing для статики игры. CSP скриптов уже зашит meta-тегом в dist/vk/index.html
+#        (build_platform.py, хэши inline-скриптов); frame-ancestors в meta не работает, поэтому здесь.
+#        Проверять сразу на живом VK и OK (десктоп + мобильное приложение): если игра стала белой - убрать блок.
+@matchholdStatic path /vk/matchhold /vk/matchhold/*
+header @matchholdStatic {
+	Content-Security-Policy "frame-ancestors https://vk.com https://*.vk.com https://vk.ru https://*.vk.ru https://ok.ru https://*.ok.ru https://games.sarville.online"
+	X-Content-Type-Options nosniff
+	Referrer-Policy strict-origin-when-cross-origin
+}

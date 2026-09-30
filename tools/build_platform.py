@@ -1,11 +1,23 @@
 #!/usr/bin/env python3
 """Сборка под платформу: python3 tools/build_platform.py <yandex|vk|android>
 build (r.js + almond, бандл без глобалов) -> dist/<platform>/ ; yandex дополнительно -> dist/matchhold-yandex.zip"""
-import os, re, shutil, subprocess, sys, zipfile
+import base64, hashlib, os, re, shutil, subprocess, sys, zipfile
 
 PLATFORMS = ('yandex', 'vk', 'android')
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 JUNK = ('src', 'nodeploy')  # в img/
+
+# yandex: CSP выдаёт платформа, свой meta ломает SDK; vk: frame-ancestors в заголовке Caddy (ops/Caddyfile.matchhold.snippet)
+CSP_EXTRA_CONNECT = {'vk': ' https://*.vk.com https://*.vk.ru https://*.ok.ru', 'android': ''}
+
+
+def csp_meta(html, name):
+    hashes = ''.join(" 'sha256-%s'" % base64.b64encode(hashlib.sha256(m.encode('utf-8')).digest()).decode()
+                     for m in re.findall(r'<script>(.*?)</script>', html, re.S))
+    csp = ("default-src 'self'; script-src 'self'%s; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; "
+           "media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'%s; object-src 'none'; base-uri 'none'; "
+           "form-action 'none'" % (hashes, CSP_EXTRA_CONNECT[name]))
+    return '<meta http-equiv="Content-Security-Policy" content="%s">' % csp
 
 
 def main(name):
@@ -43,6 +55,8 @@ def main(name):
     assert n == 1, 'no require.js script tag in index.html'
     html, n = re.subn(r'<head>', '<head>\n\t\t<script>window.G_PLATFORM="%s"</script>' % name, html, count=1)
     assert n == 1, 'no <head> in index.html'
+    if name in CSP_EXTRA_CONNECT:
+        html = html.replace('<head>', '<head>\n\t\t' + csp_meta(html, name), 1)
     open(idx, 'w', encoding='utf-8', newline='').write(html)
 
     if name == 'yandex':
