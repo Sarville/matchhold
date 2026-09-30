@@ -62,12 +62,12 @@
 		<div id="loadingScreen" data-clickable>
 			<div class="titleMain">
 				<h1 class="logo"><span class="a"></span><i class="coin"></i><span class="b"></span></h1>
-				<script>(function(){var l;try{l=JSON.parse(localStorage.gameOptions).lang}catch(e){}if(!l)l=/^ru/i.test(navigator.language||"")?"ru":"en";var q=document.querySelectorAll(".logo span");q[0].textContent=l=="ru"?"\u041c\u0410\u0422\u0427\u0425":"MATCHH";q[1].textContent=l=="ru"?"\u041b\u0414":"LD"})()</script>
+				<script>(function(){var l;try{l=JSON.parse(localStorage.gameOptions).lang}catch(e){}if(l!="ru"&&l!="en")l=/^ru/i.test(navigator.language||"")?"ru":"en";var q=document.querySelectorAll(".logo span");q[0].textContent=l=="ru"?"\u041c\u0410\u0422\u0427\u0425":"MATCHH";q[1].textContent=l=="ru"?"\u041b\u0414":"LD"})()</script>
 				<div class="logoTiles"><i style="--c:1"></i><i style="--c:4"></i><i style="--c:0"></i><i style="--c:3"></i><i style="--c:5"></i></div>
 				<div class="emblem"></div>
 				<div class="slotsArea">
 					<div class="loader"><div class="track"><div class="walker"><i class="hero"></i><i class="gi a"></i><i class="gi b"></i></div></div><p></p></div>
-					<script>(function(){var l;try{l=JSON.parse(localStorage.gameOptions).lang}catch(e){}if(!l)l=/^ru/i.test(navigator.language||"")?"ru":"en";var L=document.querySelector(".loader"),p=L.querySelector("p"),g=L.querySelectorAll(".gi"),tips,ti=-1,c=Math.floor(Math.random()*6);function res(){g[0].style.setProperty("--c",c%6);g[1].style.setProperty("--c",(c+1)%6);c+=2}function tip(){if(tips){ti=(ti+1+Math.floor(Math.random()*(tips.length-1)))%tips.length;p.textContent=tips[ti]}}res();L.querySelector(".walker").addEventListener("animationiteration",function(e){if(e.animationName=="ldWalk")res()});p.addEventListener("animationiteration",tip);require(["app/locale/"+l],function(x){tips=x.LOAD_TIPS;tip()})})()</script>
+					<script>(function(){var l;try{l=JSON.parse(localStorage.gameOptions).lang}catch(e){}if(l!="ru"&&l!="en")l=/^ru/i.test(navigator.language||"")?"ru":"en";var L=document.querySelector(".loader"),p=L.querySelector("p"),g=L.querySelectorAll(".gi"),tips,ti=-1,c=Math.floor(Math.random()*6);function res(){g[0].style.setProperty("--c",c%6);g[1].style.setProperty("--c",(c+1)%6);c+=2}function tip(){if(tips){ti=(ti+1+Math.floor(Math.random()*(tips.length-1)))%tips.length;p.textContent=tips[ti]}}res();L.querySelector(".walker").addEventListener("animationiteration",function(e){if(e.animationName=="ldWalk")res()});p.addEventListener("animationiteration",tip);document.addEventListener("mhtips",function(e){tips=e.detail;tip()})})()</script>
 					<ul class="saveSlots"></ul>
 				</div>
 				<div class="titleBar">

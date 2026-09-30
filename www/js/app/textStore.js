@@ -2,7 +2,7 @@ define(function() {
 	
 	var TextStore = function(locale, onReady) {
 		var _this = this;
-		require(['app/locale/' + (locale || 'en')], function(l) {
+		require(['app/locale/' + (locale == 'ru' ? 'ru' : 'en')], function(l) {
 			_this.locale = l;
 			onReady && onReady();
 		});

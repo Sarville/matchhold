@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Сборка под платформу: python3 tools/build_platform.py <yandex|vk|android>
-build (r.js) -> dist/<platform>/ ; yandex дополнительно -> dist/matchhold-yandex.zip"""
+build (r.js + almond, бандл без глобалов) -> dist/<platform>/ ; yandex дополнительно -> dist/matchhold-yandex.zip"""
 import os, re, shutil, subprocess, sys, zipfile
 
 PLATFORMS = ('yandex', 'vk', 'android')
@@ -12,7 +12,8 @@ def main(name):
     if name not in PLATFORMS:
         sys.exit('usage: build_platform.py <%s>' % '|'.join(PLATFORMS))
     os.chdir(ROOT)
-    subprocess.check_call(['node', 'tools/r.js', '-o', 'tools/build.js'], stdout=subprocess.DEVNULL)
+    subprocess.check_call(['node', 'tools/r.js', '-o', 'tools/build.js'], stdout=subprocess.DEVNULL,
+                          env=dict(os.environ, MH_PLATFORM=name))
 
     out = os.path.join('dist', name)
     shutil.rmtree(out, ignore_errors=True)
@@ -20,12 +21,15 @@ def main(name):
     for d in JUNK:
         shutil.rmtree(os.path.join(out, 'img', d), ignore_errors=True)
 
-    plat = os.path.join(out, 'js', 'app', 'platform')
-    for f in os.listdir(plat):
-        if f != name + '.js':
-            os.remove(os.path.join(plat, f))
+    # весь код уже в бандле js/app/main.js: кладём его как js/app.js, остальное из js/ выбрасываем (кроме vk-bridge)
+    js = os.path.join(out, 'js')
+    shutil.move(os.path.join(js, 'app', 'main.js'), os.path.join(js, 'app.js'))
+    shutil.rmtree(os.path.join(js, 'app'))
+    for f in os.listdir(os.path.join(js, 'lib')):
+        if not (name == 'vk' and f == 'vk-bridge.min.js'):
+            os.remove(os.path.join(js, 'lib', f))
     if name != 'vk':
-        os.remove(os.path.join(out, 'js', 'lib', 'vk-bridge.min.js'))
+        os.rmdir(os.path.join(js, 'lib'))
     if name == 'android':  # WebView (Chromium) играет ogg; вдвое меньше APK
         audio = os.path.join(out, 'audio')
         for f in os.listdir(audio):
@@ -35,6 +39,8 @@ def main(name):
     idx = os.path.join(out, 'index.html')
     html = open(idx, encoding='utf-8', newline='').read()
     html = re.sub(r'<div [^>]*nodeploy>[^<]*</div>\s*', '', html)
+    html, n = re.subn(r'<script[^>]*data-main="js/app"[^>]*></script>', '<script defer src="js/app.js"></script>', html, count=1)
+    assert n == 1, 'no require.js script tag in index.html'
     html, n = re.subn(r'<head>', '<head>\n\t\t<script>window.G_PLATFORM="%s"</script>' % name, html, count=1)
     assert n == 1, 'no <head> in index.html'
     open(idx, 'w', encoding='utf-8', newline='').write(html)

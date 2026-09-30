@@ -146,7 +146,7 @@ define(['app/eventmanager', 'app/entity/worldentity', 'app/graphics/graphics',
 	
 	dude.prototype.speed = function() {
 		var W = require('app/world');
-		var speed = this.options.speed / W.getDebugMultiplier();
+		var speed = this.options.speed;
 		return !W.hasEffect('haste') ? speed / 2 : speed / 8;
 	};
 	

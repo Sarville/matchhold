@@ -9,11 +9,40 @@ const APP_SECRET = process.env.VK_APP_SECRET || "";
 const DATA_FILE = process.env.DATA_FILE || "/data/entitlements.json";
 const SAVEGAMES_DIR = process.env.SAVEGAMES_DIR || "/data/savegames";
 fs.mkdirSync(SAVEGAMES_DIR, { recursive: true });
+// Files used to be <id>.json; VK and OK ids can collide, so they are now <vk|ok>_<id>.json. Old files were VK-era.
+for (const f of fs.readdirSync(SAVEGAMES_DIR)) {
+    if (/^[0-9]+\.json$/.test(f)) {
+        fs.renameSync(`${SAVEGAMES_DIR}/${f}`, `${SAVEGAMES_DIR}/vk_${f}`);
+    }
+}
 
 // ponytail: flat 2 MB cap (3 slots + options as text JSON), raise if real saves hit it.
 const MAX_SAVEGAME_BYTES = 2 * 1024 * 1024;
 
 const isValidVkUserId = id => typeof id === "string" && /^[0-9]+$/.test(id); // also keeps it path-safe
+
+// Constant-time string compare for signatures.
+function safeEqual(a, b) {
+    const x = Buffer.from(String(a));
+    const y = Buffer.from(String(b));
+    return x.length === y.length && crypto.timingSafeEqual(x, y);
+}
+
+// Only what the client really syncs (platform.js snapshot): { ts, data: { slotN | gameOptions: string } }.
+function isValidSavegame(body) {
+    let blob;
+    try {
+        blob = JSON.parse(body);
+    } catch {
+        return false;
+    }
+    if (!blob || typeof blob !== "object" || typeof blob.ts !== "number" || !blob.data || typeof blob.data !== "object") {
+        return false;
+    }
+    return Object.entries(blob.data).every(
+        ([k, v]) => (/^slot[0-9]+$/.test(k) || k === "gameOptions") && typeof v === "string"
+    );
+}
 
 // price = VK "голоса", priceOk = OK "ОКи". They don't convert 1:1 to RUB or to each other - take
 // the rate from the cabinet's purchase storefront (see ops/README.md), never guess.
@@ -34,10 +63,21 @@ try {
 
 // Serializes writes so retried webhooks can't race each other's write of the same file.
 let writeQueue = Promise.resolve();
+// tmp + rename: a crash mid-write must not leave a truncated file
+async function writeFileAtomic(file, data) {
+    const tmp = `${file}.${process.pid}.${crypto.randomBytes(4).toString("hex")}.tmp`;
+    await fs.promises.writeFile(tmp, data);
+    await fs.promises.rename(tmp, file);
+}
 function persist() {
-    const write = () => fs.promises.writeFile(DATA_FILE, JSON.stringify(entitlements));
+    const write = () => writeFileAtomic(DATA_FILE, JSON.stringify(entitlements));
     writeQueue = writeQueue.then(write, write);
     return writeQueue;
+}
+
+// Read-only: a GET must never create a ledger record.
+function readUser(vkUserId) {
+    return entitlements[vkUserId] || { adsDisabled: false };
 }
 
 function getUser(vkUserId) {
@@ -58,7 +98,7 @@ function isValidSig(params) {
         .sort()
         .map(key => `${key}=${rest[key]}`)
         .join("");
-    return sig === crypto.createHash("md5").update(joined + APP_SECRET).digest("hex");
+    return typeof sig === "string" && safeEqual(sig, crypto.createHash("md5").update(joined + APP_SECRET).digest("hex"));
 }
 
 // Launch-params signature: HMAC-SHA256 over the vk_ params, base64url. Proves a fresh VK/OK launch.
@@ -84,7 +124,7 @@ function isValidLaunchParams(searchParams) {
         .replace(/\+/g, "-")
         .replace(/\//g, "_")
         .replace(/=+$/, "");
-    if (expected !== sign) {
+    if (!safeEqual(expected, sign)) {
         return false;
     }
     // OK sends vk_ts in milliseconds, VK in seconds; anything > 1e11 is unambiguously ms.
@@ -131,7 +171,7 @@ async function handleOkPaymentNotification(searchParams, res) {
     if (!isValidSig(params)) {
         return fail(1001, "CALLBACK_INVALID_SIGNATURE: invalid sig");
     }
-    if (!params.uid || !params.transaction_id || !params.transaction_time || !params.amount) {
+    if (!isValidVkUserId(params.uid) || !params.transaction_id || !params.transaction_time || !params.amount) {
         return fail(1001, "CALLBACK_INVALID_PAYMENT: missing required field");
     }
     const item = ITEMS[params.product_code];
@@ -165,7 +205,7 @@ function readBody(req, maxBytes = Infinity) {
     });
 }
 
-const server = http.createServer(async (req, res) => {
+async function handle(req, res) {
     const url = new URL(req.url, "http://placeholder");
 
     // Gate for the game page itself: Caddy forward_auth mirrors the request here first.
@@ -180,8 +220,13 @@ const server = http.createServer(async (req, res) => {
             res.writeHead(403);
             return res.end();
         }
+        const id = url.searchParams.get("vk_user_id");
+        if (!isValidVkUserId(id)) {
+            res.writeHead(400);
+            return res.end();
+        }
         res.writeHead(200, { "Content-Type": "application/json" });
-        return res.end(JSON.stringify(getUser(url.searchParams.get("vk_user_id"))));
+        return res.end(JSON.stringify(readUser(id)));
     }
 
     // Cross-device progress (VK rule 2.3.8): one JSON blob per user, never held in memory.
@@ -195,7 +240,7 @@ const server = http.createServer(async (req, res) => {
             res.writeHead(400);
             return res.end();
         }
-        const file = `${SAVEGAMES_DIR}/${vkUserId}.json`;
+        const file = `${SAVEGAMES_DIR}/${url.searchParams.get("vk_client") === "ok" ? "ok" : "vk"}_${vkUserId}.json`;
         if (req.method === "GET") {
             res.writeHead(200, { "Content-Type": "application/json" });
             return res.end(await fs.promises.readFile(file, "utf8").catch(() => "null"));
@@ -203,12 +248,15 @@ const server = http.createServer(async (req, res) => {
         let body;
         try {
             body = await readBody(req, MAX_SAVEGAME_BYTES);
-            JSON.parse(body); // reject non-JSON before persisting
         } catch (ex) {
             res.writeHead(ex.tooLarge ? 413 : 400);
             return res.end();
         }
-        await fs.promises.writeFile(file, body);
+        if (!isValidSavegame(body)) {
+            res.writeHead(400);
+            return res.end();
+        }
+        await writeFileAtomic(file, body);
         res.writeHead(200);
         return res.end();
     }
@@ -238,6 +286,9 @@ const server = http.createServer(async (req, res) => {
         }
 
         if (notificationType === "order_status_change" && params.status === "chargeable" && item) {
+            if (!isValidVkUserId(params.user_id)) {
+                return res.end(JSON.stringify({ error: { error_code: 20, error_msg: "Bad user_id" } }));
+            }
             getUser(params.user_id).adsDisabled = true;
             await persist();
             return res.end(
@@ -250,7 +301,21 @@ const server = http.createServer(async (req, res) => {
 
     res.writeHead(404);
     res.end();
+}
+
+const server = http.createServer(async (req, res) => {
+    try {
+        await handle(req, res);
+    } catch (err) {
+        console.error(err);
+        if (!res.headersSent) {
+            res.writeHead(500);
+        }
+        res.end();
+    }
 });
+
+process.on("unhandledRejection", err => console.error("unhandledRejection", err));
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`vk-payments-matchhold listening on :${PORT}`));

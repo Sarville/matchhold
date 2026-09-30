@@ -1,10 +1,5 @@
 requirejs.config({
 	baseUrl: "js/lib",
-	shim: {
-		"base64": {
-			exports: "Base64"
-		}
-	},
 	paths: {
 		app: "../app",
 		"jquery": "jquery-2.0.3.min"

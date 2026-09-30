@@ -23,14 +23,14 @@ define(['app/eventmanager', 'app/entity/loot/treasurechest', 'app/gamestate', 'a
 		}
 	}
 	
-	function getLoot(treasure, debugMultiplier) {
+	function getLoot(treasure) {
 		var lootName = null;
 		var gemDropRate = 0.05;
-		if(GameState.dayNumber > (20 / debugMultiplier)) gemDropRate *= 2;
-		if(GameState.dayNumber > (40 / debugMultiplier)) gemDropRate *= 2;
+		if(GameState.dayNumber > 20) gemDropRate *= 2;
+		if(GameState.dayNumber > 40) gemDropRate *= 2;
 		if(treasure.options.forceLoot) {
 			lootName = treasure.options.forceLoot;
-		} else if(GameState.gem < 4 && Math.random() < gemDropRate * debugMultiplier) {
+		} else if(GameState.gem < 4 && Math.random() < gemDropRate) {
 			lootName = "shard";
 		} else {
 			var r = Math.random();
@@ -46,7 +46,7 @@ define(['app/eventmanager', 'app/entity/loot/treasurechest', 'app/gamestate', 'a
 			poolSize++; // Correct for array 0-indexing
 			
 			r = Math.random();
-			for(i in lootPool) {
+			for(var i in lootPool) {
 				lootName = lootPool[i];
 				if(r < (i + 1) / poolSize) {
 					break;

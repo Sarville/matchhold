@@ -1,10 +1,10 @@
 define(['jquery', 'app/eventmanager', 'app/graphics/graphics', 
         'app/gamecontent', 'app/gameboard', 'app/gamestate', 'app/world', 'app/loot', 
         'app/magic', 'app/gameoptions', 'app/audio/audio',
-        'app/visibility', 'app/keysequencer', 'app/ui', 'app/platform'], 
-		function($, EventManager, Graphics, Content, GameBoard, 
+        'app/visibility', 'app/ui', 'app/platform'],
+		function($, EventManager, Graphics, Content, GameBoard,
 				 GameState, World, Loot, Magic, GameOptions, GameAudio,
-				 Visibility, KeySequencer, UI, Platform) {
+				 Visibility, UI, Platform) {
 
 	var DRAG_THRESHOLD = 30; // in pixels
 	var MOBILE_RATIO = 16/10; // height/width
@@ -180,7 +180,6 @@ define(['jquery', 'app/eventmanager', 'app/graphics/graphics',
 							World,
 							Loot,
 							Magic,
-							KeySequencer,
 							Platform];
 			if(window.location.search.indexOf('nomusic') >= 0) {
 				modules.push([GameAudio, { nomusic: true }]);

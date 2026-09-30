@@ -25,6 +25,9 @@ define(['jquery'], function($) {
 				var savedOptions = JSON.parse(localStorage.gameOptions);
 				if(savedOptions) {
 					$.extend(gameOptions, savedOptions);
+					if(gameOptions.lang != 'ru' && gameOptions.lang != 'en') {
+						gameOptions.lang = /^ru/i.test(navigator.language || '') ? 'ru' : 'en';
+					}
 				}
 			} catch(e) {
 				// Nothing

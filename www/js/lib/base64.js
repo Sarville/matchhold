@@ -4,6 +4,7 @@
 *  http://www.webtoolkit.info/
 *
 **/
+define(function() {
 var Base64 = {
 
 // private property
@@ -138,4 +139,6 @@ _utf8_decode : function (utftext) {
     return string;
 }
 
-}
+};
+return Base64;
+});

@@ -269,12 +269,7 @@ define(['jquery', 'app/eventmanager', 'app/gameoptions'], function($, E, O) {
 		$('#btnMore').on('click', function() { soon('MORE_GAMES'); });
 		$('#btnExit').on('click', confirmExit);
 		$('#btnAds').on('click', function() {
-			// заготовка под сторы: плагин покупок выставляет window.MatchholdStore.removeAds
-			if(window.MatchholdStore && typeof window.MatchholdStore.removeAds == 'function') {
-				window.MatchholdStore.removeAds();
-			} else {
-				soon('REMOVE_ADS');
-			}
+			require('app/platform').removeAds();
 		});
 		$('.overlay').on('click', function(e) {
 			if(e.target == this) dismiss();

@@ -10,6 +10,7 @@ define(['app/eventmanager'], function(E) {
 	var AD_GRACE = 90000;    // после входа в игру, мс
 	var AD_COOLDOWN = 180000; // между интерстишлами, мс
 
+	var PLATFORM = window.G_PLATFORM; // фиксируем при загрузке: правка глобала в консоли не должна отключать проверку рекламы
 	var provider = null;
 	var adsOff = false;
 	var adBusy = false, lastAd = 0, playStart = 0;
@@ -46,7 +47,7 @@ define(['app/eventmanager'], function(E) {
 			}
 		}
 		for(var k in blob.data) {
-			store(k, blob.data[k]);
+			if(typeof blob.data[k] == 'string' && (/^slot\d+$/.test(k) || k == 'gameOptions')) store(k, blob.data[k]);
 		}
 		store('mh_ts', String(blob.ts));
 	}
@@ -80,7 +81,6 @@ define(['app/eventmanager'], function(E) {
 
 	function setAdsOff() {
 		adsOff = true;
-		store('mh_noads', '1');
 		setShopVisible();
 		provider && provider.hideBanner();
 	}
@@ -125,8 +125,6 @@ define(['app/eventmanager'], function(E) {
 		setTimeout(finish, INIT_TIMEOUT);
 		require(['app/platform/' + name], function(p) {
 			provider = p;
-			adsOff = store('mh_noads') == '1';
-			window.MatchholdStore = { removeAds: buy };
 			setShopVisible();
 			p.init().then(function(info) {
 				return p.load().then(function(blob) {
@@ -148,9 +146,8 @@ define(['app/eventmanager'], function(E) {
 	var Platform = {
 		// раз в загрузку страницы: SDK, облачное сохранение, язык; потом done()
 		boot: function(done) {
-			var name = window.G_PLATFORM;
-			if(!name) return done();
-			start(name, done);
+			if(!PLATFORM) return done();
+			start(PLATFORM, done);
 			setInterval(flush, SYNC_EVERY);
 			document.addEventListener('visibilitychange', function() { document.hidden && flush(); });
 			window.addEventListener('pagehide', flush);
@@ -166,9 +163,12 @@ define(['app/eventmanager'], function(E) {
 			E.bind('unpause', function() { gameplay(true); });
 		},
 
-		// реклама за награду (воскрешение / повтор ночи): без ограничений; в dev-сборке без платформы награда выдаётся сразу
+		removeAds: buy,
+
+		// реклама за награду (воскрешение / повтор ночи): награда только за реально показанную рекламу.
+		// Платформенная сборка без провайдера (офлайн, SDK не загрузился) — нет рекламы, нет награды; в dev без платформы выдаётся сразу
 		showRewarded: function() {
-			if(!provider) return Promise.resolve(true);
+			if(!provider) return Promise.resolve(!PLATFORM);
 			if(!provider.showRewarded || adBusy) return Promise.resolve(false);
 			adBusy = true;
 			E.trigger('pause', [true]);

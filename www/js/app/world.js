@@ -23,18 +23,11 @@ define(['jquery', 'app/eventmanager', 'app/graphics/graphics', 'app/entity/build
 	var prioritizedBuilding = null;
 	var recorded = null;
 	var streak = 0;
+	var casualNight = false;
 	// живут между World.init (перезапуск ночи перезагружает игру из снимка начала ночи)
 	var nightSnapshot = null;
 	var revived = false;
 	var resumeNight = false;
-	
-	var _debugMultiplier = 1;
-	multiplier = function(n) {
-		_debugMultiplier = n > 0 ? n : 1;
-		if(World.getDude()) {
-			reinitializeAllActions();
-		}
-	};
 	
 	var World = {
 			
@@ -44,7 +37,6 @@ define(['jquery', 'app/eventmanager', 'app/graphics/graphics', 'app/entity/build
 		},
 		init: function(opts) {
 			$.extend(this.options, opts);
-			_el = null;
 			dude = null;
 			celestial = null;
 			star = null;
@@ -56,7 +48,7 @@ define(['jquery', 'app/eventmanager', 'app/graphics/graphics', 'app/entity/build
 			theDragon = null;
 			var deferredCallbacks = [];
 			streak = 0;
-			var casualNight = false;
+			casualNight = false;
 			
 			EventManager.bind('difficultyChanged', difficultyToggle);
 			EventManager.bind('launchDude', launchDude);
@@ -80,7 +72,6 @@ define(['jquery', 'app/eventmanager', 'app/graphics/graphics', 'app/entity/build
 			EventManager.bind('resourceStoreChanged', handleResourceStoreChanged);
 			EventManager.bind('prioritizeBuilding', prioritizeBuilding);
 			EventManager.bind('callDragon', callDragon);
-			EventManager.bind('keySequenceComplete', multiplier.bind(this, 5));
 			EventManager.bind('fillEquipment', function() {
 				fillDefense();
 				fillAttack();
@@ -303,10 +294,6 @@ define(['jquery', 'app/eventmanager', 'app/graphics/graphics', 'app/entity/build
 			EventManager.trigger('gameOver', [GameState.counts]);
 		},
 		
-		getDebugMultiplier: function() {
-			return _debugMultiplier;
-		},
-
 		setPause: function(paused) {
 			if(paused && gameLoop) {
 				clearInterval(gameLoop);
@@ -484,7 +471,7 @@ define(['jquery', 'app/eventmanager', 'app/graphics/graphics', 'app/entity/build
 	
 	function handleTileClear(resourcesGained, side) {
 		// Gain resources
-		for(typeName in resourcesGained) {
+		for(var typeName in resourcesGained) {
 			var type = Content.getResourceType(typeName);
 			if(isNight && !inTransition) {
 				var effect = null;
@@ -530,9 +517,6 @@ define(['jquery', 'app/eventmanager', 'app/graphics/graphics', 'app/entity/build
 						}
 					}
 				}
-				// Apply debug multiplier
-				quantity *= _debugMultiplier;
-				
 				if(type == Content.ResourceType.Grain) {
 					EventManager.trigger("healDude", [quantity]);
 				} else if(type ==  Content.ResourceType.Mana) {
@@ -575,7 +559,7 @@ define(['jquery', 'app/eventmanager', 'app/graphics/graphics', 'app/entity/build
 					}
 				} else if(entity.hostile) {
 					if(isNight && !entity.wiped) {
-						dude.gainXp(entity.getXp() * _debugMultiplier);
+						dude.gainXp(entity.getXp());
 						advanceTime();
 					}
 					EventManager.trigger('monsterKilled', [entity]);
@@ -759,7 +743,7 @@ define(['jquery', 'app/eventmanager', 'app/graphics/graphics', 'app/entity/build
 			// Open all chests
 			stuff.forEach(function(thing) {
 				if(thing.lootable) {
-					EventManager.trigger('pickupLoot', [thing, World.getDebugMultiplier()]);
+					EventManager.trigger('pickupLoot', [thing]);
 				}
 			});
 			theDragon = null;

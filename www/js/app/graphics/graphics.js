@@ -306,7 +306,7 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 	}
 	
 	function newStylesheet(id){
-		style = document.createElement('style');
+		var style = document.createElement('style');
 		if(id) {
 			style.id = id;
 		}
@@ -315,20 +315,12 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 		return style.sheet;
 	}
 
-	function activateHyperspace() {
-		$('body').addClass('hyperspace');
-		setTimeout(function() {
-			$('body').removeClass('hyperspace');
-		}, 1000);
-	}
-
 	function setPaused(p) {
 		$('body').toggleClass('paused', p);
 	}
 
 	var Graphics = {
 		init: function(opts) {
-			loaded = false;
 			isDragon = false;
 			_bossHealth = null
 			$('body').removeClass('night dragonBg').toggleClass('ios', opts.ios);
@@ -357,7 +349,6 @@ define(['jquery', 'app/eventmanager', 'app/textStore', 'app/gameoptions',
 			EventManager.bind('dayBreak', this.handleDayBreak);
 			EventManager.bind('gameOver', gameOver);
 			EventManager.bind('blockDown', dropBlock);
-			EventManager.bind('keySequenceComplete', activateHyperspace);
 			
 			BoardGraphics.init();
 			WorldGraphics.init();

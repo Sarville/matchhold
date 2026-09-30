@@ -28,7 +28,6 @@ define(['jquery', 'app/eventmanager', 'app/entity/tile',
 		},
 		init : function(opts) {
 			$.extend(this.options, opts);
-			_el = null;
 			Resources.loaded = false;
 			tileString = '';
 			effectString = null;
@@ -46,11 +45,6 @@ define(['jquery', 'app/eventmanager', 'app/entity/tile',
 					checkMatches();
 				}
 			});
-			
-			window.tiles = function() {
-				console.log(tileString);
-				console.log(rowString);
-			}
 		},
 		
 		switchTiles: function(pos1, pos2) {
@@ -489,8 +483,8 @@ define(['jquery', 'app/eventmanager', 'app/entity/tile',
 	}
 	
 	function getTotal(pCounts) {
-		total = 0;
-		for (tileChar in pCounts) {
+		var total = 0;
+		for (var tileChar in pCounts) {
 			pCounts[tileChar] = pCounts[tileChar] < 0 ? 0 : pCounts[tileChar];
 			total += pCounts[tileChar];
 		}
@@ -505,7 +499,7 @@ define(['jquery', 'app/eventmanager', 'app/entity/tile',
 		var baseline = 0;
 		var r = Math.random();
 		var theChar = "";
-		for (tileChar in pCounts) {
+		for (var tileChar in pCounts) {
 			theChar = tileChar;
 			var chance = pCounts[tileChar] / total;
 			// console.log(tileClass + ': ' + r + ' < ' + baseline + ' + ' + pCounts[tileClass]  + ' / ' + total  + ' (' + chance + ')');

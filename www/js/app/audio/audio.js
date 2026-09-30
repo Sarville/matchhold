@@ -325,7 +325,7 @@ define(['app/eventmanager', 'app/audio/webaudioprovider', 'app/audio/htmlaudiopr
 					if(provider != null && format != null) {
 						toLoad = 0;
 						noMusic = !!options.nomusic;
-						for(s in sounds) {
+						for(var s in sounds) {
 							if(!sounds[s].lazy && (!options.nomusic || !sounds[s].music)) {
 								loadSound(sounds[s]);
 							}

@@ -2,6 +2,67 @@ define(['base64', 'app/entity/building', 'app/entity/block', 'app/eventmanager',
 		function(Base64, Building, Block, E, Content) {
 	
 	var loadedSlot = 0;
+	var MAX_SAVE = 200000; // символов; реальное сохранение — единицы КБ
+
+	function isNum(n, max) {
+		return typeof n == 'number' && isFinite(n) && n >= 0 && n <= max;
+	}
+
+	function isObj(o) {
+		return o !== null && typeof o == 'object' && !Array.isArray(o);
+	}
+
+	// Проверка чужого сохранения (импорт, облако, localStorage). Типы построек/складов берутся из Content, а не из сохранения.
+	function validState(st) {
+		if(!isObj(st)) return false;
+		if(!Array.isArray(st.buildings) || st.buildings.length > 200) return false;
+		if(!Array.isArray(st.stores) || st.stores.length > 200) return false;
+		var i, k;
+		for(i = 0; i < st.buildings.length; i++) {
+			var b = st.buildings[i];
+			if(!isObj(b) || !isObj(b.options) || !isObj(b.options.type)) return false;
+			var bt = Content.getBuildingType(b.options.type.className);
+			if(!bt) return false;
+			b.options.type = bt;
+			if(b.requiredResources != null && !isObj(b.requiredResources)) return false;
+			for(k in b.requiredResources) {
+				if(!isNum(b.requiredResources[k] + 1e6, 2e6)) return false;
+			}
+		}
+		for(i = 0; i < st.stores.length; i++) {
+			var s = st.stores[i];
+			if(!isObj(s) || !isObj(s.options) || !isObj(s.options.type) || typeof s.options.type.className != 'string') return false;
+			var rt = Content.getResourceType(s.options.type.className);
+			if(!rt || !isNum(s._quantity, 1000)) return false;
+			s.options.type = rt;
+		}
+		var nums = ['level', 'xp', 'dayNumber', 'gem', 'mana', 'prestige', 'health'];
+		for(i = 0; i < nums.length; i++) {
+			if(st[nums[i]] != null && !isNum(st[nums[i]], 1e9)) return false;
+		}
+		if(st.items != null) {
+			if(!isObj(st.items)) return false;
+			for(k in st.items) {
+				// старые сохранения могут содержать удалённые предметы — выбрасываем, а не сбрасываем весь прогресс
+				if(!Content.LootType.hasOwnProperty(k) || !isNum(st.items[k], 3)) delete st.items[k];
+			}
+		}
+		if(st.counts != null) {
+			if(!isObj(st.counts)) return false;
+			for(k in st.counts) {
+				if(!isNum(st.counts[k], 1e12)) delete st.counts[k];
+			}
+		}
+		if(st.prioritizedBuilding != null && typeof st.prioritizedBuilding != 'string') return false;
+		return true;
+	}
+
+	function parseState(raw) {
+		if(typeof raw != 'string' || raw.length > MAX_SAVE) return null;
+		var st = JSON.parse(raw);
+		return validState(st) ? st : null;
+	}
+
 	var GameState = {
 		create: function() {
 			this.buildings = [];
@@ -48,7 +109,7 @@ define(['base64', 'app/entity/building', 'app/entity/block', 'app/eventmanager',
 			var raw = this.pendingRaw;
 			this.pendingRaw = null;
 			try {
-				var savedState = JSON.parse(raw || localStorage["slot" + slot]);
+				var savedState = parseState(raw || localStorage["slot" + slot]);
 				if(savedState) {
 					this.buildings = [];
 					for(var i in savedState.buildings) {
@@ -94,11 +155,11 @@ define(['base64', 'app/entity/building', 'app/entity/block', 'app/eventmanager',
 				health: this.health,
 				prioritizedBuilding: this.prioritizedBuilding
 			};
-			for(b in this.buildings) {
+			for(var b in this.buildings) {
 				var building = this.buildings[b];
 				state.buildings.push(Building.makeBuilding(building));
 			}
-			for(s in this.stores) {
+			for(var s in this.stores) {
 				var store = this.stores[s];
 				state.stores.push(Block.makeBlock(store));
 			}
@@ -114,7 +175,9 @@ define(['base64', 'app/entity/building', 'app/entity/block', 'app/eventmanager',
 		
 		import: function(slotNum, importCode) {
 			try {
-				localStorage["slot" + slotNum] = Base64.decode(importCode);
+				var raw = Base64.decode(importCode);
+				if(!parseState(raw)) return null;
+				localStorage["slot" + slotNum] = raw;
 			} catch(e) {
 				return null;
 			}

@@ -10,7 +10,9 @@
    и `GET /vk/matchhold-payments/ok` (отдельное подтверждение покупки OK). Пишут в леджер `entitlements.json`
    `{adsDisabled:true}` по `vk_user_id`. Клиент читает `GET /vk/matchhold-entitlements` (VK не даёт «мои покупки»).
 3. **Облачные сохранения** (`/vk/matchhold-savegames`, GET/POST): один JSON `{ts,data}` на пользователя,
-   `SAVEGAMES_DIR/<vk_user_id>.json`, лимит 2 МБ (413), не-JSON → 400. Не VK Storage (там 4096 байт на ключ).
+   `SAVEGAMES_DIR/<vk|ok>_<vk_user_id>.json` (id в VK и OK могут совпасть; старые `<id>.json` при старте
+   переименовываются в `vk_<id>.json`), лимит 2 МБ (413). Принимается только `{ts:number, data:{slotN|gameOptions: string}}`,
+   иначе 400. Не VK Storage (там 4096 байт на ключ). Записи атомарные (tmp + rename), GET ничего не создаёт.
 
 Единственный товар — `disable_ads` (не расходуемый, поэтому `consume` нет).
 

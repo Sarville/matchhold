@@ -102,6 +102,8 @@ async function main() {
     let entitlements = (await request("GET", `/vk/matchhold-entitlements?${gameQuery}`)).body;
     assert.deepStrictEqual(entitlements, { adsDisabled: false }, "new user has no entitlements");
     assert.strictEqual((await request("GET", `/vk/matchhold-entitlements`)).status, 403, "unsigned entitlements rejected");
+    assert.strictEqual((await request("GET", `/vk/matchhold-entitlements?${launchQuery("../x")}`)).status, 400, "non-numeric id rejected");
+    await request("GET", `/vk/matchhold-entitlements?${launchQuery("424242")}`);
 
     // get_item (VK, with sandbox _test suffix, and OK with uppercase site)
     const getItemParams = { notification_type: "get_item_test", item: "disable_ads" };
@@ -127,6 +129,13 @@ async function main() {
     );
     assert.strictEqual(forged.body.error.error_code, 10, "forged payment signature rejected");
     assert.strictEqual((await request("GET", `/vk/matchhold-entitlements?${launchQuery("888")}`)).body.adsDisabled, false);
+    assert.ok(!("424242" in JSON.parse(fs.readFileSync(DATA_FILE, "utf8"))), "GET does not create a ledger record");
+    const badUser = { ...orderParams, order_id: "556", user_id: "12/../3" };
+    assert.strictEqual(
+        (await request("POST", "/vk/matchhold-payments", form(badUser))).body.error.error_code,
+        20,
+        "non-numeric payer id rejected"
+    );
 
     // OK confirmation
     const okParams = { uid: "777", transaction_id: "ok-1", transaction_time: "2026-09-15 12:00:00", amount: "30", product_code: "disable_ads" };
@@ -148,13 +157,18 @@ async function main() {
     // Savegames
     const saveQuery = launchQuery("321");
     assert.strictEqual((await request("GET", `/vk/matchhold-savegames?${saveQuery}`)).body, null, "no save yet");
-    const bundle = JSON.stringify({ ts: 1, data: { mh_save: "{}" } });
+    const bundle = JSON.stringify({ ts: 1, data: { slot0: "{}", gameOptions: "{}" } });
     const post = (q, body) =>
         fetch(`http://127.0.0.1:${PORT}/vk/matchhold-savegames?${q}`, { method: "POST", body, headers: { "Content-Type": "application/json" } });
     assert.strictEqual((await post(saveQuery, bundle)).status, 200);
     assert.deepStrictEqual((await request("GET", `/vk/matchhold-savegames?${saveQuery}`)).body, JSON.parse(bundle), "save round-trips");
     assert.strictEqual((await post(saveQuery.replace("321", "999"), bundle)).status, 403, "tampered vk_user_id rejected");
     assert.strictEqual((await post(saveQuery, "not json")).status, 400, "non-JSON rejected");
+    assert.strictEqual((await post(saveQuery, "[1]")).status, 400, "wrong shape rejected");
+    assert.strictEqual((await post(saveQuery, JSON.stringify({ ts: 1, data: { "../evil": "x" } }))).status, 400, "foreign keys rejected");
+    assert.strictEqual((await post(saveQuery, JSON.stringify({ ts: 1, data: { slot0: { a: 1 } } }))).status, 400, "non-string value rejected");
+    const okSaveQuery = launchQuery("321", { vk_client: "ok" });
+    assert.strictEqual((await request("GET", `/vk/matchhold-savegames?${okSaveQuery}`)).body, null, "OK user does not see VK user's save");
     assert.strictEqual((await post(saveQuery, "[" + "0,".repeat(1.2e6) + "0]")).status, 413, "oversized rejected");
 
     console.log("All vk-payments server checks passed.");
