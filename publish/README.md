@@ -12,3 +12,16 @@
 Общее: студия/разработчик — sarville, возраст 6+, языки RU+EN, applicationId `ru.sarville.matchhold`.
 
 Требования кабинетов: справочник скилла `yandex-vk-integration` (`reference/publish-materials.md`); проектные требования и статусы — в `<платформа>/requirements.md`, тексты — в `<платформа>/description.md`.
+
+## Цены «Отключить рекламу» (`disable_ads`)
+
+Базовая цена 150 ₽. Курс владельца: 1 голос = 10 ₽, 100 ОК = 125 ₽, 1 Ян = 1 ₽.
+
+| Площадка | Цена в кабинете | В игре на кнопке |
+|---|---|---|
+| VK | 15 голосов | «15 голосов» / «15 votes» |
+| OK | 120 ОК | «120 ОК» / «120 OK» |
+| Яндекс | 150 Ян | «150 ₽» |
+| RuStore | 150 ₽ | «150 ₽» |
+
+Места: `ops/vk-payments/server.js` (`ITEM_PRICE_VK/OK`), кабинеты, `www/js/app/locale/*.js` (`PRICE_*`), `publish/*`.

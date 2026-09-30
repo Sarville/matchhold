@@ -8,7 +8,7 @@
    с vk.com / vk.ru / ok.ru / `games.sarville.online` (или отсутствует).
 2. **Платежи**: вебхук `POST /vk/matchhold-payments` (`get_item`, `order_status_change`, подпись md5 + секрет)
    и `GET /vk/matchhold-payments/ok` (отдельное подтверждение покупки OK). Пишут в леджер `entitlements.json`
-   `{adsDisabled:true}` по `vk_user_id`. Клиент читает `GET /vk/matchhold-entitlements` (VK не даёт «мои покупки»).
+   `{adsDisabled:true}` по ключу `<vk|ok>_<id>` (OK-покупка — `ok_`, VK — `vk_` или `ok_`, если в уведомлении `site=OK`). Клиент читает `GET /vk/matchhold-entitlements` (VK не даёт «мои покупки»). Лимит 60 запросов/мин на пользователя (429).
 3. **Облачные сохранения** (`/vk/matchhold-savegames`, GET/POST): один JSON `{ts,data}` на пользователя,
    `SAVEGAMES_DIR/<vk|ok>_<vk_user_id>.json` (id в VK и OK могут совпасть; старые `<id>.json` при старте
    переименовываются в `vk_<id>.json`), лимит 2 МБ (413). Принимается только `{ts:number, data:{slotN|gameOptions: string}}`,
@@ -32,9 +32,12 @@ ops/Caddyfile.matchhold.snippet  блоки для общего Caddyfile
 
 ## Цены — сверить руками
 
-`ITEM_PRICE_VK` (голоса, по умолчанию 10) и `ITEM_PRICE_OK` (ОКи, по умолчанию 30) — **заглушки**. Голоса и ОКи
-не равны рублям и друг другу; курс и допустимые значения смотреть на витрине покупок в кабинете VK/OK и выставить
-env перед первой публикацией. Для OK сервер сверяет `amount` подтверждения с `ITEM_PRICE_OK` — при рассинхроне покупка отклоняется.
+Цена «Отключить рекламу» — **150 ₽** на всех площадках. Курс (задан владельцем): 1 голос = 10 ₽, 100 ОК = 125 ₽
+(1 ОК = 1,25 ₽), 1 Ян = 1 ₽. Отсюда: `ITEM_PRICE_VK` = 15 голосов, `ITEM_PRICE_OK` = 120 ОК (по умолчанию в `server.js`),
+Яндекс — 150 Ян в кабинете, RuStore — 150 ₽. В игре цена показывается на кнопке в валюте площадки (VK — голоса,
+OK — ОК, Яндекс/RuStore — ₽): ключи `PRICE_VK/PRICE_OK/PRICE_RUB` в `www/js/app/locale/*.js`, `priceKey` в провайдере.
+Менять цену — во всех местах сразу (env сервера, кабинеты, locale). Для OK сервер сверяет `amount` подтверждения с
+`ITEM_PRICE_OK` — при рассинхроне покупка отклоняется. Курс сверить с витриной покупок кабинета перед публикацией.
 
 ## Проверка
 

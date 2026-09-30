@@ -75,6 +75,7 @@ define([], function() {
 
 	return {
 		name: 'android',
+		priceKey: 'PRICE_RUB',
 
 		init: function() {
 			if(!cap || !cap.nativePromise) return Promise.resolve({ lang: null });

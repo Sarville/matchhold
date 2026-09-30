@@ -789,6 +789,7 @@ define(['jquery', 'app/eventmanager', 'app/graphics/graphics', 'app/entity/build
 			if(entity.hostile && entity.isAlive() && !entity.isBoss) {
 				entity.wiped = true;
 				entity.noLoot = noLoot === true;
+				entity.hp(0); // иначе isAlive() true, и лич заклинанием перебивает Die
 				entity.die();
 				EventManager.trigger('monsterKilled', [entity]);
 			}

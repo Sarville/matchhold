@@ -49,8 +49,8 @@ function isValidSavegame(body) {
 const ITEMS = {
     disable_ads: {
         title: "Отключить рекламу",
-        price: Number(process.env.ITEM_PRICE_VK) || 10,
-        priceOk: Number(process.env.ITEM_PRICE_OK) || 30,
+        price: Number(process.env.ITEM_PRICE_VK) || 15,
+        priceOk: Number(process.env.ITEM_PRICE_OK) || 120,
     },
 };
 
@@ -75,17 +75,42 @@ function persist() {
     return writeQueue;
 }
 
+// VK and OK user ids can collide, so the ledger is keyed <vk|ok>_<id> (same as savegames).
+const clientOf = v => (String(v).toLowerCase() === "ok" ? "ok" : "vk");
+
 // Read-only: a GET must never create a ledger record.
-function readUser(vkUserId) {
-    return entitlements[vkUserId] || { adsDisabled: false };
+function readUser(client, id) {
+    return entitlements[`${client}_${id}`] || { adsDisabled: false };
 }
 
-function getUser(vkUserId) {
-    if (!entitlements[vkUserId]) {
-        entitlements[vkUserId] = { adsDisabled: false };
+function getUser(client, id) {
+    const key = `${client}_${id}`;
+    if (!entitlements[key]) {
+        entitlements[key] = { adsDisabled: false };
     }
-    return entitlements[vkUserId];
+    return entitlements[key];
 }
+
+// ponytail: fixed window per user, in memory, reset on restart; move to a Caddy rate_limit module if abused.
+const RATE_MAX_PER_MIN = 60;
+const rateHits = new Map();
+function rateOk(key) {
+    const now = Date.now();
+    let h = rateHits.get(key);
+    if (!h || now > h.reset) {
+        h = { n: 0, reset: now + 60000 };
+        rateHits.set(key, h);
+    }
+    return ++h.n <= RATE_MAX_PER_MIN;
+}
+setInterval(() => {
+    const now = Date.now();
+    for (const [k, h] of rateHits) {
+        if (now > h.reset) {
+            rateHits.delete(k);
+        }
+    }
+}, 60000).unref();
 
 // Classic Payments API signature: md5 of all params except sig, sorted, "name=value" concatenated
 // with no separator, plus the app secret. (Launch params below use a different scheme.)
@@ -179,7 +204,7 @@ async function handleOkPaymentNotification(searchParams, res) {
         return fail(1001, "CALLBACK_INVALID_PAYMENT: unknown item or price");
     }
 
-    getUser(params.uid).adsDisabled = true;
+    getUser("ok", params.uid).adsDisabled = true;
     await persist();
 
     res.writeHead(200, { "Content-Type": "application/json" });
@@ -225,8 +250,12 @@ async function handle(req, res) {
             res.writeHead(400);
             return res.end();
         }
+        if (!rateOk(`e${clientOf(url.searchParams.get("vk_client"))}_${id}`)) {
+            res.writeHead(429);
+            return res.end();
+        }
         res.writeHead(200, { "Content-Type": "application/json" });
-        return res.end(JSON.stringify(readUser(id)));
+        return res.end(JSON.stringify(readUser(clientOf(url.searchParams.get("vk_client")), id)));
     }
 
     // Cross-device progress (VK rule 2.3.8): one JSON blob per user, never held in memory.
@@ -240,7 +269,12 @@ async function handle(req, res) {
             res.writeHead(400);
             return res.end();
         }
-        const file = `${SAVEGAMES_DIR}/${url.searchParams.get("vk_client") === "ok" ? "ok" : "vk"}_${vkUserId}.json`;
+        const client = clientOf(url.searchParams.get("vk_client"));
+        if (!rateOk(`s${client}_${vkUserId}`)) {
+            res.writeHead(429);
+            return res.end();
+        }
+        const file = `${SAVEGAMES_DIR}/${client}_${vkUserId}.json`;
         if (req.method === "GET") {
             res.writeHead(200, { "Content-Type": "application/json" });
             return res.end(await fs.promises.readFile(file, "utf8").catch(() => "null"));
@@ -289,7 +323,7 @@ async function handle(req, res) {
             if (!isValidVkUserId(params.user_id)) {
                 return res.end(JSON.stringify({ error: { error_code: 20, error_msg: "Bad user_id" } }));
             }
-            getUser(params.user_id).adsDisabled = true;
+            getUser(clientOf(params.site), params.user_id).adsDisabled = true;
             await persist();
             return res.end(
                 JSON.stringify({ response: { order_id: Number(params.order_id), app_order_id: Number(params.order_id) } })

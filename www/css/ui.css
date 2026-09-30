@@ -31,6 +31,8 @@ button { font-family: inherit; }
 .btn.round { width: 3em; height: 3em; padding: 0; border-radius: 50%; border-width: .14em; }
 .btn.round, #btnLang { font-size: 1em; }
 .btn.wide { flex: 1; }
+.btn .price { opacity: .75; font-size: .85em; white-space: nowrap; }
+.btn .price:not(:empty)::before { content: "· "; }
 .onlyTitle { display: none; }
 .titleScreen .onlyTitle { display: flex; }
 .titleScreen .onlyGame { display: none; }

@@ -35,6 +35,8 @@ define(['app/eventmanager'], function(E) {
 
 	return {
 		name: 'yandex',
+		priceKey: 'PRICE_RUB', // 1 Ян = 1 ₽, показываем рубли
+
 
 		init: function() {
 			return loadSdk().then(function(YaGames) {

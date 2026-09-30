@@ -109,9 +109,9 @@ async function main() {
     const getItemParams = { notification_type: "get_item_test", item: "disable_ads" };
     let r = await request("POST", "/vk/matchhold-payments", form(getItemParams));
     assert.strictEqual(r.body.response.item_id, "disable_ads");
-    assert.strictEqual(r.body.response.price, 10, "VK price");
+    assert.strictEqual(r.body.response.price, 15, "VK price");
     r = await request("POST", "/vk/matchhold-payments", form({ notification_type: "get_item", item: "disable_ads", site: "OK" }));
-    assert.strictEqual(r.body.response.price, 30, "OK price for site=\"OK\"");
+    assert.strictEqual(r.body.response.price, 120, "OK price for site=\"OK\"");
     r = await request("POST", "/vk/matchhold-payments", form({ notification_type: "get_item", item: "nope" }));
     assert.strictEqual(r.body.error.error_code, 20, "unknown item rejected");
 
@@ -138,11 +138,12 @@ async function main() {
     );
 
     // OK confirmation
-    const okParams = { uid: "777", transaction_id: "ok-1", transaction_time: "2026-09-15 12:00:00", amount: "30", product_code: "disable_ads" };
+    const okParams = { uid: "777", transaction_id: "ok-1", transaction_time: "2026-09-15 12:00:00", amount: "120", product_code: "disable_ads" };
     const okRes = fakeRes();
     await handleOkPaymentNotification(new URLSearchParams({ ...okParams, sig: signPaymentParams(okParams) }), okRes);
     assert.strictEqual(okRes.body, "true", "valid OK confirmation returns bare true");
-    assert.strictEqual((await request("GET", `/vk/matchhold-entitlements?${launchQuery("777")}`)).body.adsDisabled, true);
+    assert.strictEqual((await request("GET", `/vk/matchhold-entitlements?${launchQuery("777", { vk_client: "ok" })}`)).body.adsDisabled, true);
+    assert.strictEqual((await request("GET", `/vk/matchhold-entitlements?${launchQuery("777")}`)).body.adsDisabled, false, "OK purchase does not leak to the VK user with the same id");
 
     const badSigRes = fakeRes();
     await handleOkPaymentNotification(new URLSearchParams({ ...okParams, sig: "deadbeef" }), badSigRes);
@@ -153,6 +154,14 @@ async function main() {
     await handleOkPaymentNotification(new URLSearchParams({ ...wrongPrice, sig: signPaymentParams(wrongPrice) }), wrongPriceRes);
     assert.strictEqual(JSON.parse(wrongPriceRes.body).error_code, 1001, "OK amount must match priceOk");
     assert.strictEqual((await request("GET", `/vk/matchhold-entitlements?${launchQuery("778")}`)).body.adsDisabled, false);
+
+    // Rate limit: 60 requests/min per user
+    const rateQ = launchQuery("5150");
+    let last = 200;
+    for (let i = 0; i < 61; i++) {
+        last = (await request("GET", `/vk/matchhold-entitlements?${rateQ}`)).status;
+    }
+    assert.strictEqual(last, 429, "61st request within a minute is throttled");
 
     // Savegames
     const saveQuery = launchQuery("321");

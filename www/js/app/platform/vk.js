@@ -40,12 +40,17 @@ define([], function() {
 
 	return {
 		name: 'vk',
+		priceKey: params.get('vk_client') == 'ok' ? 'PRICE_OK' : 'PRICE_VK', // цена в валюте площадки: голоса / ОКи
 
 		init: function() {
 			if(!inVk) return Promise.resolve({ lang: null });
-			var lang = params.get('vk_language') == 'ru' ? 'ru' : 'en';
+			var lang = params.get('vk_language') == 'en' ? 'en' : 'ru'; // правила VK 3.1.2: язык пользователя, по умолчанию русский
 			return loadBridge().then(function(b) {
 				bridge = b;
+				b && b.subscribe(function(e) {
+					// правила VK 2.2.5: при сворачивании глушим звук и ставим паузу (pause глушит аудио)
+					if(e.detail && e.detail.type == 'VKWebAppViewHide' && require('app/engine').isStarted()) require('app/eventmanager').trigger('pause');
+				});
 				return b && timeout(b.send('VKWebAppInit'), 8000);
 			}).catch(function() {}).then(function() {
 				return { lang: lang };

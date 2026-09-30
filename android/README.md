@@ -63,3 +63,8 @@ adb logcat -s Capacitor Capacitor/Console chromium
 ```
 На эмуляторе без RuStore/сервисов покупки вернут ошибку — это нормально; проверять оплату нужно на устройстве
 с установленным RuStore и тестовым платежом.
+
+## Анимированный сплэш
+`MainActivity.showLottieSplash()` рисует Lottie (`res/raw/splash_lottie.json`, библиотека `com.airbnb.android:lottie`) поверх WebView
+на фоне `#EEDCB2` (= `splash.png`, `windowSplashScreenBackground`). Снимается после загрузки страницы, но не раньше 1,4 с; страховка — 8 с.
+Тот же JSON лежит в `publish/vk/launch/` для экрана запуска VK. Перегенерация обоих: `python3 tools/gen_lottie.py`.
