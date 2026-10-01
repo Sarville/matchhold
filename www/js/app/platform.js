@@ -1,5 +1,6 @@
 // Общий слой платформ (Яндекс.Игры / VK+OK / Android RuStore). Платформу выбирает сборка: window.G_PLATFORM.
 // Провайдер (app/platform/<name>) возвращает объект:
+//   (необяз. вход: canAuth() -> bool, isAuthorized() -> bool, auth() -> Promise<bool>)
 //   name, init() -> Promise<{lang}>, ready(), load() -> Promise<{ts,data}|null>, save({ts,data}),
 //   gameplay(on) (необяз.), showBanner(), hideBanner(), showInterstitial() -> Promise<bool>, showRewarded() -> Promise<bool> (true = награда заслужена), adsPurchased() -> Promise<bool>, buyAdsOff() -> Promise<bool>
 // Все методы-промисы не реджектятся. Без G_PLATFORM (dev/web) слой ничего не делает.
@@ -82,6 +83,8 @@ define(['app/eventmanager'], function(E) {
 			try { require('app/ui').applyLang(); } catch(e) {} // поздняя загрузка провайдера; иначе подпишет ui.init
 		}
 		if(more) more.style.display = 'none';
+		var login = document.getElementById('btnLogin');
+		if(login) login.style.display = provider && provider.canAuth && provider.canAuth() && !provider.isAuthorized() ? '' : 'none';
 	}
 
 	function setAdsOff() {
@@ -102,6 +105,18 @@ define(['app/eventmanager'], function(E) {
 			adBusy = false;
 			if(!shown) lastAd = prev;
 			E.trigger('unpause');
+		});
+	}
+
+	// один раз на устройство, пока игрок не нажмёт «Позже» (не навязчиво); вход — кнопкой в настройках
+	function offerLogin() {
+		if(!provider || !provider.canAuth || !provider.canAuth() || provider.isAuthorized() || store('mh_auth_no')) return;
+		require('app/ui').modal({
+			title: 'AUTH_TITLE', text: 'AUTH_TEXT', locked: true,
+			buttons: [
+				{ text: 'LATER', click: function() { store('mh_auth_no', '1'); } },
+				{ text: 'LOGIN', click: function() { Platform.login(); } }
+			]
 		});
 	}
 
@@ -144,6 +159,7 @@ define(['app/eventmanager'], function(E) {
 				return p.adsPurchased();
 			}).then(function(bought) {
 				if(bought) setAdsOff();
+				setShopVisible();
 			}).then(finish, finish);
 		}, finish);
 	}
@@ -170,6 +186,24 @@ define(['app/eventmanager'], function(E) {
 
 		removeAds: buy,
 
+		// после входа аккаунт может хранить своё облачное сохранение: новее локального — берём его и перезагружаемся, иначе отправляем локальное
+		login: function() {
+			if(!provider || !provider.auth) return;
+			provider.auth().then(function(ok) {
+				setShopVisible();
+				if(!ok) return;
+				return provider.load().then(function(blob) {
+					if(blob && blob.data && blob.ts > (+store('mh_ts') || 0)) {
+						hydrate(blob);
+						location.reload();
+					} else {
+						lastSynced = null;
+						flush();
+					}
+				});
+			});
+		},
+
 		// реклама за награду (воскрешение / повтор ночи): награда только за реально показанную рекламу.
 		// Платформенная сборка без провайдера (офлайн, SDK не загрузился) — нет рекламы, нет награды; в dev без платформы выдаётся сразу
 		showRewarded: function() {
@@ -191,6 +225,7 @@ define(['app/eventmanager'], function(E) {
 			readyDone = true;
 			provider.ready();
 			adsOff || provider.showBanner();
+			offerLogin();
 		}
 	};
 

@@ -54,6 +54,20 @@ define(['app/eventmanager'], function(E) {
 			}).catch(function() { return { lang: null }; });
 		},
 
+		canAuth: function() { return !!(ysdk && player); },
+
+		isAuthorized: function() { return !!(player && player.isAuthorized()); },
+
+		auth: function() {
+			if(!ysdk) return Promise.resolve(false);
+			return ysdk.auth.openAuthDialog().then(function() {
+				return ysdk.getPlayer({ scopes: false });
+			}).then(function(p) {
+				player = p;
+				return p.isAuthorized();
+			}).catch(function() { return false; });
+		},
+
 		gameplay: function(on) {
 			if(!ysdk || playing == on) return;
 			playing = on;
