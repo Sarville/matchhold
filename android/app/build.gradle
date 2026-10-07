@@ -21,8 +21,8 @@ android {
         applicationId "ru.sarville.matchhold"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
         // RuStore Console -> приложение -> «ID приложения»: rustoreConsoleAppId в android/gradle.properties
         manifestPlaceholders = [rustoreConsoleAppId: project.findProperty("rustoreConsoleAppId") ?: "0"]
         // R-M-… блоки из кабинета РСЯ (gradle.properties или -P); по умолчанию демо-блоки Яндекса — не платят
