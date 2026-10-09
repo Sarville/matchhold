@@ -78,14 +78,13 @@ define([], function() {
 		priceKey: 'PRICE_RUB',
 
 		init: function() {
-			var lang = /^en/i.test(navigator.language || '') ? 'en' : 'ru'; // RuStore: русский по умолчанию, английский только для явной en-локали
-			if(!cap || !cap.nativePromise) return Promise.resolve({ lang: lang });
+			if(!cap || !cap.nativePromise) return Promise.resolve({ lang: 'ru', forceLang: true });
 			try { adsOff = localStorage.getItem(ADS_KEY) == '1'; } catch(e) {}
 			return pay('getConfig').then(function(c) {
 				if(c.bannerId) bannerId = c.bannerId;
 				if(c.interstitialId) interstitialId = c.interstitialId;
 				if(c.rewardedId) rewardedId = c.rewardedId;
-			}).catch(function() {}).then(function() { return { lang: lang }; });
+			}).catch(function() {}).then(function() { return { lang: 'ru', forceLang: true }; });
 		},
 
 		ready: function() {},

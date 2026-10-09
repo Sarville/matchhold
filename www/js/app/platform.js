@@ -64,13 +64,15 @@ define(['app/eventmanager'], function(E) {
 		provider.save(blob);
 	}
 
-	function applyLang(lang) {
+	function applyLang(lang, force) {
 		if(!lang) return;
 		var o = {};
 		try { o = JSON.parse(store('gameOptions')) || {}; } catch(e) {}
-		if(!o.lang) {
+		// force: один раз перезаписать ранее сохранённый язык (дальше выбор игрока в настройках уважается)
+		if(!o.lang || (force && !store('mh_langforced'))) {
 			o.lang = lang;
 			store('gameOptions', JSON.stringify(o));
+			if(force) store('mh_langforced', '1');
 		}
 	}
 
@@ -153,7 +155,7 @@ define(['app/eventmanager'], function(E) {
 					}
 					lastSynced = JSON.stringify(snapshot());
 					if(!blob) lastSynced = null;
-					applyLang(info && info.lang);
+					applyLang(info && info.lang, info && info.forceLang);
 				});
 			}).then(function() {
 				return p.adsPurchased();
